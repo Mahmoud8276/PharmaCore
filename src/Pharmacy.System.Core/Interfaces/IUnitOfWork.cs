@@ -16,6 +16,7 @@ namespace Pharmacy.System.Core.Interfaces
         public IProductActiveIngredientRepository ProductActiveIngredientRepository { get; }
         public IProductPackagingLevelRepository ProductPackagingLevelRepository { get; }
         public IPackagingUnitRepository PackagingUnitRepository { get; }
+        public ISupplierRepository SupplierRepository { get; }
 
         public Task CompleteAsync();
         public Task<IDbContextTransaction> BeginTransactionAsync();

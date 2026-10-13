@@ -17,14 +17,9 @@ namespace Pharmacy.System.Core.Dtos.SupplierDtos
 
         [AllowedImageTypes("png", "jpg", "jpeg", "webp")]
         public IFormFile? Logo { get; set; }
-        public List<SupplierPhoneNumberDto> PhoneNumbers { get; set; } = new List<SupplierPhoneNumberDto>();
+        
+        [MinLength(1, ErrorMessage = "At least one phone number must be provided!")]
+        public List<string> PhoneNumbers { get; set; } = new List<string>();
 
-    }
-
-    public class SupplierPhoneNumberDto
-    {
-        [Required(ErrorMessage = "Supplier Phone Number Is Required")]
-        [Phone]
-        public string Number { get; set; } = null!;
     }
 }

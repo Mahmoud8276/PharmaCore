@@ -520,9 +520,12 @@ namespace Pharmacy.System.Infrastructure.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("Name")
+                        .IsUnique();
 
                     b.ToTable("Suppliers");
                 });
@@ -794,12 +797,6 @@ namespace Pharmacy.System.Infrastructure.Migrations
 
                             b1.WithOwner()
                                 .HasForeignKey("SupplierId");
-
-                            b1.HasOne("Pharmacy.System.Core.Models.Supply", null)
-                                .WithMany()
-                                .HasForeignKey("SupplierId")
-                                .OnDelete(DeleteBehavior.Cascade)
-                                .IsRequired();
                         });
 
                     b.Navigation("PhoneNumbers");

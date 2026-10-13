@@ -21,6 +21,7 @@ namespace Pharmacy.System.Infrastructure.Repositories
         private readonly Lazy<IProductPackagingLevelRepository> _productPackagingLevelRepository;
         private readonly Lazy<IPackagingUnitRepository> _packagingUnitRepository;
         private readonly Lazy<ISupplierRepository> _supplierRepository;
+        private readonly Lazy<ISupplyRepository> _supplyRepository;
 
 
         public UnitOfWork(AppDbContext context)
@@ -37,6 +38,7 @@ namespace Pharmacy.System.Infrastructure.Repositories
             _productPackagingLevelRepository = new Lazy<IProductPackagingLevelRepository>(() => new ProductPackagingLevelRepository(_context));
             _packagingUnitRepository = new Lazy<IPackagingUnitRepository>(() => new PackagingUnitRepository(_context));
             _supplierRepository = new Lazy<ISupplierRepository>(() => new SupplierRepository(_context));
+            _supplyRepository = new Lazy<ISupplyRepository>(() => new SupplyRepository(_context));
         }
 
         public IProductRepository ProductRepository => _productRepository.Value;
@@ -49,6 +51,7 @@ namespace Pharmacy.System.Infrastructure.Repositories
         public IProductPackagingLevelRepository ProductPackagingLevelRepository => _productPackagingLevelRepository.Value;
         public IPackagingUnitRepository PackagingUnitRepository => _packagingUnitRepository.Value;
         public ISupplierRepository SupplierRepository => _supplierRepository.Value;
+        public ISupplyRepository SupplyRepository => _supplyRepository.Value;
 
 
 

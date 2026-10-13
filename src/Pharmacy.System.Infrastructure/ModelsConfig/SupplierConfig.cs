@@ -16,11 +16,9 @@ namespace Pharmacy.System.Infrastructure.ModelsConfig
                 pn.Property(p => p.Number).IsRequired();
                 pn.HasIndex(p => p.Number).IsUnique();
                 
-                pn.HasOne<Supply>()
-                .WithMany()
-                .HasForeignKey("SupplierId")
-                .OnDelete(DeleteBehavior.Cascade);
             });
+
+            builder.HasIndex(x => x.Name).IsUnique();
         }
     }
 }

@@ -5,6 +5,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Pharmacy.System.Core.Dtos.ProductDtos;
 using Pharmacy.System.Core.Dtos.ProductPackagingDtos;
+using Pharmacy.System.Core.Dtos.SupplierDtos;
+using System.Linq;
 
 namespace Pharmacy.System.Services.ApplicatoinServicesConfig
 {
@@ -37,6 +39,19 @@ namespace Pharmacy.System.Services.ApplicatoinServicesConfig
                 .NewConfig()
                 .Map(dest => dest.PackagingUnitName, src => src.PackagingUnit.Name)
                 .Map(dest => dest.ChildPackagingUnitQuantity, src => src.QuantityOfChildPackage);
+
+            TypeAdapterConfig<Supplier, SupplierDetailsDto>
+                .NewConfig()
+                .Map(dest => dest.Logo, src => src.Logo == null ? null : $"{BaseUrl}/files/ProductImages/{src.Logo}")
+                .Map(dest => dest.PhoneNumbers, src => src.PhoneNumbers.Select(x=>x.Number));
+
+            TypeAdapterConfig<SupplierDto, Supplier>
+                .NewConfig()
+                .Map(dest => dest.PhoneNumbers, src => src.PhoneNumbers.Select(x=>new SupplierPhoneNumber() { Number = x}));
+
+            TypeAdapterConfig<UpdateSupplierDto, Supplier>
+                .NewConfig()
+                .Map(dest => dest.PhoneNumbers, src => src.PhoneNumbers.Select(x=>new SupplierPhoneNumber() { Number = x}));
 
             return services;
         }

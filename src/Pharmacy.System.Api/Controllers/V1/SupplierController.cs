@@ -38,9 +38,30 @@ namespace Pharmacy.System.Api.Controllers.V1
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateAsync(int id, [FromForm] SupplierDto dto)
+        public async Task<IActionResult> UpdateAsync(int id, [FromForm] UpdateSupplierDto dto)
         {
             var response = await _supplierService.UpdateAsync(id, dto);
+            return StatusCode(response.StatusCode, response);
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteAsync(int id)
+        {
+            var response = await _supplierService.DeleteAsync(id);
+            return StatusCode(response.StatusCode, response);
+        }
+
+        [HttpPut("{id}/logo")]
+        public async Task<IActionResult> UpdateLogoAsync(int id, [FromForm] UpdateSupplierLogoDto dto)
+        {
+            var response = await _supplierService.UpdateLogoAsync(id, dto);
+            return StatusCode(response.StatusCode, response);
+        }
+
+        [HttpDelete("{id}/logo")]
+        public async Task<IActionResult> DeleteLogoAsync(int id)
+        {
+            var response = await _supplierService.DeleteLogoAsync(id);
             return StatusCode(response.StatusCode, response);
         }
     }

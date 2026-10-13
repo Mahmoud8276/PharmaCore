@@ -59,7 +59,7 @@ namespace Pharmacy.System.Services.IServices
         /// A <see cref="Response"/> containing the updated supplier on success,
         /// or a not-found or validation error on failure.
         /// </returns>
-        public Task<Response> UpdateAsync(int id, SupplierDto dto);
+        public Task<Response> UpdateAsync(int id, UpdateSupplierDto dto);
 
         /// <summary>
         /// Deletes a supplier.
@@ -70,10 +70,27 @@ namespace Pharmacy.System.Services.IServices
         /// or a not-found or business error on failure.
         /// </returns>
         /// <remarks>
-        /// A supplier that already has supplies, payments or returns should not be
-        /// permanently removed, because that history must stay readable. Implementations
-        /// should prefer a soft delete or reject the request in that case.
+        /// A supplier that already has supplies, payments or returns should not be removed.
         /// </remarks>
         public Task<Response> DeleteAsync(int id);
+
+        /// <summary>
+        /// Updates supplier's logo image
+        /// </summary>
+        /// <param name="id">The unique identifier of the supplier</param>
+        /// <param name="dto">The DTO containing the new logo image of the supplier</param>
+        /// <returns>
+        /// A <see cref="Response"/> indicating whether the update process succedded or not.
+        /// </returns>
+        public Task<Response> UpdateLogoAsync(int id, UpdateSupplierLogoDto dto);
+
+        /// <summary>
+        /// Delete supplier's logo image
+        /// </summary>
+        /// <param name="id">The unique identifier of the supplier</param>
+        /// <returns>
+        /// A <see cref="Response"/> indicating whether the deletion succeeded or a not.
+        /// </returns>
+        public Task<Response> DeleteLogoAsync(int id);
     }
 }

@@ -17,7 +17,7 @@ namespace Pharmacy.System.Infrastructure.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Email = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Address = table.Column<string>(type: "nvarchar(max)", nullable: true),
@@ -26,6 +26,26 @@ namespace Pharmacy.System.Infrastructure.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Suppliers", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "SupplierPhoneNumber",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Number = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    SupplierId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_SupplierPhoneNumber", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_SupplierPhoneNumber_Suppliers_SupplierId",
+                        column: x => x.SupplierId,
+                        principalTable: "Suppliers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -52,32 +72,6 @@ namespace Pharmacy.System.Infrastructure.Migrations
                         onDelete: ReferentialAction.Restrict);
                 });
 
-            migrationBuilder.CreateTable(
-                name: "SupplierPhoneNumber",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Number = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    SupplierId = table.Column<int>(type: "int", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_SupplierPhoneNumber", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_SupplierPhoneNumber_Suppliers_SupplierId",
-                        column: x => x.SupplierId,
-                        principalTable: "Suppliers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_SupplierPhoneNumber_Supplies_SupplierId",
-                        column: x => x.SupplierId,
-                        principalTable: "Supplies",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
             migrationBuilder.CreateIndex(
                 name: "IX_SupplierPhoneNumber_Number",
                 table: "SupplierPhoneNumber",
@@ -88,6 +82,12 @@ namespace Pharmacy.System.Infrastructure.Migrations
                 name: "IX_SupplierPhoneNumber_SupplierId",
                 table: "SupplierPhoneNumber",
                 column: "SupplierId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Suppliers_Name",
+                table: "Suppliers",
+                column: "Name",
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_Supplies_SupplierId",

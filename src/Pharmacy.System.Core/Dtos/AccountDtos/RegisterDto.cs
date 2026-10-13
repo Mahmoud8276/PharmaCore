@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http;
+using Pharmacy.System.Core.Attributes;
 using System.ComponentModel.DataAnnotations;
 
 namespace Pharmacy.System.Core.Dtos.AccountDtos
@@ -28,6 +29,7 @@ namespace Pharmacy.System.Core.Dtos.AccountDtos
         [Phone(ErrorMessage = "Invalid Phone Number!")]
         public string PhoneNumber { get; set; }
 
+        [AllowedImageTypes("png", "jpg", "jpeg", "webp")]
         public IFormFile? UserImage { get; set; }
     }
 }

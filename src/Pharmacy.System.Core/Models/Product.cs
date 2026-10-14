@@ -5,8 +5,8 @@ namespace Pharmacy.System.Core.Models
 {
     public class Product : BaseModel<int>
     {
-        public string Name { get; set; }
-        public string Barcode { get; set; }
+        public string Name { get; set; } = null!;
+        public string Barcode { get; set; } = null!;
         public string? Description { get; set; }
         public double? MinimumStockLevel { get; set; }
         public string? Image { get; set; }

@@ -12,6 +12,9 @@ namespace Pharmacy.System.Infrastructure.ModelsConfig
                    .WithMany()
                    .HasForeignKey(s => s.SupplierId)
                    .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Property(x => x.TotalCost).HasPrecision(18, 4);
+            builder.Property(x => x.DiscountPercentage).HasPrecision(18, 4);
         }
     }
 }

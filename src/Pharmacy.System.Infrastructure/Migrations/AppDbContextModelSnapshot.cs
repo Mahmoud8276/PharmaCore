@@ -541,26 +541,88 @@ namespace Pharmacy.System.Infrastructure.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<decimal>("DiscountPercintage")
+                    b.Property<decimal>("DiscountPercentage")
+                        .HasPrecision(18, 4)
+                        .HasColumnType("decimal(18,4)");
+
+                    b.Property<decimal>("FinalCost")
                         .HasColumnType("decimal(18,2)");
+
+                    b.Property<bool>("IsConfirmed")
+                        .HasColumnType("bit");
 
                     b.Property<int>("PaymentStatus")
                         .HasColumnType("int");
 
-                    b.Property<DateTime>("ReceivedAt")
-                        .HasColumnType("datetime2");
+                    b.Property<DateOnly>("ReceivedAt")
+                        .HasColumnType("date");
 
                     b.Property<int>("SupplierId")
                         .HasColumnType("int");
 
                     b.Property<decimal>("TotalCost")
-                        .HasColumnType("decimal(18,2)");
+                        .HasPrecision(18, 4)
+                        .HasColumnType("decimal(18,4)");
+
+                    b.Property<bool>("UserPaidConfirmation")
+                        .HasColumnType("bit");
 
                     b.HasKey("Id");
 
                     b.HasIndex("SupplierId");
 
                     b.ToTable("Supplies");
+                });
+
+            modelBuilder.Entity("Pharmacy.System.Core.Models.SupplyItem", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<decimal>("BaseUnitsPerReceivedUnit")
+                        .HasPrecision(18, 4)
+                        .HasColumnType("decimal(18,4)");
+
+                    b.Property<decimal>("EffectiveUnitCost")
+                        .HasPrecision(18, 4)
+                        .HasColumnType("decimal(18,4)");
+
+                    b.Property<DateOnly>("ExpiryDate")
+                        .HasColumnType("date");
+
+                    b.Property<int?>("PackagingLevelId")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("PricePerUnit")
+                        .HasPrecision(18, 4)
+                        .HasColumnType("decimal(18,4)");
+
+                    b.Property<int?>("ProductId")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("Quantity")
+                        .HasPrecision(18, 4)
+                        .HasColumnType("decimal(18,4)");
+
+                    b.Property<int>("SupplyId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("UnitName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PackagingLevelId");
+
+                    b.HasIndex("ProductId");
+
+                    b.HasIndex("SupplyId");
+
+                    b.ToTable("SupplyItem");
                 });
 
             modelBuilder.Entity("Pharmacy.System.Core.Models.UnitFamily", b =>
@@ -813,6 +875,120 @@ namespace Pharmacy.System.Infrastructure.Migrations
                     b.Navigation("Supplier");
                 });
 
+            modelBuilder.Entity("Pharmacy.System.Core.Models.SupplyItem", b =>
+                {
+                    b.HasOne("Pharmacy.System.Core.Models.ProductPackagingLevel", "PackagingLevel")
+                        .WithMany()
+                        .HasForeignKey("PackagingLevelId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("Pharmacy.System.Core.Models.Product", "Product")
+                        .WithMany()
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("Pharmacy.System.Core.Models.Supply", "Supply")
+                        .WithMany("Items")
+                        .HasForeignKey("SupplyId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.OwnsMany("Pharmacy.System.Core.Models.PackagingLevelSnapshot", "PackagingLevelsSnapshot", b1 =>
+                        {
+                            b1.Property<int>("SupplyItemId")
+                                .HasColumnType("int");
+
+                            b1.Property<int>("Id")
+                                .ValueGeneratedOnAdd()
+                                .HasColumnType("int");
+
+                            b1.Property<int>("LevelId")
+                                .HasColumnType("int");
+
+                            b1.Property<int>("PackagingUnitId")
+                                .HasColumnType("int");
+
+                            b1.Property<int?>("ParentId")
+                                .HasColumnType("int");
+
+                            b1.Property<decimal>("QuantityOfBaseUnit")
+                                .HasPrecision(18, 4)
+                                .HasColumnType("decimal(18,4)");
+
+                            b1.Property<decimal>("QuantityOfChildPackage")
+                                .HasPrecision(18, 4)
+                                .HasColumnType("decimal(18,4)");
+
+                            b1.Property<string>("UnitName")
+                                .IsRequired()
+                                .HasColumnType("nvarchar(max)");
+
+                            b1.HasKey("SupplyItemId", "Id");
+
+                            b1.ToTable("SupplyItem");
+
+                            b1.ToJson("PackagingLevelsSnapshot");
+
+                            b1.WithOwner()
+                                .HasForeignKey("SupplyItemId");
+                        });
+
+                    b.OwnsOne("Pharmacy.System.Core.Models.ProductSnapshot", "ProductSnapshot", b1 =>
+                        {
+                            b1.Property<int>("SupplyItemId")
+                                .HasColumnType("int");
+
+                            b1.Property<string>("ActiveIngredientNames")
+                                .IsRequired()
+                                .HasColumnType("nvarchar(max)");
+
+                            b1.Property<string>("Barcode")
+                                .IsRequired()
+                                .HasColumnType("nvarchar(max)");
+
+                            b1.Property<string>("CategoryName")
+                                .IsRequired()
+                                .HasColumnType("nvarchar(max)");
+
+                            b1.Property<string>("Description")
+                                .HasColumnType("nvarchar(max)");
+
+                            b1.Property<string>("ManufacturerName")
+                                .HasColumnType("nvarchar(max)");
+
+                            b1.Property<string>("Name")
+                                .IsRequired()
+                                .HasColumnType("nvarchar(max)");
+
+                            b1.Property<string>("ProductFormName")
+                                .IsRequired()
+                                .HasColumnType("nvarchar(max)");
+
+                            b1.Property<int>("productId")
+                                .HasColumnType("int");
+
+                            b1.HasKey("SupplyItemId");
+
+                            b1.ToTable("SupplyItem");
+
+                            b1.ToJson("ProductSnapshot");
+
+                            b1.WithOwner()
+                                .HasForeignKey("SupplyItemId");
+                        });
+
+                    b.Navigation("PackagingLevel");
+
+                    b.Navigation("PackagingLevelsSnapshot");
+
+                    b.Navigation("Product");
+
+                    b.Navigation("ProductSnapshot")
+                        .IsRequired();
+
+                    b.Navigation("Supply");
+                });
+
             modelBuilder.Entity("Pharmacy.System.Core.Models.ActiveIngredient", b =>
                 {
                     b.Navigation("ProductActiveIngredients");
@@ -828,6 +1004,11 @@ namespace Pharmacy.System.Infrastructure.Migrations
                     b.Navigation("ProductActiveIngredients");
 
                     b.Navigation("ProductPackagingLevels");
+                });
+
+            modelBuilder.Entity("Pharmacy.System.Core.Models.Supply", b =>
+                {
+                    b.Navigation("Items");
                 });
 #pragma warning restore 612, 618
         }

@@ -36,7 +36,7 @@ namespace Pharmacy.System.Services.Services
             if(await _unitOfWork.SupplierRepository.AnyAsync(x=>x.Name == dto.Name))
             {
                 return Response.Fail(
-                    message: "There is already a supplier with this name!",
+                    message: "Supplier with the same name already exists!",
                     statusCode: (int)HttpStatusCode.Conflict);
             }
 
@@ -44,7 +44,7 @@ namespace Pharmacy.System.Services.Services
                 await _unitOfWork.SupplierRepository.AnyAsync(x=>x.Email == dto.Email))
             {
                 return Response.Fail(
-                    message: "There is already a supplier with this email!",
+                    message: "Supplier with the same email already exists!",
                     statusCode: (int)HttpStatusCode.Conflict);
             }
 
@@ -54,7 +54,7 @@ namespace Pharmacy.System.Services.Services
                     p => dto.PhoneNumbers.Contains(p.Number))))
             {
                 return Response.Fail(
-                    message: "One or more phone numbers already belong to a supplier!",
+                    message: "One or more phone numbers already belongs to a supplier!",
                     statusCode: (int)HttpStatusCode.Conflict);
             }
 
@@ -110,14 +110,14 @@ namespace Pharmacy.System.Services.Services
             if (supplier == null)
             {
                 return Response.Fail(
-                    message: "Supplier Not Found!",
+                    message: "Supplier not found!",
                     statusCode: (int)HttpStatusCode.NotFound);
             }
 
             if (await _unitOfWork.SupplyRepository.AnyAsync(x => x.SupplierId == id))
             {
                 return Response.Fail(
-                    message: "Cannot delete this supplier, because it is associated with one or more supplies!",
+                    message: "Cannot delete supplier with existing supplies!",
                     statusCode: (int)HttpStatusCode.Conflict);
             }
 
@@ -177,7 +177,7 @@ namespace Pharmacy.System.Services.Services
             if (supplier == null)
             {
                 return Response.Fail(
-                    message: "Supplier Not Found!",
+                    message: "Supplier not found!",
                     statusCode: (int)HttpStatusCode.NotFound);
             }
 
@@ -191,7 +191,7 @@ namespace Pharmacy.System.Services.Services
             if (await _unitOfWork.SupplierRepository.AnyAsync(x => x.Id != id && x.Name == dto.Name))
             {
                 return Response.Fail(
-                    message: "There is already a supplier with this name!",
+                    message: "Supplier with the same name already exists!",
                     statusCode: (int)HttpStatusCode.Conflict);
             }
 
@@ -199,7 +199,7 @@ namespace Pharmacy.System.Services.Services
                 await _unitOfWork.SupplierRepository.AnyAsync(x => x.Id != id && x.Email == dto.Email))
             {
                 return Response.Fail(
-                    message: "There is already a supplier with this email!",
+                    message: "Supplier with the same email already exists!",
                     statusCode: (int)HttpStatusCode.Conflict);
             }
 
@@ -209,7 +209,7 @@ namespace Pharmacy.System.Services.Services
                     p => dto.PhoneNumbers.Contains(p.Number))))
             {
                 return Response.Fail(
-                    message: "One or more phone numbers already belong to a supplier!",
+                    message: "One or more phone numbers already belongs to a supplier!",
                     statusCode: (int)HttpStatusCode.Conflict);
             }
 
@@ -219,7 +219,7 @@ namespace Pharmacy.System.Services.Services
             if (supplier == null)
             {
                 return Response.Fail(
-                    message: "Supplier Not Found!",
+                    message: "Supplier not found!",
                     statusCode: (int)HttpStatusCode.NotFound);
             }
 

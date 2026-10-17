@@ -2,6 +2,8 @@
 using Pharmacy.System.Core.Models;
 using System.Linq.Expressions;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Pharmacy.System.Services.Specifications
 {
@@ -25,6 +27,17 @@ namespace Pharmacy.System.Services.Specifications
         }
 
         public ProductSpecification(int ProductId) : base(x => x.Id == ProductId)
+        {
+            AddInclude(x => x.Category);
+            AddInclude(x => x.ProductForm);
+            AddInclude(x => x.Manufacturer);
+            AddInclude(x => x.ProductActiveIngredients);
+            AddInclude(x => x.ProductPackagingLevels);
+            AddInclude("ProductActiveIngredients.ActiveIngredient");
+        }
+
+        public ProductSpecification(IEnumerable<int> productIds)
+            : base(x => productIds.ToHashSet().Contains(x.Id))
         {
             AddInclude(x => x.Category);
             AddInclude(x => x.ProductForm);

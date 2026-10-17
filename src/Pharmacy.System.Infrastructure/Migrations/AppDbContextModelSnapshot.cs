@@ -610,6 +610,9 @@ namespace Pharmacy.System.Infrastructure.Migrations
                     b.Property<int>("SupplyId")
                         .HasColumnType("int");
 
+                    b.Property<decimal>("TotalBaseUnits")
+                        .HasColumnType("decimal(18,2)");
+
                     b.Property<string>("UnitName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");

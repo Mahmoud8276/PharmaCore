@@ -1,4 +1,6 @@
 ﻿using Pharmacy.System.Core.Models;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Pharmacy.System.Services.Specifications
 {
@@ -14,6 +16,13 @@ namespace Pharmacy.System.Services.Specifications
             : base(x=> 
             (!productId.HasValue || x.ProductId == productId) &&
             (!packagingUnitId.HasValue || x.PackagingUnitId == packagingUnitId))
+        {
+            AddInclude(x => x.Product);
+            AddInclude(x => x.PackagingUnit);
+        }
+
+        public ProductPackagingLevelSpecification(IEnumerable<int> packagingLevelIds):
+            base(x => packagingLevelIds.ToHashSet().Contains(x.Id))
         {
             AddInclude(x => x.Product);
             AddInclude(x => x.PackagingUnit);

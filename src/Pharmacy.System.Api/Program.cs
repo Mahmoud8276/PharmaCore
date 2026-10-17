@@ -31,8 +31,8 @@ builder.Services.AddEndpointsApiExplorer();
 
 builder.Services.AddSwaggerGen(options => {
 
-    options.SwaggerDoc("v1", new OpenApiInfo() { Title = "Atlas Template", Version = "1.0" });
-    options.SwaggerDoc("v2", new OpenApiInfo() { Title = "Atlas Template", Version = "2.0" });
+    options.SwaggerDoc("v1", new OpenApiInfo() { Title = "Pharmacy System", Version = "1.0" });
+    options.SwaggerDoc("v2", new OpenApiInfo() { Title = "Pharmacy System", Version = "2.0" });
     options.UseInlineDefinitionsForEnums();
     options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {

@@ -21,6 +21,7 @@ namespace Pharmacy.System.Services.ApplicatoinServicesConfig
              services.AddScoped<IPackagingUnitService, PackagingUnitService>();
              services.AddScoped<IProductPackagingService, ProductPackagingService>();
              services.AddScoped<ISupplierService, SupplierService>();
+             services.AddScoped<ISupplyService, SupplyService>();
 
             return services;
         }

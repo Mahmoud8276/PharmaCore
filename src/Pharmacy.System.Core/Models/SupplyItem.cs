@@ -11,11 +11,11 @@ namespace Pharmacy.System.Core.Models
         public Supply Supply { get; set; } = null!;
 
         public decimal Quantity { get; set; }
-        public decimal BaseUnitsPerReceivedUnit { get; set; }
-        public decimal TotalBaseUnits { get; set; }
-        public string UnitName { get; set; } = null!;
+        public decimal BaseUnitsPerReceivedUnit { get; set; } // Not covered with mapping
+        public decimal TotalBaseUnits { get; set; } // Not covered with mapping
+        public string UnitName { get; set; } = null!; // Not covered with mapping
         public decimal PricePerUnit { get; set; }
-        public decimal EffectiveUnitCost { get; set; }
+        public decimal EffectiveUnitCost { get; set; } // Not covered with mapping
         public DateOnly ExpiryDate { get; set; }
         public ProductSnapshot ProductSnapshot { get; set; } = null!;
         public List<PackagingLevelSnapshot> PackagingLevelsSnapshot { get; set; } = new List<PackagingLevelSnapshot>();

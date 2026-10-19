@@ -7,9 +7,7 @@ using Pharmacy.System.Services.SpecificationParams;
 using Mapster;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using System.Collections.Generic;
 using System.Linq;
-using System.Net;
 using System.Threading.Tasks;
 
 namespace Pharmacy.System.Services.Services
@@ -60,8 +58,7 @@ namespace Pharmacy.System.Services.Services
         {
             var user = await _userManager.FindByIdAsync(id);
             if(user == null)
-                return Response.Fail(message: "User not found", 
-                    statusCode: (int)HttpStatusCode.NotFound);
+                return Response.NotFound(message: "User not found");
 
             var userData = user.Adapt<UserDetailsDto>();
             userData.Roles = (await _userManager.GetRolesAsync(user)).ToList();

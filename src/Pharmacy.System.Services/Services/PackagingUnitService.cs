@@ -1,5 +1,4 @@
-﻿using FluentValidation;
-using Pharmacy.System.Core.Dtos.PackagingUnitDtos;
+﻿using Pharmacy.System.Core.Dtos.PackagingUnitDtos;
 using Pharmacy.System.Core.Interfaces;
 using Pharmacy.System.Core.Interfaces.IRepositories;
 using Pharmacy.System.Core.Models;
@@ -7,7 +6,6 @@ using Pharmacy.System.Services.IServices;
 using Pharmacy.System.Services.Responses;
 using Pharmacy.System.Services.SpecificationParams;
 using Pharmacy.System.Services.Specifications;
-using System.Net;
 using System.Threading.Tasks;
 
 namespace Pharmacy.System.Services.Services
@@ -34,9 +32,8 @@ namespace Pharmacy.System.Services.Services
         {
             if (await _unitOfWork.ProductPackagingLevelRepository.AnyAsync(x => x.PackagingUnitId == entity.Id))
             {
-                return Response.Fail(
-                    message: "Cannot delete packaging unit because it is associated with one or more products.",
-                    statusCode: (int)HttpStatusCode.Conflict);
+                return Response.Conflict(
+                    message: "Cannot delete packaging unit because it is associated with one or more products.");
             }
             return Response.Success();
         }

@@ -9,7 +9,6 @@ using Pharmacy.System.Services.Responses;
 using Pharmacy.System.Services.SpecificationParams;
 using Pharmacy.System.Services.Specifications;
 using System.Collections.Generic;
-using System.Net;
 using System.Threading.Tasks;
 
 namespace Pharmacy.System.Services.Services
@@ -35,26 +34,23 @@ namespace Pharmacy.System.Services.Services
             await _unitOfWork.ProductCategoryRepository.AddAsync(productCategory);
             await _unitOfWork.CompleteAsync();
 
-            return Response.Success(
+            return Response.Created(
                 data: productCategory.Adapt<ProductCategoryDetailsDto>(),
-                message: "Product Category Created Successfully!",
-                statusCode: (int)HttpStatusCode.Created);
+                message: "Product Category Created Successfully!");
         }
 
         public async Task<Response> DeleteAsync(int id)
         {
             var productCategory = await _unitOfWork.ProductCategoryRepository.GetByIdAsync(id);
             if (productCategory == null)
-                return Response.Fail(
-                    message: "Product category not found!",
-                    statusCode: (int)HttpStatusCode.NotFound);
+                return Response.NotFound(
+                    message: "Product category not found!");
 
             if (await _unitOfWork.ProductRepository.AnyAsync(x => x.CategoryId == id))
             {
-                return Response.Fail(
+                return Response.Conflict(
                     message: "Could not delete this product category", 
-                    details: $"{productCategory.Name} product category has one or more products associated with it!",
-                    statusCode: (int)HttpStatusCode.Conflict);
+                    details: $"{productCategory.Name} product category has one or more products associated with it!");
             }
 
             _unitOfWork.ProductCategoryRepository.Delete(productCategory);
@@ -86,9 +82,8 @@ namespace Pharmacy.System.Services.Services
         {
             var productCategory = await _unitOfWork.ProductCategoryRepository.GetByIdAsync(id);
             if (productCategory == null)
-                return Response.Fail(
-                    message: "Product category not found!",
-                    statusCode: (int)HttpStatusCode.NotFound);
+                return Response.NotFound(
+                    message: "Product category not found!");
 
             return Response.Success(
                 data: productCategory.Adapt<ProductCategoryDetailsDto>(),
@@ -99,9 +94,8 @@ namespace Pharmacy.System.Services.Services
         {
             var productCategory = await _unitOfWork.ProductCategoryRepository.GetByIdAsync(id);
             if (productCategory == null)
-                return Response.Fail(
-                    message: "Product category not found!",
-                    statusCode: (int)HttpStatusCode.NotFound);
+                return Response.NotFound(
+                    message: "Product category not found!");
 
             dto.Adapt(productCategory);
 

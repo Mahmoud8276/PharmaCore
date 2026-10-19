@@ -6,7 +6,6 @@ using Pharmacy.System.Services.IServices;
 using Pharmacy.System.Services.Responses;
 using Pharmacy.System.Services.SpecificationParams;
 using Pharmacy.System.Services.Specifications;
-using System.Net;
 using System.Threading.Tasks;
 
 namespace Pharmacy.System.Services.Services
@@ -30,9 +29,8 @@ namespace Pharmacy.System.Services.Services
         {
             if(await _unitOfWork.ProductActiveIngredientRepository.AnyAsync(x => x.ActiveIngredientId == entity.Id))
             {
-                return Response.Fail(
-                    message: "Cannot delete active ingredient because it is associated with one or more products.",
-                    statusCode: (int)HttpStatusCode.Conflict);
+                return Response.Conflict(
+                    message: "Cannot delete active ingredient because it is associated with one or more products.");
             }
 
             return Response.Success();

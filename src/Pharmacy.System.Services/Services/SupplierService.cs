@@ -13,7 +13,6 @@ using Pharmacy.System.Services.Specifications;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net;
 using System.Threading.Tasks;
 
 namespace Pharmacy.System.Services.Services
@@ -35,17 +34,15 @@ namespace Pharmacy.System.Services.Services
         {
             if(await _unitOfWork.SupplierRepository.AnyAsync(x=>x.Name == dto.Name))
             {
-                return Response.Fail(
-                    message: "Supplier with the same name already exists!",
-                    statusCode: (int)HttpStatusCode.Conflict);
+                return Response.Conflict(
+                    message: "Supplier with the same name already exists!");
             }
 
             if(dto.Email != null &&
                 await _unitOfWork.SupplierRepository.AnyAsync(x=>x.Email == dto.Email))
             {
-                return Response.Fail(
-                    message: "Supplier with the same email already exists!",
-                    statusCode: (int)HttpStatusCode.Conflict);
+                return Response.Conflict(
+                    message: "Supplier with the same email already exists!");
             }
 
             if(dto.PhoneNumbers.Count > 0 &&
@@ -53,9 +50,8 @@ namespace Pharmacy.System.Services.Services
                 x=>x.PhoneNumbers.Any(
                     p => dto.PhoneNumbers.Contains(p.Number))))
             {
-                return Response.Fail(
-                    message: "One or more phone numbers already belongs to a supplier!",
-                    statusCode: (int)HttpStatusCode.Conflict);
+                return Response.Conflict(
+                    message: "One or more phone numbers already belongs to a supplier!");
             }
 
 
@@ -72,8 +68,7 @@ namespace Pharmacy.System.Services.Services
                 {
                     _logger.LogWarning(ex, "Failed to upload logo file for the created supplier.");
                     return Response.Fail(
-                        message: "Failed to upload the supplier logo!",
-                        statusCode: (int)HttpStatusCode.BadRequest);
+                        message: "Failed to upload the supplier logo!");
                 }
             }
 
@@ -98,9 +93,8 @@ namespace Pharmacy.System.Services.Services
                 throw;
             }
 
-            return Response.Success(
+            return Response.Created(
                 message: "Supplier created successfully",
-                statusCode: (int)HttpStatusCode.Created,
                 data: supplier.Adapt<SupplierDetailsDto>());
         }
 
@@ -109,16 +103,14 @@ namespace Pharmacy.System.Services.Services
             var supplier = await _unitOfWork.SupplierRepository.GetByIdAsync(id);
             if (supplier == null)
             {
-                return Response.Fail(
-                    message: "Supplier not found!",
-                    statusCode: (int)HttpStatusCode.NotFound);
+                return Response.NotFound(
+                    message: "Supplier not found!");
             }
 
             if (await _unitOfWork.SupplyRepository.AnyAsync(x => x.SupplierId == id))
             {
-                return Response.Fail(
-                    message: "Cannot delete supplier with existing supplies!",
-                    statusCode: (int)HttpStatusCode.Conflict);
+                return Response.Conflict(
+                    message: "Cannot delete supplier with existing supplies!");
             }
 
             var logo = supplier.Logo;
@@ -131,9 +123,8 @@ namespace Pharmacy.System.Services.Services
             catch (DbUpdateException ex)
             {
                 _logger.LogWarning(ex, "Delete blocked by FK for supplier {Id}", id);
-                return Response.Fail(
-                    message: "Cannot delete this supplier, because it is referenced by other records!",
-                    statusCode: (int)HttpStatusCode.Conflict);
+                return Response.Conflict(
+                    message: "Cannot delete this supplier, because it is referenced by other records!");
             }
 
             if (logo != null)
@@ -176,9 +167,8 @@ namespace Pharmacy.System.Services.Services
                 new SupplierSpecification(id));
             if (supplier == null)
             {
-                return Response.Fail(
-                    message: "Supplier not found!",
-                    statusCode: (int)HttpStatusCode.NotFound);
+                return Response.NotFound(
+                    message: "Supplier not found!");
             }
 
             return Response.Success(
@@ -190,17 +180,15 @@ namespace Pharmacy.System.Services.Services
         {
             if (await _unitOfWork.SupplierRepository.AnyAsync(x => x.Id != id && x.Name == dto.Name))
             {
-                return Response.Fail(
-                    message: "Supplier with the same name already exists!",
-                    statusCode: (int)HttpStatusCode.Conflict);
+                return Response.Conflict(
+                    message: "Supplier with the same name already exists!");
             }
 
             if (dto.Email != null &&
                 await _unitOfWork.SupplierRepository.AnyAsync(x => x.Id != id && x.Email == dto.Email))
             {
-                return Response.Fail(
-                    message: "Supplier with the same email already exists!",
-                    statusCode: (int)HttpStatusCode.Conflict);
+                return Response.Conflict(
+                    message: "Supplier with the same email already exists!");
             }
 
             if (dto.PhoneNumbers.Count > 0 &&
@@ -208,9 +196,8 @@ namespace Pharmacy.System.Services.Services
                 x => x.Id != id && x.PhoneNumbers.Any(
                     p => dto.PhoneNumbers.Contains(p.Number))))
             {
-                return Response.Fail(
-                    message: "One or more phone numbers already belongs to a supplier!",
-                    statusCode: (int)HttpStatusCode.Conflict);
+                return Response.Conflict(
+                    message: "One or more phone numbers already belongs to a supplier!");
             }
 
 
@@ -218,9 +205,8 @@ namespace Pharmacy.System.Services.Services
                 new SupplierSpecification(id));
             if (supplier == null)
             {
-                return Response.Fail(
-                    message: "Supplier not found!",
-                    statusCode: (int)HttpStatusCode.NotFound);
+                return Response.NotFound(
+                    message: "Supplier not found!");
             }
 
             supplier.Name = dto.Name.Trim();
@@ -249,9 +235,8 @@ namespace Pharmacy.System.Services.Services
             catch (DbUpdateException ex)
             {
                 _logger.LogWarning(ex, "Failed to update supplier {Id}", id);
-                return Response.Fail(
-                    message: "Could not update the supplier. Check for duplicate data.",
-                    statusCode: (int)HttpStatusCode.Conflict);
+                return Response.Conflict(
+                    message: "Could not update the supplier. Check for duplicate data.");
             }
 
             return Response.Success(
@@ -264,9 +249,8 @@ namespace Pharmacy.System.Services.Services
             var supplier = await _unitOfWork.SupplierRepository.GetByIdAsync(id);
             if (supplier == null)
             {
-                return Response.Fail(
-                    message: "Supplier Not Found!",
-                    statusCode: (int)HttpStatusCode.NotFound);
+                return Response.NotFound(
+                    message: "Supplier Not Found!");
             }
 
             var oldLogo = supplier.Logo;
@@ -297,9 +281,8 @@ namespace Pharmacy.System.Services.Services
             var supplier = await _unitOfWork.SupplierRepository.GetByIdAsync(id);
             if(supplier == null)
             {
-                return Response.Fail(
-                    message: "Supplier Not Found!",
-                    statusCode: (int)HttpStatusCode.NotFound);
+                return Response.NotFound(
+                    message: "Supplier Not Found!");
             }
 
             if(supplier.Logo == null)

@@ -6,7 +6,6 @@ using Pharmacy.System.Services.IServices;
 using Pharmacy.System.Services.Responses;
 using FluentValidation;
 using Mapster;
-using System.Net;
 using System.Threading.Tasks;
 
 namespace Pharmacy.System.Services.Services
@@ -45,8 +44,7 @@ namespace Pharmacy.System.Services.Services
                 {
                     return Response.Fail(
                         message: "Validation failed.",
-                        details: string.Join("; ", validationResult.Errors),
-                        statusCode: (int)HttpStatusCode.BadRequest);
+                        details: string.Join("; ", validationResult.Errors));
                 }
             }
 
@@ -62,14 +60,14 @@ namespace Pharmacy.System.Services.Services
 
             await AfterCreateAsync(entity, dto);
 
-            return Response.Success(data: entity.Adapt<TDetailsDto>(), statusCode: (int)HttpStatusCode.Created);
+            return Response.Created(data: entity.Adapt<TDetailsDto>());
         }
 
         public async Task<Response> UpdateAsync(TUpdateDto dto, TKey id)
         {
             var entity = await _repository.GetByIdAsync(id);
             if (entity is null)
-                return Response.Fail(message: "Resource not found.", statusCode: (int)HttpStatusCode.NotFound);
+                return Response.NotFound(message: "Resource not found.");
 
             if (_updateValidator is not null)
             {
@@ -78,8 +76,7 @@ namespace Pharmacy.System.Services.Services
                 {
                     return Response.Fail(
                         message: "Validation failed.",
-                        details: string.Join("; ", validationResult.Errors),
-                        statusCode: (int)HttpStatusCode.BadRequest);
+                        details: string.Join("; ", validationResult.Errors));
                 }
             }
 
@@ -94,14 +91,14 @@ namespace Pharmacy.System.Services.Services
 
             await AfterUpdateAsync(entity, dto);
 
-            return Response.Success(data: entity.Adapt<TDetailsDto>(), statusCode: (int)HttpStatusCode.OK);
+            return Response.Success(data: entity.Adapt<TDetailsDto>());
         }
 
         public async Task<Response> DeleteAsync(TKey id)
         {
             var entity = await _repository.GetByIdAsync(id);
             if (entity is null)
-                return Response.Fail(message: "Resource not found.", statusCode: (int)HttpStatusCode.NotFound);
+                return Response.NotFound(message: "Resource not found.");
 
             var result = await BeforeDeleteAsync(entity);
             if(!result.IsSuccess)
@@ -112,7 +109,7 @@ namespace Pharmacy.System.Services.Services
 
             await AfterDeleteAsync(entity);
 
-            return Response.Success(data: null, message: "Deleted successfully.", statusCode: (int)HttpStatusCode.OK);
+            return Response.Success(data: null, message: "Deleted successfully.");
         }
 
 

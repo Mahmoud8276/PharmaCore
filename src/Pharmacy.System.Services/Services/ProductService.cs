@@ -12,7 +12,6 @@ using Pharmacy.System.Services.SpecificationParams;
 using Pharmacy.System.Services.Specifications;
 using System;
 using System.Collections.Generic;
-using System.Net;
 using System.Threading.Tasks;
 using System.Linq;
 
@@ -36,33 +35,29 @@ namespace Pharmacy.System.Services.Services
             if (await _unitOfWork.ProductRepository.AnyAsync(x =>
                     x.Barcode == dto.Barcode && (excludeProductId == null || x.Id != excludeProductId)))
             {
-                return Response.Fail
-                    (message: "Product barcode already exists!",
-                    statusCode: (int)HttpStatusCode.Conflict);
+                return Response.Conflict
+                    (message: "Product barcode already exists!");
             }
 
             if (dto.ManufacturerId != null)
             {
                 if (!await _unitOfWork.ManufacturerRepository.AnyAsync(x => x.Id == dto.ManufacturerId))
                 {
-                    return Response.Fail(
-                        message: "Manufacturer not found!",
-                        statusCode: (int)HttpStatusCode.NotFound);
+                    return Response.NotFound(
+                        message: "Manufacturer not found!");
                 }
             }
 
             if (!await _unitOfWork.ProductCategoryRepository.AnyAsync(x => x.Id == dto.CategoryId))
             {
-                return Response.Fail(
-                    message: "Product category not found!",
-                    statusCode: (int)HttpStatusCode.NotFound);
+                return Response.NotFound(
+                    message: "Product category not found!");
             }
 
             if (!await _unitOfWork.ProductFormRepository.AnyAsync(x => x.Id == dto.ProductFormId))
             {
-                return Response.Fail(
-                    message: "Product form not found!",
-                    statusCode: (int)HttpStatusCode.NotFound);
+                return Response.NotFound(
+                    message: "Product form not found!");
             }
 
             return Response.Success();
@@ -121,10 +116,9 @@ namespace Pharmacy.System.Services.Services
             var createdProduct = await _unitOfWork.ProductRepository
                 .GetWithSpecAsync(new ProductSpecification(product.Id));
 
-            return Response.Success(
+            return Response.Created(
             data: createdProduct.Adapt<ProductDetailsDto>(),
-            message: "Product created successfully",
-            statusCode: (int)HttpStatusCode.Created);
+            message: "Product created successfully");
         }
 
         public async Task<Response> DeleteAsync(int id)
@@ -132,9 +126,8 @@ namespace Pharmacy.System.Services.Services
             var product = await _unitOfWork.ProductRepository.GetByIdAsync(id);
             if(product == null)
             {
-                return Response.Fail(
-                    message: "Product not found!",
-                    statusCode: (int)HttpStatusCode.NotFound);
+                return Response.NotFound(
+                    message: "Product not found!");
             }
 
             _unitOfWork.ProductRepository.Delete(product);
@@ -153,8 +146,7 @@ namespace Pharmacy.System.Services.Services
             }
 
             return Response.Success(
-            message: "Product deleted successfully",
-            statusCode: (int)HttpStatusCode.OK);
+            message: "Product deleted successfully");
         }
 
         public async Task<Response> GetAllAsync(ProductSpecParams specParams)
@@ -181,22 +173,20 @@ namespace Pharmacy.System.Services.Services
             var product = await _unitOfWork.ProductRepository.GetWithSpecAsync(new ProductSpecification(id));
             if (product == null)
             {
-                return Response.Fail(
-                    message: "Product not found!",
-                    statusCode: (int)HttpStatusCode.NotFound);
+                return Response.NotFound(
+                    message: "Product not found!");
             }
 
             return Response.Success(
                 data: product.Adapt<ProductDetailsDto>(),
-                message: "Product retrieved successfully",
-                statusCode: (int)HttpStatusCode.OK);
+                message: "Product retrieved successfully");
         }
 
         public async Task<Response> UpdateAsync(int id, ProductDto dto)
         {
             var product = await _unitOfWork.ProductRepository.GetWithSpecAsync(new ProductSpecification(id));
             if (product == null)
-                return Response.Fail(message: "Product not found!", statusCode: (int)HttpStatusCode.NotFound);
+                return Response.NotFound(message: "Product not found!");
 
             var validationResult = await ValidateProductDtoAsync(dto, excludeProductId: id);
             if (!validationResult.IsSuccess)
@@ -229,8 +219,7 @@ namespace Pharmacy.System.Services.Services
 
             return Response.Success(
                 data: product.Adapt<ProductDetailsDto>(),
-                message: "Product updated successfully",
-                statusCode: (int)HttpStatusCode.OK);
+                message: "Product updated successfully");
         }
 
 
@@ -240,25 +229,22 @@ namespace Pharmacy.System.Services.Services
         {
             if(!await _unitOfWork.ProductRepository.AnyAsync(x=>x.Id == productId))
             {
-                return Response.Fail(
-                    message: "Product Not Fount",
-                    statusCode: (int)HttpStatusCode.NotFound);
+                return Response.NotFound(
+                    message: "Product Not Fount");
             }
 
             var activeIngredient = await _unitOfWork.ActiveIngredientRepository.GetByIdAsync(activeIngredientId);
             if(activeIngredient == null)
             {
-                return Response.Fail(
-                    message: "Active Ingredient Not Fount",
-                    statusCode: (int)HttpStatusCode.NotFound);
+                return Response.NotFound(
+                    message: "Active Ingredient Not Fount");
             }
 
             if (await _unitOfWork.ProductActiveIngredientRepository.
                 AnyAsync(x=>x.ActiveIngredientId == activeIngredientId && x.ProductId == productId))
             {
-                return Response.Fail(
-                    message: "Active Ingredient Exists For This Product!",
-                    statusCode: (int)HttpStatusCode.Conflict);
+                return Response.Conflict(
+                    message: "Active Ingredient Exists For This Product!");
             }
 
             await _unitOfWork.ProductActiveIngredientRepository.AddAsync(new ProductActiveIngredient()
@@ -271,10 +257,9 @@ namespace Pharmacy.System.Services.Services
             await _unitOfWork.CompleteAsync();
 
 
-            return Response.Success(
+            return Response.Created(
                 message: $"Active Ingredient Added For The Product Successfully",
-                data: activeIngredient.Adapt<ProductActiveIngredientDetailsDto>(),
-                statusCode: (int)HttpStatusCode.Created);
+                data: activeIngredient.Adapt<ProductActiveIngredientDetailsDto>());
         }
 
         public async Task<Response> AddProductActiveIngredientsAsync(int productId, List<ProductActiveIngredientAssociationDto> dtos)
@@ -282,9 +267,8 @@ namespace Pharmacy.System.Services.Services
             //Check the existence of the product
             if (!await _unitOfWork.ProductRepository.AnyAsync(x=>x.Id == productId))
             {
-                return Response.Fail(
-                    message: "Product Not Fount",
-                    statusCode: (int)HttpStatusCode.NotFound);
+                return Response.NotFound(
+                    message: "Product Not Fount");
             }
 
             //Check the douplication of the active Ingredients in the incoming request
@@ -299,18 +283,16 @@ namespace Pharmacy.System.Services.Services
                 FindAsync(x => incomingActiveIngredientsIds.Contains(x.Id));
             if (validActiveIngredients.Count != incomingActiveIngredientsIds.Count)
             {
-                return Response.Fail(
-                    message: "One or more active ingredients not found!",
-                    statusCode: (int)HttpStatusCode.NotFound);
+                return Response.NotFound(
+                    message: "One or more active ingredients not found!");
             }
 
             //Check if any of the incoming active ingredients already associated with the product
             if (await _unitOfWork.ProductActiveIngredientRepository
                 .AnyAsync(x => incomingActiveIngredientsIds.Contains(x.ActiveIngredientId) && x.ProductId == productId))
             {
-                return Response.Fail(
-                    message: "One or more active ingredients already associated with this product!",
-                    statusCode: (int)HttpStatusCode.Conflict);
+                return Response.Conflict(
+                    message: "One or more active ingredients already associated with this product!");
             }
 
             //Associate the active ingredients with the product
@@ -337,9 +319,8 @@ namespace Pharmacy.System.Services.Services
             var product = await _unitOfWork.ProductRepository.GetWithSpecAsync(new ProductSpecification(productId));
             if (product == null)
             {
-                return Response.Fail(
-                    message: "Product Not Fount",
-                    statusCode: (int)HttpStatusCode.NotFound);
+                return Response.NotFound(
+                    message: "Product Not Fount");
             }
 
             return Response.Success(
@@ -353,25 +334,22 @@ namespace Pharmacy.System.Services.Services
                 GetWithSpecAsync(new ProductSpecification(productId));
             if (product == null)
             {
-                return Response.Fail(
-                    message: "Product Not Fount",
-                    statusCode: (int)HttpStatusCode.NotFound);
+                return Response.NotFound(
+                    message: "Product Not Fount");
             }
 
             if(!await _unitOfWork.ActiveIngredientRepository.AnyAsync(x=>x.Id == activeIngredientId))
             {
-                return Response.Fail(
-                     message: "Active Ingredient Not Fount",
-                     statusCode: (int)HttpStatusCode.NotFound);
+                return Response.NotFound(
+                     message: "Active Ingredient Not Fount");
             }
 
             var association = await _unitOfWork.ProductActiveIngredientRepository
                 .GetWithSpecAsync(new ProductActiveIngredientSpecification(productId, activeIngredientId));
             if(association == null)
             {
-                return Response.Fail(
-                    message: "Active Ingredient Not Associated With This Product",
-                    statusCode: (int)HttpStatusCode.NotFound);
+                return Response.NotFound(
+                    message: "Active Ingredient Not Associated With This Product");
             }
 
             dto.Adapt(association);
@@ -387,9 +365,8 @@ namespace Pharmacy.System.Services.Services
             //Check the existence of the product
             if (!await _unitOfWork.ProductRepository.AnyAsync(x => x.Id == productId))
             {
-                return Response.Fail(
-                    message: "Product Not Fount",
-                    statusCode: (int)HttpStatusCode.NotFound);
+                return Response.NotFound(
+                    message: "Product Not Fount");
             }
 
             //Check the douplication of the active Ingredients in the incoming request
@@ -404,9 +381,8 @@ namespace Pharmacy.System.Services.Services
                 FindAsync(x => incomingActiveIngredientsIds.Contains(x.Id));
             if (validActiveIngredients.Count != incomingActiveIngredientsIds.Count)
             {
-                return Response.Fail(
-                    message: "One or more active ingredients not found!",
-                    statusCode: (int)HttpStatusCode.NotFound);
+                return Response.NotFound(
+                    message: "One or more active ingredients not found!");
             }
 
             //1.Get products active ingredients
@@ -470,59 +446,52 @@ namespace Pharmacy.System.Services.Services
         {
             if(!await _unitOfWork.ProductRepository.AnyAsync(x => x.Id == productId))
             {
-                return Response.Fail(
-                    message: "Product Not Fount",
-                    statusCode: (int)HttpStatusCode.NotFound);
+                return Response.NotFound(
+                    message: "Product Not Fount");
             }
 
             if(!await _unitOfWork.ActiveIngredientRepository.AnyAsync(x => x.Id == activeIngredientId))
             {
-                return Response.Fail(
-                    message: "Active Ingredient Not Fount",
-                    statusCode: (int)HttpStatusCode.NotFound);
+                return Response.NotFound(
+                    message: "Active Ingredient Not Fount");
             }
 
             var association = await _unitOfWork.ProductActiveIngredientRepository
                 .GetWithSpecAsync(new ProductActiveIngredientSpecification(productId, activeIngredientId));
             if (association == null)
             {
-                return Response.Fail(
-                    message: "Active Ingredient Not Associated With This Product",
-                    statusCode: (int)HttpStatusCode.NotFound);
+                return Response.NotFound(
+                    message: "Active Ingredient Not Associated With This Product");
             }
 
             _unitOfWork.ProductActiveIngredientRepository.Delete(association);
             await _unitOfWork.CompleteAsync();
 
             return Response.Success(
-                message: "Product Active Ingredient Deleted Successfully",
-                statusCode: (int)HttpStatusCode.OK);
+                message: "Product Active Ingredient Deleted Successfully");
         }
 
         public async Task<Response> DeleteProductActiveIngredientsAsync(int productId)
         {
             if(!await _unitOfWork.ProductRepository.AnyAsync(x => x.Id == productId))
             {
-                return Response.Fail(
-                    message: "Product Not Fount",
-                    statusCode: (int)HttpStatusCode.NotFound);
+                return Response.NotFound(
+                    message: "Product Not Fount");
             }
 
             var associations = await _unitOfWork.ProductActiveIngredientRepository
                 .FindAsync(x => x.ProductId == productId);
             if (associations.Count == 0)
             {
-                return Response.Fail(
-                    message: "No Active Ingredients Associated With This Product",
-                    statusCode: (int)HttpStatusCode.NotFound);
+                return Response.NotFound(
+                    message: "No Active Ingredients Associated With This Product");
             }
 
             _unitOfWork.ProductActiveIngredientRepository.DeleteRange(associations);
             await _unitOfWork.CompleteAsync();
 
             return Response.Success(
-                message: "All Product Active Ingredients Deleted Successfully",
-                statusCode: (int)HttpStatusCode.OK);
+                message: "All Product Active Ingredients Deleted Successfully");
         }
 
 

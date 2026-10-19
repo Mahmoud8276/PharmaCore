@@ -2,14 +2,12 @@
 using Pharmacy.System.Core.Interfaces;
 using Pharmacy.System.Services.IServices;
 using Pharmacy.System.Services.Responses;
-using System.Net;
 using System.Threading.Tasks;
 using Mapster;
 using Pharmacy.System.Core.Dtos.BaseUnitDtos;
 using Pharmacy.System.Core.Models;
 using System.Linq;
 using Pharmacy.System.Services.Specifications;
-using System;
 
 namespace Pharmacy.System.Services.Services
 {
@@ -46,9 +44,8 @@ namespace Pharmacy.System.Services.Services
             var product = await _unitOfWork.ProductRepository.GetByIdAsync(productId);
             if(product == null)
             {
-                return Response.Fail(
-                    message: "Product Not Found!",
-                    statusCode: (int)HttpStatusCode.NotFound);
+                return Response.NotFound(
+                    message: "Product Not Found!");
             }
 
             //Check the existence of the packaging unit
@@ -56,18 +53,16 @@ namespace Pharmacy.System.Services.Services
                 .GetByIdAsync(dto.PackagingUnitId);
             if (packagingUnit == null)
             {
-                return Response.Fail(
-                    message: "Packaging Unit Not Found!",
-                    statusCode: (int)HttpStatusCode.NotFound);
+                return Response.NotFound(
+                    message: "Packaging Unit Not Found!");
             }
 
             //Check if there is already a configuration for this packaging unit
             if(await _unitOfWork.ProductPackagingLevelRepository
                 .AnyAsync(x=>x.ProductId == productId && x.PackagingUnitId == dto.PackagingUnitId))
             {
-                return Response.Fail(
-                    message: "There Is Already a Configuration For this Packaging Unit With this Product!",
-                    statusCode: (int)HttpStatusCode.Conflict);
+                return Response.Conflict(
+                    message: "There Is Already a Configuration For this Packaging Unit With this Product!");
             }
 
             //Check if it is the first time to configure a package unit of this product or not
@@ -96,10 +91,9 @@ namespace Pharmacy.System.Services.Services
                 await _unitOfWork.ProductPackagingLevelRepository.AddAsync(productPackaging);
                 await _unitOfWork.CompleteAsync();
 
-                return Response.Success(
+                return Response.Created(
                     message: "Package Unit Configured For This Product Successfully",
-                    data: await MapToProductPackagingDetails(productPackaging),
-                    statusCode: (int)HttpStatusCode.Created);
+                    data: await MapToProductPackagingDetails(productPackaging));
             }
         
             //Check if the client passes the child packaging ID or not, cuz it's not the first time.
@@ -114,16 +108,14 @@ namespace Pharmacy.System.Services.Services
                 .GetByIdAsync((int)dto.ChildUnitId);
             if(childPackaging == null || childPackaging.ProductId != productId)
             {
-                return Response.Fail(
-                    message: "Child Packaging Not Found!",
-                    statusCode: (int)HttpStatusCode.NotFound);
+                return Response.NotFound(
+                    message: "Child Packaging Not Found!");
             }
 
             if(childPackaging.ParentId != null)
             {
-                return Response.Fail(
-                    message: "Child Packaging Already Contained In Another Packaging Level!",
-                    statusCode: (int)HttpStatusCode.Conflict);
+                return Response.Conflict(
+                    message: "Child Packaging Already Contained In Another Packaging Level!");
             }
 
             var packagingLevel = new ProductPackagingLevel()
@@ -150,16 +142,14 @@ namespace Pharmacy.System.Services.Services
                 .GetByIdAsync(ProductPackagingId);
             if(productPackaging == null || productPackaging.ProductId != productId)
             {
-                return Response.Fail(
-                    message: "Product's Packaging Not Found!",
-                    statusCode: (int)HttpStatusCode.NotFound);
+                return Response.NotFound(
+                    message: "Product's Packaging Not Found!");
             }
 
             if(productPackaging.ParentId != null)
             {
                 return Response.Fail(
-                    message: "This Product's Packaging Is Contained Into Another Packaging",
-                    statusCode: (int)HttpStatusCode.BadRequest);
+                    message: "This Product's Packaging Is Contained Into Another Packaging");
             }
             var child = await _unitOfWork.ProductPackagingLevelRepository
                 .GetChildPackagingLevelAsync(productPackaging.Id);
@@ -180,9 +170,8 @@ namespace Pharmacy.System.Services.Services
                 .FindAsync(x=>x.ProductId == productId);
             if (packagingLevels == null || packagingLevels.Count == 0)
             {
-                return Response.Success(
-                    message: "No Packaging Configured for this product!",
-                    statusCode: (int)HttpStatusCode.NotFound);
+                return Response.NotFound(
+                    message: "No Packaging Configured for this product!");
             }
 
             _unitOfWork.ProductPackagingLevelRepository
@@ -197,9 +186,8 @@ namespace Pharmacy.System.Services.Services
         {
             if(!await _unitOfWork.ProductRepository.AnyAsync(x=>x.Id == productId))
             {
-                return Response.Fail(
-                    message: "Product Not Found!",
-                    (int)HttpStatusCode.NotFound);
+                return Response.NotFound(
+                    message: "Product Not Found!");
             }
 
             var packagingLevels = await _unitOfWork
@@ -207,9 +195,8 @@ namespace Pharmacy.System.Services.Services
                 new ProductPackagingLevelSpecification(productId, null));
             if(packagingLevels == null || packagingLevels.Count == 0)
             {
-                return Response.Success(
-                    message : "No Packaging Configured for this product!",
-                    statusCode: (int)HttpStatusCode.NotFound);
+                return Response.NotFound(
+                    message : "No Packaging Configured for this product!");
             }
 
             var childLoockup = packagingLevels.ToDictionary(
@@ -247,14 +234,13 @@ namespace Pharmacy.System.Services.Services
             if(!await _unitOfWork.ProductRepository.AnyAsync(
                 product=> product.Id == productId))
             {
-                return Response.Fail(
-                    message: "Product Not Found!",
-                    statusCode: (int)HttpStatusCode.NotFound);
+                return Response.NotFound(
+                    message: "Product Not Found!");
             }
 
             var baseUnit = await _unitOfWork.BaseUnitRepository.GetByProductIdAsync(productId);
             return baseUnit == null ? 
-                Response.Fail(message: "Base Unit Not Found!", statusCode: (int)HttpStatusCode.NotFound) :
+                Response.NotFound(message: "Base Unit Not Found!") :
                 Response.Success(data: baseUnit.Adapt<BaseUnitDetailsDto>(), message: "Base unit retrieved successfully");
         }
 
@@ -266,9 +252,8 @@ namespace Pharmacy.System.Services.Services
            var targetProductPackaging = productPackagings.FirstOrDefault(x => x.Id == productPackagingId);
             if (targetProductPackaging == null)
             {
-                return Response.Fail(
-                    message: "Product's Packaging Not Found!",
-                    statusCode: (int)HttpStatusCode.NotFound);
+                return Response.NotFound(
+                    message: "Product's Packaging Not Found!");
             }
 
             targetProductPackaging.QuantityOfBaseUnit =

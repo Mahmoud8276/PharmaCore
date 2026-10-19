@@ -6,7 +6,6 @@ using Pharmacy.System.Services.IServices;
 using Pharmacy.System.Services.Responses;
 using Pharmacy.System.Services.SpecificationParams;
 using Pharmacy.System.Services.Specifications;
-using System.Net;
 using System.Threading.Tasks;
 
 namespace Pharmacy.System.Services.Services
@@ -34,9 +33,8 @@ namespace Pharmacy.System.Services.Services
         {
             if(await _unitOfWork.ProductRepository.AnyAsync(x=>x.ProductFormId == entity.Id))
             {
-                return Response.Fail(
-                    message: "Cannot delete product form because it is associated with existing products.",
-                    statusCode: (int)HttpStatusCode.Conflict);
+                return Response.Conflict(
+                    message: "Cannot delete product form because it is associated with existing products.");
             }
 
             return Response.Success();
@@ -46,9 +44,8 @@ namespace Pharmacy.System.Services.Services
         {
             if(!await _unitOfWork.BaseUnitRepository.AnyAsync(x=>x.Id == dto.BaseUnitId))
             {
-                return Response.Fail(
-                    message: "Base unit not found!",
-                    statusCode: (int)HttpStatusCode.NotFound);
+                return Response.NotFound(
+                    message: "Base unit not found!");
             }
 
             return Response.Success();

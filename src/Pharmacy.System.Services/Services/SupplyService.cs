@@ -6,7 +6,6 @@ using Pharmacy.System.Services.Responses;
 using Pharmacy.System.Services.SpecificationParams;
 using Pharmacy.System.Services.Specifications;
 using System.Linq;
-using System.Net;
 using System.Threading.Tasks;
 using Mapster;
 using System.Collections.Generic;
@@ -36,24 +35,21 @@ namespace Pharmacy.System.Services.Services
             if (dto.InitialPaidAmount > finalCost)
             {
                 return new(null, Response.Fail(
-                     message: "Initial paid amount cannot be greater than the final cost!",
-                     statusCode: (int)HttpStatusCode.BadRequest));
+                     message: "Initial paid amount cannot be greater than the final cost!"));
             }
 
             // Check that the receivement date is not in the future.
             if (dto.ReceivedAt > new DateOnly(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day))
             {
                 return new(null, Response.Fail(
-                     message: "Invalid receivement date!",
-                     statusCode: (int)HttpStatusCode.BadRequest));
+                     message: "Invalid receivement date!"));
             }
             // Check the existance of the supplier.
             var supplier = await _unitOfWork.SupplierRepository.GetByIdAsync(dto.SupplierId);
             if (supplier == null)
             {
-                return new (null, Response.Fail(
-                    message: "Supplier not found!",
-                    statusCode: (int)HttpStatusCode.NotFound));
+                return new (null, Response.NotFound(
+                    message: "Supplier not found!"));
             }
 
             var productIds = dto.Items.Select(x => x.ProductId).ToHashSet();
@@ -70,20 +66,18 @@ namespace Pharmacy.System.Services.Services
             {
                 var notFoundProductIds = productIds.Except(products.Select(x => x.Id)).ToList();
 
-                return new(null, Response.Fail(
+                return new(null, Response.NotFound(
                     message: "One or more products not found!",
-                    details: "Not found product IDs: " + string.Join(", ", notFoundProductIds),
-                    statusCode: (int)HttpStatusCode.NotFound));
+                    details: "Not found product IDs: " + string.Join(", ", notFoundProductIds)));
             }
 
             // The existance of the Packaging Level of the associated product.
             if (packagingLevelIds.Count != packagingLevels.Count)
             {
                 var notFoundPackagingLevelIds = packagingLevelIds.Except(packagingLevels.Select(x => x.Id)).ToList();
-                return new(null, Response.Fail(
+                return new(null, Response.NotFound(
                     message: "One or more packaging levels not found!",
-                    details: "Not found packaging level IDs: " + string.Join(", ", notFoundPackagingLevelIds),
-                    statusCode: (int)HttpStatusCode.NotFound));
+                    details: "Not found packaging level IDs: " + string.Join(", ", notFoundPackagingLevelIds)));
             }
 
             // That this packaging level is for the targeted product.
@@ -98,8 +92,7 @@ namespace Pharmacy.System.Services.Services
                 return new(null, Response.Fail(
                     message: "Invalid packaging level for one or more products!",
                     details: string.Join("; ", mismatched.Select(i =>
-                        $"Level {i.PackagingLevelId} does not belong to product {i.ProductId}")),
-                    statusCode: (int)HttpStatusCode.BadRequest));
+                        $"Level {i.PackagingLevelId} does not belong to product {i.ProductId}"))));
             }
 
             // After validating the incoming DTO, map and make the essintial updates to the existing supply entity.
@@ -155,10 +148,9 @@ namespace Pharmacy.System.Services.Services
             await _unitOfWork.SupplyRepository.AddAsync(supply);
             await _unitOfWork.CompleteAsync();
 
-            return Response.Success(
+            return Response.Created(
                 data: supply.Adapt<SupplyDetailsDto>(),
-                message: "Supply created successfully!",
-                statusCode: (int)HttpStatusCode.Created);
+                message: "Supply created successfully!");
         }
 
         public async Task<Response> GetByIdAsync(int id)
@@ -167,9 +159,8 @@ namespace Pharmacy.System.Services.Services
                 new SupplySpecification(id));
             if(supply == null)
             {
-                return Response.Fail(
-                    message: "Supply not found!",
-                    statusCode: (int)HttpStatusCode.NotFound);
+                return Response.NotFound(
+                    message: "Supply not found!");
             }
 
             return Response.Success(
@@ -202,16 +193,14 @@ namespace Pharmacy.System.Services.Services
             // Check the existance of the supply to be updated.
             if (supply == null)
             {
-                return Response.Fail(
-                    message: "Supply not found!",
-                    statusCode: (int)HttpStatusCode.NotFound);
+                return Response.NotFound(
+                    message: "Supply not found!");
             }
             // Check if the supply is alread confirmed, if so, it cannot be updated.
             if (supply.IsConfirmed)
             {
                 return Response.Fail(
-                    message: "Cannot update a confirmed supply!",
-                    statusCode: (int)HttpStatusCode.BadRequest);
+                    message: "Cannot update a confirmed supply!");
             }
 
             var result = await ValidateAsync(dto);
@@ -229,8 +218,7 @@ namespace Pharmacy.System.Services.Services
 
             return Response.Success(
                 data: supply.Adapt<SupplyDetailsDto>(),
-                message: "Supply updated successfully!",
-                statusCode: (int)HttpStatusCode.OK);
+                message: "Supply updated successfully!");
         }
 
         public async Task<Response> DeleteAsync(int id)
@@ -238,24 +226,21 @@ namespace Pharmacy.System.Services.Services
             var supply = await _unitOfWork.SupplyRepository.GetByIdAsync(id);
             if (supply == null)
             {
-                return Response.Fail(
-                    message: "Supply not found!",
-                    statusCode: (int)HttpStatusCode.NotFound);
+                return Response.NotFound(
+                    message: "Supply not found!");
             }
             // Check if the supply is alread confirmed, if so, it cannot be deleted.
             if (supply.IsConfirmed)
             {
                 return Response.Fail(
-                    message: "Cannot update a confirmed supply!",
-                    statusCode: (int)HttpStatusCode.BadRequest);
+                    message: "Cannot update a confirmed supply!");
             }
 
             _unitOfWork.SupplyRepository.Delete(supply);
             await _unitOfWork.CompleteAsync();
 
             return Response.Success(
-                message: "Supply deleted successfully!",
-                statusCode: (int)HttpStatusCode.OK);
+                message: "Supply deleted successfully!");
         }
 
         public Task<Response> ConfirmAsync(int id)

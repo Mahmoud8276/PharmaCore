@@ -16,7 +16,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Linq;
-using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -89,8 +88,7 @@ namespace Pharmacy.System.Services.Services
         public async Task<Response> RegisterUserAsync(RegisterDto dto)
         {
             if (await UserExistsAsync(dto.Email))
-                return Response.Fail("User Already Exists",
-                    (int)HttpStatusCode.BadRequest);
+                return Response.Fail("User Already Exists");
 
             var appUser = new AppUser()
             {
@@ -116,8 +114,9 @@ namespace Pharmacy.System.Services.Services
                     await transaction.RollbackAsync();
                     await RemoveUserImageAsync(appUser.Image);
                     var errors = string.Join(", ", result.Errors.Select(x => x.Description));
-                    return Response.Fail("User registration failed",
-                        (int)HttpStatusCode.BadRequest, $"{errors}");
+                    return Response.Fail(
+                        message: "User registration failed",
+                        details: $"{errors}");
                 }
 
                 result = await _userManager.AddToRoleAsync(appUser, AppUserRoles.User.ToString());
@@ -126,8 +125,9 @@ namespace Pharmacy.System.Services.Services
                     await transaction.RollbackAsync();
                     await RemoveUserImageAsync(appUser.Image);
                     var errors = string.Join(", ", result.Errors.Select(x => x.Description));
-                    return Response.Fail("Failed to assign role to user",
-                        (int)HttpStatusCode.InternalServerError, $"{errors}");
+                    return Response.InternalServerError(
+                        message: "Failed to assign role to user",
+                        details: $"{errors}");
                 }
 
                 await transaction.CommitAsync();
@@ -162,18 +162,15 @@ namespace Pharmacy.System.Services.Services
                                         .Include(u=>u.RefreshTokens)
                                         .FirstOrDefaultAsync(u => u.Email == dto.Email);
             if (user is null)
-                return Response<LoginDetailsDto>.Fail("Invalid Email Or Password!",
-                    (int)HttpStatusCode.Unauthorized);
+                return Response<LoginDetailsDto>.Unauthorized("Invalid Email Or Password!");
 
             if(!user.EmailConfirmed)
-                return Response<LoginDetailsDto>.Fail("Email is not confirmed!",
-                    (int)HttpStatusCode.Unauthorized);
+                return Response<LoginDetailsDto>.Unauthorized("Email is not confirmed!");
 
 
             var signInResult = await _signInManager.CheckPasswordSignInAsync(user, dto.Password, false);
             if(!signInResult.Succeeded)
-                return Response<LoginDetailsDto>.Fail("Invalid Email Or Password!",
-                    (int)HttpStatusCode.Unauthorized);
+                return Response<LoginDetailsDto>.Unauthorized("Invalid Email Or Password!");
 
             RefreshToken refreshToken; 
             if(user.RefreshTokens.Any(token => token.IsActive))
@@ -203,14 +200,16 @@ namespace Pharmacy.System.Services.Services
         {
             var user = await _userManager.FindByIdAsync(userId);
             if (user == null)
-                return Response.Fail("User not found", (int)HttpStatusCode.NotFound);
+                return Response.NotFound("User not found");
 
             var decodedToken = Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(token));
             var result = await _userManager.ConfirmEmailAsync(user, decodedToken);
             if (!result.Succeeded)
             {
                 var errors = string.Join(", ", result.Errors.Select(x => x.Description));
-                return Response.Fail("Email confirmation failed", (int)HttpStatusCode.BadRequest, $"{errors}");
+                return Response.Fail(
+                    message: "Email confirmation failed", 
+                    details: $"{errors}");
             }
 
             return Response.Success(message:"Email confirmed successfully");
@@ -264,7 +263,7 @@ namespace Pharmacy.System.Services.Services
         {
             var user = await _userManager.FindByIdAsync(dto.UserId);
             if (user == null)
-                return Response.Fail("User not found", (int)HttpStatusCode.NotFound);
+                return Response.NotFound("User not found");
 
             var decodedToken = Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(dto.Token));
 
@@ -272,7 +271,9 @@ namespace Pharmacy.System.Services.Services
             if (!result.Succeeded)
             {
                 var errors = string.Join(", ", result.Errors.Select(x => x.Description));
-                return Response.Fail("Password reset failed", (int)HttpStatusCode.BadRequest, $"{errors}");
+                return Response.Fail(
+                    message: "Password reset failed", 
+                    details: $"{errors}");
             }
 
             return Response.Success(message: "Password has been reset successfully!");
@@ -284,13 +285,11 @@ namespace Pharmacy.System.Services.Services
                 .SingleOrDefaultAsync(u => u.RefreshTokens.Any(t => t.Token == refreshToken));
             
             if(user == null)
-                return Response<LoginDetailsDto>.Fail("Invalid token",
-                    (int)HttpStatusCode.BadRequest);
+                return Response<LoginDetailsDto>.Fail("Invalid token");
 
             var token = user.RefreshTokens.Single(t => t.Token == refreshToken);
             if(!token.IsActive)
-                return Response<LoginDetailsDto>.Fail("Invalid token",
-                    (int)HttpStatusCode.BadRequest);
+                return Response<LoginDetailsDto>.Fail("Invalid token");
 
             token.RevokedOn = DateTime.UtcNow;
 
@@ -316,13 +315,11 @@ namespace Pharmacy.System.Services.Services
                 .SingleOrDefaultAsync(u => u.RefreshTokens.Any(t => t.Token == refreshToken));
 
             if (user == null)
-                return Response.Fail("Invalid token",
-                    (int)HttpStatusCode.BadRequest);
+                return Response.Fail("Invalid token");
 
             var token = user.RefreshTokens.Single(t => t.Token == refreshToken);
             if (!token.IsActive)
-                return Response.Fail("Invalid token",
-                    (int)HttpStatusCode.BadRequest);
+                return Response.Fail("Invalid token");
 
             token.RevokedOn = DateTime.UtcNow;
             await _userManager.UpdateAsync(user);
@@ -335,7 +332,7 @@ namespace Pharmacy.System.Services.Services
             var userId = _httpContextAccessor.HttpContext.GetRequiredUserId();
             var user = await _userManager.FindByIdAsync(userId);
             if(user == null) 
-                return Response.Fail(message: "User does not exist!", statusCode: (int)HttpStatusCode.NotFound);
+                return Response.NotFound(message: "User does not exist!");
 
             var userDetails = user.Adapt<UserDetailsDto>();
             userDetails.Roles = (await _userManager.GetRolesAsync(user)).ToList();
@@ -348,7 +345,7 @@ namespace Pharmacy.System.Services.Services
             var userId = _httpContextAccessor.HttpContext.GetRequiredUserId();
             var user = await _userManager.FindByIdAsync(userId);
             if (user == null)
-                return Response.Fail(message: "User does not exist!", statusCode: (int)HttpStatusCode.NotFound);
+                return Response.NotFound(message: "User does not exist!");
 
             var previousImage = user.Image;
 
@@ -374,7 +371,9 @@ namespace Pharmacy.System.Services.Services
                     await RemoveUserImageAsync(newlyUploadedImage);
 
                 var errors = string.Join(", ", result.Errors.Select(x => x.Description));
-                return Response.Fail("Failed to update profile", statusCode: (int)HttpStatusCode.BadRequest, details: errors);
+                return Response.Fail(
+                    message: "Failed to update profile",
+                    details: errors);
             }
 
             if ((dto.RemoveImage || newlyUploadedImage != null) && !string.IsNullOrEmpty(previousImage))
@@ -391,7 +390,7 @@ namespace Pharmacy.System.Services.Services
             var userId = _httpContextAccessor.HttpContext.GetRequiredUserId();
             var user = await _userManager.FindByIdAsync(userId);
             if (user == null)
-                return Response.Fail(message: "User does not exist!", statusCode: (int)HttpStatusCode.NotFound);
+                return Response.NotFound(message: "User does not exist!");
 
             var previousImage = user.Image;
 
@@ -399,7 +398,9 @@ namespace Pharmacy.System.Services.Services
             if(!result.Succeeded)
             {
                 var errors = string.Join(", ", result.Errors.Select(x => x.Description));
-                return Response.Fail("Failed to delete user", statusCode: (int)HttpStatusCode.BadRequest, details: errors);
+                return Response.Fail(
+                    message: "Failed to delete user",
+                    details: errors);
             }
 
             await RemoveUserImageAsync(previousImage);
@@ -412,13 +413,15 @@ namespace Pharmacy.System.Services.Services
             var userId = _httpContextAccessor.HttpContext.GetRequiredUserId();
             var user = await _userManager.FindByIdAsync(userId);
             if(user == null)
-                return Response.Fail(message: "User does not exist!", statusCode: (int)HttpStatusCode.NotFound);
+                return Response.NotFound(message: "User does not exist!");
 
             var result = await _userManager.ChangePasswordAsync(user, dto.CurrentPassword, dto.NewPassword);
             if (!result.Succeeded)
             {
                 var errors = string.Join(", ", result.Errors.Select(x => x.Description));
-                return Response.Fail("Failed to change user password", statusCode: (int)HttpStatusCode.BadRequest, details: errors);
+                return Response.Fail(
+                    message: "Failed to change user password",
+                    details: errors);
             }
 
             return Response.Success(message: "User password has been changed successfully");

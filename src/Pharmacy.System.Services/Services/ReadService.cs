@@ -7,7 +7,6 @@ using Pharmacy.System.Services.IServices;
 using Pharmacy.System.Services.Responses;
 using Mapster;
 using System.Collections.Generic;
-using System.Net;
 using System.Threading.Tasks;
 
 namespace Pharmacy.System.Services.Services
@@ -46,10 +45,10 @@ namespace Pharmacy.System.Services.Services
             var resource = await _repository.GetByIdAsync(id);
             if(resource == null)
             {
-                return Response.Fail(message: "resource not found", statusCode: (int)HttpStatusCode.NotFound);
+                return Response.NotFound(message: "resource not found");
             }
 
-            return Response.Success(data: resource.Adapt<TDetailsDto>(), statusCode: (int)HttpStatusCode.OK);
+            return Response.Success(data: resource.Adapt<TDetailsDto>());
         }
     }
 }

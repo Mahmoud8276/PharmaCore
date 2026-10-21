@@ -11,6 +11,8 @@ using Mapster;
 using System.Collections.Generic;
 using Pharmacy.System.Core.Dtos;
 using System;
+using Pharmacy.System.Core.Enums;
+using Pharmacy.System.Core.Dtos.SupplyPaymentDtos;
 
 namespace Pharmacy.System.Services.Services
 {
@@ -24,22 +26,14 @@ namespace Pharmacy.System.Services.Services
 
         private sealed record ValidatedSupply(
             Supplier supplier,
+            Repository repository,
             Dictionary<int, Product> Products,
             Dictionary<int, ProductPackagingLevel> Levels);
 
         private async Task<(ValidatedSupply? Data, Response? Error)> ValidateAsync(SupplyDto dto)
         {
-            // Check that the initial paid amount is not greater than the final cost.
-            var finalCost = dto.Items.Sum(x => x.Quantity * x.PricePerUnit)
-                        * (1 - (dto.DiscountPercentage ?? 0) / 100m);
-            if (dto.InitialPaidAmount > finalCost)
-            {
-                return new(null, Response.Fail(
-                     message: "Initial paid amount cannot be greater than the final cost!"));
-            }
-
             // Check that the receivement date is not in the future.
-            if (dto.ReceivedAt > new DateOnly(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day))
+            if (dto.ReceivedAt > DateOnly.FromDateTime(DateTime.Today))
             {
                 return new(null, Response.Fail(
                      message: "Invalid receivement date!"));
@@ -50,6 +44,14 @@ namespace Pharmacy.System.Services.Services
             {
                 return new (null, Response.NotFound(
                     message: "Supplier not found!"));
+            }
+
+            //Check the existance of the repository
+            var repository = await _unitOfWork.RepositoryRepository.GetByIdAsync(dto.RepositoryId);
+            if (repository == null)
+            {
+                return new (null, Response.NotFound(
+                    message: "Repository not found!"));
             }
 
             var productIds = dto.Items.Select(x => x.ProductId).ToHashSet();
@@ -102,6 +104,7 @@ namespace Pharmacy.System.Services.Services
             return new (
                 new ValidatedSupply(
                 supplier: supplier,
+                repository: repository,
                 Products: productsLookup,
                 Levels: packagingLevelsLookup
             ), null);
@@ -141,6 +144,7 @@ namespace Pharmacy.System.Services.Services
             }
             var supply = dto.Adapt<Supply>();
             supply.Supplier = result.Data.supplier;
+            supply.Repository = result.Data.repository;
 
             BuildItems(dto, supply, result.Data);
 
@@ -210,6 +214,7 @@ namespace Pharmacy.System.Services.Services
             }
             dto.Adapt(supply);
             supply.Supplier = result.Data.supplier;
+            supply.Repository = result.Data.repository;
             BuildItems(dto, supply, result.Data); 
 
             _unitOfWork.SupplyRepository.Update(supply);
@@ -243,9 +248,81 @@ namespace Pharmacy.System.Services.Services
                 message: "Supply deleted successfully!");
         }
 
-        public Task<Response> ConfirmAsync(int id)
+        public async Task<Response> ConfirmAsync(int id, SupplyPaymentConfirmationDto dto)
         {
-            throw new global::System.NotImplementedException();
+            var supply = await _unitOfWork.SupplyRepository.GetWithSpecAsync(
+                new SupplySpecification(id));
+
+            //Check the existance of the supply
+            if(supply == null)
+            {
+                return Response.NotFound(
+                    message: "Supply not found!");
+            }
+
+            //Check the supply is not already confirmed
+            if (supply.IsConfirmed)
+            {
+                return Response.Conflict(
+                    message: "Supply already confirmed!");
+            }
+
+            //Translate the supply items into the corresponding inventory items.
+            //(group them by product type, price, and expiry date)
+            //(convert supply items quantities into its base units to be stored)
+            var inventoryItems = supply.Items.Select(x => x.Adapt<InventoryItem>());
+            if(inventoryItems.Any(x=>x.ProductId == -1))
+            {
+                return Response.NotFound(
+                    message: "One or more product are not found!",
+                    details: "You may have deleted one or more products that is inside the supply before confirming it!");
+            }
+
+            inventoryItems = inventoryItems.GroupBy(x => new
+            {
+                x.ProductId,
+                x.SupplyItemId,
+                x.RepositoryId,
+                x.ExpiryDate,
+                x.PricePerBaseUnits
+
+            }).Select(g => new InventoryItem
+            {
+                ProductId = g.Key.ProductId,
+                SupplyItemId = g.Key.SupplyItemId,
+                RepositoryId = g.Key.RepositoryId,
+                ExpiryDate = g.Key.ExpiryDate,
+                PricePerBaseUnits = g.Key.PricePerBaseUnits,
+
+                ReceivedBaseUnits = g.Sum(x=>x.ReceivedBaseUnits),
+                OnHandBaseUnits = g.Sum(x=>x.OnHandBaseUnits),
+            
+            }).ToList();
+            //Store the inventory items into the corresponding repository.
+            await _unitOfWork.InventoryItemRepository.AddRangeAsync(inventoryItems);
+
+            //Issue supply payment, or payments based on supply payment plan.
+            if(supply.PaymentPlan == SupplyPaymentPlan.FullPayment)
+            {
+                await _unitOfWork.SupplyPaymentRepository.AddAsync(new SupplyPayment()
+                {
+                    Amount = supply.FinalCost,
+                    CreatedAt = supply.CreatedAt,
+                    Method = dto.PaymentMethod,
+                    Notes = dto.Notes,
+                    PaidAt = supply.ReceivedAt,
+                    SupplyId = supply.Id,
+                    
+                });
+                supply.PaymentStatus = PaymentStatus.FullyPaid;
+            }
+
+            supply.IsConfirmed = true;
+            await _unitOfWork.CompleteAsync();
+
+            return Response.Success(
+                message: "Supply confirmed sucessfully",
+                data : supply.Adapt<SupplyDetailsDto>());
         }
 
     }

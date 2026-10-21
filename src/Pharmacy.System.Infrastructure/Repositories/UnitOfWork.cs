@@ -22,6 +22,9 @@ namespace Pharmacy.System.Infrastructure.Repositories
         private readonly Lazy<IPackagingUnitRepository> _packagingUnitRepository;
         private readonly Lazy<ISupplierRepository> _supplierRepository;
         private readonly Lazy<ISupplyRepository> _supplyRepository;
+        private readonly Lazy<ISupplyPaymentRepository> _supplyPaymentRepository;
+        private readonly Lazy<IRepositoryRepository> _repositoryRepository;
+        private readonly Lazy<IInventoryItemRepository> _inventoryItemRepository;
 
 
         public UnitOfWork(AppDbContext context)
@@ -39,6 +42,9 @@ namespace Pharmacy.System.Infrastructure.Repositories
             _packagingUnitRepository = new Lazy<IPackagingUnitRepository>(() => new PackagingUnitRepository(_context));
             _supplierRepository = new Lazy<ISupplierRepository>(() => new SupplierRepository(_context));
             _supplyRepository = new Lazy<ISupplyRepository>(() => new SupplyRepository(_context));
+            _supplyPaymentRepository = new Lazy<ISupplyPaymentRepository>(() => new SupplyPaymentRepository(_context));
+            _repositoryRepository = new Lazy<IRepositoryRepository>(() => new RepositoryRepository(_context));
+            _inventoryItemRepository = new Lazy<IInventoryItemRepository>(() => new InventoryItemRepository(_context));
         }
 
         public IProductRepository ProductRepository => _productRepository.Value;
@@ -52,6 +58,9 @@ namespace Pharmacy.System.Infrastructure.Repositories
         public IPackagingUnitRepository PackagingUnitRepository => _packagingUnitRepository.Value;
         public ISupplierRepository SupplierRepository => _supplierRepository.Value;
         public ISupplyRepository SupplyRepository => _supplyRepository.Value;
+        public ISupplyPaymentRepository SupplyPaymentRepository => _supplyPaymentRepository.Value;
+        public IRepositoryRepository RepositoryRepository => _repositoryRepository.Value;
+        public IInventoryItemRepository InventoryItemRepository => _inventoryItemRepository.Value;
 
 
 

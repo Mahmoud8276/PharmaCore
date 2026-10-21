@@ -70,13 +70,9 @@ namespace Pharmacy.System.Services.ApplicatoinServicesConfig
                                                         * (1 - (src.DiscountPercentage ?? 0) / 100m))
                 .Map(dest => dest.ReceivedAt, src => src.ReceivedAt)
                 .Map(dest => dest.SupplierId, src => src.SupplierId)
+                .Map(dest => dest.PaymentPlan, src => src.PaymentPlan)
                 .Map(dest => dest.PaymentStatus, src =>
-                (src.InitialPaidAmount ?? 0) <= 0 ? PaymentStatus.NotPaid
-                    : src.InitialPaidAmount <
-                        src.Items.Sum(x => x.Quantity * x.PricePerUnit)
-                        * (1 - (src.DiscountPercentage ?? 0) / 100m)
-                            ? PaymentStatus.PartiallyPaid
-                            : PaymentStatus.FullyPaid);
+                src.PaymentPlan == SupplyPaymentPlan.FullPayment ? PaymentStatus.FullyPaid : PaymentStatus.NotPaid);
 
             TypeAdapterConfig<SupplyItemDto, SupplyItem>
                 .NewConfig()
@@ -110,6 +106,16 @@ namespace Pharmacy.System.Services.ApplicatoinServicesConfig
                 .Map(dest => dest.ProductName, src => src.ProductSnapshot.Name)
                 .Map(dest => dest.ProductCategoryName, src => src.ProductSnapshot.CategoryName)
                 .Map(dest => dest.ProductFormName, src => src.ProductSnapshot.ProductFormName);
+
+            TypeAdapterConfig<SupplyItem, InventoryItem>
+                .NewConfig()
+                .Map(dest => dest.ProductId, src => src.ProductId ?? -1)
+                .Map(dest => dest.RepositoryId, src => src.Supply.RepositoryId)
+                .Map(dest => dest.SupplyItemId, src => src.Id)
+                .Map(dest => dest.ExpiryDate, src => src.ExpiryDate)
+                .Map(dest => dest.ReceivedBaseUnits, src => src.BaseUnitsPerReceivedUnit * src.Quantity)
+                .Map(dest => dest.OnHandBaseUnits, src => src.BaseUnitsPerReceivedUnit * src.Quantity)
+                .Map(dest => dest.PricePerBaseUnits, src => src.PricePerUnit / src.BaseUnitsPerReceivedUnit);
         }
     }
 }

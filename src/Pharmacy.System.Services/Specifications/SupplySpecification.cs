@@ -16,6 +16,8 @@ namespace Pharmacy.System.Services.Specifications
 
                 AddInclude(x => x.Supplier);
                 AddInclude(x => x.Items);
+                AddInclude(x => x.Payments);
+                AddInclude(x => x.Installments);
             }
         }
 
@@ -23,6 +25,8 @@ namespace Pharmacy.System.Services.Specifications
         {
             AddInclude(x => x.Supplier);
             AddInclude(x => x.Items);
+            AddInclude(x => x.Payments);
+            AddInclude(x => x.Installments);
         }
 
         private static Expression<Func<Supply, bool>> BuildCriteria(ISupplySpecParams specParams)

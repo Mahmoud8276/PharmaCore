@@ -14,6 +14,7 @@ namespace Pharmacy.System.Services.ApplicatoinServicesConfig
             services.AddScoped<IGenericRepository<ProductForm, int>, GenericRepository<ProductForm, int>>();
             services.AddScoped<IGenericRepository<ActiveIngredient, int>, GenericRepository<ActiveIngredient, int>>();
             services.AddScoped<IGenericRepository<PackagingUnit, int>, GenericRepository<PackagingUnit, int>>();
+            services.AddScoped<IGenericRepository<Repository, int>, GenericRepository<Repository, int>>();
 
             return services;
         }

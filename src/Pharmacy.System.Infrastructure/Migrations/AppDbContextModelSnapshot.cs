@@ -265,6 +265,49 @@ namespace Pharmacy.System.Infrastructure.Migrations
                     b.ToTable("BaseUnits");
                 });
 
+            modelBuilder.Entity("Pharmacy.System.Core.Models.InventoryItem", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateOnly>("ExpiryDate")
+                        .HasColumnType("date");
+
+                    b.Property<decimal>("OnHandBaseUnits")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("PricePerBaseUnits")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("ProductId")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("ReceivedBaseUnits")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("RepositoryId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("SupplyItemId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ProductId");
+
+                    b.HasIndex("RepositoryId");
+
+                    b.HasIndex("SupplyItemId");
+
+                    b.ToTable("InventoryItem");
+                });
+
             modelBuilder.Entity("Pharmacy.System.Core.Models.Manufacturer", b =>
                 {
                     b.Property<int>("Id")
@@ -498,6 +541,35 @@ namespace Pharmacy.System.Infrastructure.Migrations
                     b.ToTable("RefreshTokens");
                 });
 
+            modelBuilder.Entity("Pharmacy.System.Core.Models.Repository", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsMain")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Location")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Name")
+                        .IsUnique();
+
+                    b.ToTable("Repositories");
+                });
+
             modelBuilder.Entity("Pharmacy.System.Core.Models.Supplier", b =>
                 {
                     b.Property<int>("Id")
@@ -551,11 +623,17 @@ namespace Pharmacy.System.Infrastructure.Migrations
                     b.Property<bool>("IsConfirmed")
                         .HasColumnType("bit");
 
+                    b.Property<int>("PaymentPlan")
+                        .HasColumnType("int");
+
                     b.Property<int>("PaymentStatus")
                         .HasColumnType("int");
 
                     b.Property<DateOnly>("ReceivedAt")
                         .HasColumnType("date");
+
+                    b.Property<int>("RepositoryId")
+                        .HasColumnType("int");
 
                     b.Property<int>("SupplierId")
                         .HasColumnType("int");
@@ -564,14 +642,47 @@ namespace Pharmacy.System.Infrastructure.Migrations
                         .HasPrecision(18, 4)
                         .HasColumnType("decimal(18,4)");
 
-                    b.Property<bool>("UserPaidConfirmation")
-                        .HasColumnType("bit");
-
                     b.HasKey("Id");
+
+                    b.HasIndex("RepositoryId");
 
                     b.HasIndex("SupplierId");
 
                     b.ToTable("Supplies");
+                });
+
+            modelBuilder.Entity("Pharmacy.System.Core.Models.SupplyInstallment", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<decimal>("Amount")
+                        .HasPrecision(18, 4)
+                        .HasColumnType("decimal(18,4)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateOnly>("DueDate")
+                        .HasColumnType("date");
+
+                    b.Property<string>("Notes")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.Property<int>("SupplyId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("SupplyId");
+
+                    b.ToTable("SupplyInstallments");
                 });
 
             modelBuilder.Entity("Pharmacy.System.Core.Models.SupplyItem", b =>
@@ -626,6 +737,44 @@ namespace Pharmacy.System.Infrastructure.Migrations
                     b.HasIndex("SupplyId");
 
                     b.ToTable("SupplyItem");
+                });
+
+            modelBuilder.Entity("Pharmacy.System.Core.Models.SupplyPayment", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<decimal>("Amount")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("Method")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Notes")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateOnly>("PaidAt")
+                        .HasColumnType("date");
+
+                    b.Property<int>("SupplyId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("SupplyInstallmentId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("SupplyId");
+
+                    b.HasIndex("SupplyInstallmentId");
+
+                    b.ToTable("SupplyPayments");
                 });
 
             modelBuilder.Entity("Pharmacy.System.Core.Models.UnitFamily", b =>
@@ -739,6 +888,33 @@ namespace Pharmacy.System.Infrastructure.Migrations
                     b.Navigation("CanoncialUnit");
 
                     b.Navigation("UnitFamily");
+                });
+
+            modelBuilder.Entity("Pharmacy.System.Core.Models.InventoryItem", b =>
+                {
+                    b.HasOne("Pharmacy.System.Core.Models.Product", "Product")
+                        .WithMany()
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Pharmacy.System.Core.Models.Repository", "Repository")
+                        .WithMany()
+                        .HasForeignKey("RepositoryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Pharmacy.System.Core.Models.SupplyItem", "SupplyItem")
+                        .WithMany()
+                        .HasForeignKey("SupplyItemId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Product");
+
+                    b.Navigation("Repository");
+
+                    b.Navigation("SupplyItem");
                 });
 
             modelBuilder.Entity("Pharmacy.System.Core.Models.Product", b =>
@@ -869,13 +1045,32 @@ namespace Pharmacy.System.Infrastructure.Migrations
 
             modelBuilder.Entity("Pharmacy.System.Core.Models.Supply", b =>
                 {
+                    b.HasOne("Pharmacy.System.Core.Models.Repository", "Repository")
+                        .WithMany()
+                        .HasForeignKey("RepositoryId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.HasOne("Pharmacy.System.Core.Models.Supplier", "Supplier")
                         .WithMany()
                         .HasForeignKey("SupplierId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.Navigation("Repository");
+
                     b.Navigation("Supplier");
+                });
+
+            modelBuilder.Entity("Pharmacy.System.Core.Models.SupplyInstallment", b =>
+                {
+                    b.HasOne("Pharmacy.System.Core.Models.Supply", "Supply")
+                        .WithMany("Installments")
+                        .HasForeignKey("SupplyId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Supply");
                 });
 
             modelBuilder.Entity("Pharmacy.System.Core.Models.SupplyItem", b =>
@@ -992,6 +1187,23 @@ namespace Pharmacy.System.Infrastructure.Migrations
                     b.Navigation("Supply");
                 });
 
+            modelBuilder.Entity("Pharmacy.System.Core.Models.SupplyPayment", b =>
+                {
+                    b.HasOne("Pharmacy.System.Core.Models.Supply", "Supply")
+                        .WithMany("Payments")
+                        .HasForeignKey("SupplyId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Pharmacy.System.Core.Models.SupplyInstallment", "SupplyInstallment")
+                        .WithMany("Payments")
+                        .HasForeignKey("SupplyInstallmentId");
+
+                    b.Navigation("Supply");
+
+                    b.Navigation("SupplyInstallment");
+                });
+
             modelBuilder.Entity("Pharmacy.System.Core.Models.ActiveIngredient", b =>
                 {
                     b.Navigation("ProductActiveIngredients");
@@ -1011,7 +1223,16 @@ namespace Pharmacy.System.Infrastructure.Migrations
 
             modelBuilder.Entity("Pharmacy.System.Core.Models.Supply", b =>
                 {
+                    b.Navigation("Installments");
+
                     b.Navigation("Items");
+
+                    b.Navigation("Payments");
+                });
+
+            modelBuilder.Entity("Pharmacy.System.Core.Models.SupplyInstallment", b =>
+                {
+                    b.Navigation("Payments");
                 });
 #pragma warning restore 612, 618
         }

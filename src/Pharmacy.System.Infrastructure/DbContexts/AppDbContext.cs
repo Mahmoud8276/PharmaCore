@@ -28,6 +28,9 @@ namespace Pharmacy.System.Infrastructure.DbContexts
         public DbSet<PackagingUnit> PackagingUnits { get; set; }
         public DbSet<ProductPackagingLevel> ProductPackagingLevels { get; set; }
         public DbSet<Supply> Supplies { get; set; }
+        public DbSet<SupplyInstallment> SupplyInstallments { get; set; }
+        public DbSet<SupplyPayment> SupplyPayments { get; set; }
+        public DbSet<Repository> Repositories  { get; set; }
         public DbSet<Supplier> Suppliers { get; set; }
         public DbSet<RefreshToken> RefreshTokens { get; set; }
     }

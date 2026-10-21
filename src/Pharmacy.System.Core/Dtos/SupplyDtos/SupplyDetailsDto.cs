@@ -1,4 +1,5 @@
-﻿using Pharmacy.System.Core.Dtos.SupplyItemDtos;
+﻿using Pharmacy.System.Core.Dtos.RepositoryDtos;
+using Pharmacy.System.Core.Dtos.SupplyItemDtos;
 using Pharmacy.System.Core.Enums;
 using System;
 using System.Collections.Generic;
@@ -17,6 +18,7 @@ namespace Pharmacy.System.Core.Dtos.SupplyDtos
         public bool IsConfirmed { get; set; }
         public int SupplierId { get; set; }
         public string SupplierName { get; set; } = null!;
+        public RepositoryDetailsDto Repository { get; set; } = null!;
         public List<SupplyItemDetailsDto> Items { get; set; } = new List<SupplyItemDetailsDto>();
     }
 }

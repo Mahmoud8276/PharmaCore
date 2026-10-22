@@ -32,11 +32,18 @@ namespace Pharmacy.System.Services.Services
 
         private async Task<Response> ValidateProductDtoAsync(ProductDto dto, int? excludeProductId = null)
         {
-            if (await _unitOfWork.ProductRepository.AnyAsync(x =>
-                    x.Barcode == dto.Barcode && (excludeProductId == null || x.Id != excludeProductId)))
+            if(await _unitOfWork.ProductRepository.AnyAsync(
+                x => x.Name == dto.Name && (excludeProductId == null || x.Id != excludeProductId)))
+            {
+                return Response.Conflict(
+                    message: "Product name already exists!");
+            }
+
+            if (await _unitOfWork.ProductBarcodeRepository.AnyAsync(x =>
+                    dto.Barcodes.Contains(x.Barcode) && (excludeProductId == null || x.ProductId != excludeProductId)))
             {
                 return Response.Conflict
-                    (message: "Product barcode already exists!");
+                    (message: "One or more product barcode already exists!");
             }
 
             if (dto.ManufacturerId != null)

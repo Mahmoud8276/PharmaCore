@@ -35,7 +35,15 @@ namespace Pharmacy.System.Services.ApplicatoinServicesConfig
             TypeAdapterConfig<Product, ProductDetailsDto>
                 .NewConfig()
                 .Map(dest => dest.Image, src => src.Image == null ? null : $"{baseUrl}/files/ProductImages/{src.Image}")
-                .Map(dest => dest.ActiveIngredients, src => src.ProductActiveIngredients);
+                .Map(dest => dest.ActiveIngredients, src => src.ProductActiveIngredients)
+                .Map(dest => dest.Barcodes, src => src.Barcodes.Select(x=>x.Barcode));
+
+            TypeAdapterConfig<ProductDto, Product>
+                .NewConfig()
+                .Map(dest => dest.Barcodes, src => src.Barcodes.Select(x=> new ProductBarcode()
+                {
+                    Barcode = x
+                }));
 
             TypeAdapterConfig<ProductActiveIngredient, ProductActiveIngredientDetailsDto>
                 .NewConfig()

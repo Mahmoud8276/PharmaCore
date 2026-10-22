@@ -9,7 +9,7 @@ namespace Pharmacy.System.Core.Dtos.ProductDtos
     {
         public int Id { get; set; }
         public string Name { get; set; }
-        public string Barcode { get; set; }
+        public List<string> Barcodes { get; set; } = new List<string>();
         public string? Description { get; set; }
         public double? MinimumStockLevel { get; set; }
         public string? Image { get; set; }

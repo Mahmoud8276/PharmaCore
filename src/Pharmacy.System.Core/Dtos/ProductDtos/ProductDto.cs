@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Pharmacy.System.Core.Attributes;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace Pharmacy.System.Core.Dtos.ProductDtos
@@ -9,8 +10,8 @@ namespace Pharmacy.System.Core.Dtos.ProductDtos
         [Required(ErrorMessage = "Product Name is Required!")]
         public string Name { get; set; }
 
-        [Required(ErrorMessage = "Product Barcode is Required!")]
-        public string Barcode { get; set; }
+        [MinLength(1, ErrorMessage = "At least one product code must be provided!")]
+        public List<string> Barcodes { get; set; } = new List<string>();
         public string? Description { get; set; }
         public double? MinimumStockLevel { get; set; }
 

@@ -356,10 +356,6 @@ namespace Pharmacy.System.Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("Barcode")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
                     b.Property<int>("CategoryId")
                         .HasColumnType("int");
 
@@ -386,9 +382,6 @@ namespace Pharmacy.System.Infrastructure.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("Barcode")
-                        .IsUnique();
 
                     b.HasIndex("CategoryId");
 
@@ -429,6 +422,31 @@ namespace Pharmacy.System.Infrastructure.Migrations
                         .IsUnique();
 
                     b.ToTable("ProductActiveIngredients");
+                });
+
+            modelBuilder.Entity("Pharmacy.System.Core.Models.ProductBarcode", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Barcode")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int>("ProductId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Barcode")
+                        .IsUnique();
+
+                    b.HasIndex("ProductId");
+
+                    b.ToTable("ProductBarcode");
                 });
 
             modelBuilder.Entity("Pharmacy.System.Core.Models.ProductCategory", b =>
@@ -973,6 +991,17 @@ namespace Pharmacy.System.Infrastructure.Migrations
                     b.Navigation("Product");
                 });
 
+            modelBuilder.Entity("Pharmacy.System.Core.Models.ProductBarcode", b =>
+                {
+                    b.HasOne("Pharmacy.System.Core.Models.Product", "Product")
+                        .WithMany("Barcodes")
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Product");
+                });
+
             modelBuilder.Entity("Pharmacy.System.Core.Models.ProductForm", b =>
                 {
                     b.HasOne("Pharmacy.System.Core.Models.BaseUnit", "BaseUnit")
@@ -1227,6 +1256,8 @@ namespace Pharmacy.System.Infrastructure.Migrations
 
             modelBuilder.Entity("Pharmacy.System.Core.Models.Product", b =>
                 {
+                    b.Navigation("Barcodes");
+
                     b.Navigation("ProductActiveIngredients");
 
                     b.Navigation("ProductPackagingLevels");

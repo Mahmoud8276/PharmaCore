@@ -12,6 +12,7 @@ namespace Pharmacy.System.Infrastructure.Repositories
         private readonly AppDbContext _context;
 
         private readonly Lazy<IProductRepository> _productRepository;
+        private readonly Lazy<IProductBarcodeRepository> _productBarcodeRepository;
         private readonly Lazy<IProductCategoryRepository> _productCategoryRepository;
         private readonly Lazy<IManufactorerRepository> _manufacturerRepository;
         private readonly Lazy<IProductFormRepository> _productFormRepository;
@@ -32,6 +33,7 @@ namespace Pharmacy.System.Infrastructure.Repositories
             _context = context;
 
             _productRepository = new Lazy<IProductRepository>(() => new ProductRepository(_context));
+            _productBarcodeRepository = new Lazy<IProductBarcodeRepository>(() => new ProductBarcodeRepository(_context));
             _productCategoryRepository = new Lazy<IProductCategoryRepository>(() => new ProductCategoryRepository(_context));
             _manufacturerRepository = new Lazy<IManufactorerRepository>(() => new ManufactorerRepository(_context));
             _productFormRepository = new Lazy<IProductFormRepository>(() => new ProductFormRepository(_context));
@@ -48,6 +50,7 @@ namespace Pharmacy.System.Infrastructure.Repositories
         }
 
         public IProductRepository ProductRepository => _productRepository.Value;
+        public IProductBarcodeRepository ProductBarcodeRepository => _productBarcodeRepository.Value;
         public IProductCategoryRepository ProductCategoryRepository => _productCategoryRepository.Value;
         public IManufactorerRepository ManufacturerRepository => _manufacturerRepository.Value;
         public IProductFormRepository ProductFormRepository => _productFormRepository.Value;

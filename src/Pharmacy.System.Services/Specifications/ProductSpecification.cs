@@ -19,6 +19,7 @@ namespace Pharmacy.System.Services.Specifications
             }
 
             AddInclude(x => x.Category);
+            AddInclude(x => x.Barcodes);
             AddInclude(x => x.ProductForm);
             AddInclude(x => x.Manufacturer);
             AddInclude(x => x.ProductActiveIngredients);
@@ -31,6 +32,7 @@ namespace Pharmacy.System.Services.Specifications
         public ProductSpecification(int ProductId) : base(x => x.Id == ProductId)
         {
             AddInclude(x => x.Category);
+            AddInclude(x => x.Barcodes);
             AddInclude(x => x.ProductForm);
             AddInclude(x => x.Manufacturer);
             AddInclude(x => x.ProductActiveIngredients);
@@ -44,6 +46,7 @@ namespace Pharmacy.System.Services.Specifications
             : base(x => productIds.ToHashSet().Contains(x.Id))
         {
             AddInclude(x => x.Category);
+            AddInclude(x => x.Barcodes);
             AddInclude(x => x.ProductForm);
             AddInclude(x => x.Manufacturer);
             AddInclude(x => x.ProductActiveIngredients);

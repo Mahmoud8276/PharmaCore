@@ -8,8 +8,6 @@ namespace Pharmacy.System.Infrastructure.ModelsConfig
     {
         public void Configure(EntityTypeBuilder<Product> builder)
         {
-            builder.HasIndex(p => p.Barcode)
-                   .IsUnique(true);
 
             builder.HasOne(x=>x.Manufacturer)
                    .WithMany()

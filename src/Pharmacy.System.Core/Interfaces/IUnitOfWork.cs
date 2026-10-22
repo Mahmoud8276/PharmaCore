@@ -8,6 +8,7 @@ namespace Pharmacy.System.Core.Interfaces
     public interface IUnitOfWork : IAsyncDisposable
     {
         public IProductRepository ProductRepository { get; }
+        public IProductBarcodeRepository ProductBarcodeRepository { get; }
         public IProductCategoryRepository ProductCategoryRepository { get; }
         public IManufactorerRepository ManufacturerRepository { get; }
         public IProductFormRepository ProductFormRepository { get; }

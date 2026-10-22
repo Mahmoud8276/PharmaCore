@@ -181,5 +181,26 @@ namespace Pharmacy.System.Api.Controllers.V1
             var result = await _productPackagingService.GetProductBaseUnit(productId);
             return StatusCode(result.StatusCode, result);
         }
+
+        [HttpPut("{productId}/default-packaging/{productPackagingId}")]
+        public async Task<IActionResult> AddProductDefaultPackagingAsync(int productId, int productPackagingId)
+        {
+            var result = await _productPackagingService.AddProductDefaultPackagingAsync(productId, productPackagingId);
+            return StatusCode(result.StatusCode, result);
+        }
+
+        [HttpGet("{productId}/default-packaging")]
+        public async Task<IActionResult> GetProductDefaultPackagingAsync(int productId)
+        {
+            var result = await _productPackagingService.GetProductDefaultPackagingAsync(productId);
+            return StatusCode(result.StatusCode, result);
+        }
+
+        [HttpDelete("{productId}/default-packaging")]
+        public async Task<IActionResult> DeleteProductDefaultPackagingAsync(int productId)
+        {
+            var result = await _productPackagingService.DeleteProductDefaultPackagingAsync(productId);
+            return StatusCode(result.StatusCode, result);
+        }
     }
 }

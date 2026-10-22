@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Http;
 using Pharmacy.System.Services.Specifications;
 using FluentAssertions;
 using System.Net;
+using Pharmacy.System.Services.IServices;
 
 namespace Pharmacy.System.UnitTests.Services
 {

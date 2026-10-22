@@ -23,6 +23,8 @@ namespace Pharmacy.System.Services.Specifications
             AddInclude(x => x.Manufacturer);
             AddInclude(x => x.ProductActiveIngredients);
             AddInclude(x => x.ProductPackagingLevels);
+            AddInclude(x => x.DefaultPackaging);
+            AddInclude("DefaultPackaging.PackagingUnit");
             AddInclude("ProductActiveIngredients.ActiveIngredient");
         }
 
@@ -33,6 +35,8 @@ namespace Pharmacy.System.Services.Specifications
             AddInclude(x => x.Manufacturer);
             AddInclude(x => x.ProductActiveIngredients);
             AddInclude(x => x.ProductPackagingLevels);
+            AddInclude(x => x.DefaultPackaging);
+            AddInclude("DefaultPackaging.PackagingUnit");
             AddInclude("ProductActiveIngredients.ActiveIngredient");
         }
 
@@ -44,6 +48,8 @@ namespace Pharmacy.System.Services.Specifications
             AddInclude(x => x.Manufacturer);
             AddInclude(x => x.ProductActiveIngredients);
             AddInclude(x => x.ProductPackagingLevels);
+            AddInclude(x => x.DefaultPackaging);
+            AddInclude("DefaultPackaging.PackagingUnit");
             AddInclude("ProductActiveIngredients.ActiveIngredient");
         }
 

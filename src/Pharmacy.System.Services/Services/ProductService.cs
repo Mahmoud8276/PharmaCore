@@ -494,8 +494,5 @@ namespace Pharmacy.System.Services.Services
                 message: "All Product Active Ingredients Deleted Successfully");
         }
 
-
-
-        
     }
 }

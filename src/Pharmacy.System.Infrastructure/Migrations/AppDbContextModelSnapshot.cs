@@ -363,6 +363,9 @@ namespace Pharmacy.System.Infrastructure.Migrations
                     b.Property<int>("CategoryId")
                         .HasColumnType("int");
 
+                    b.Property<int?>("DefaultPackagingId")
+                        .HasColumnType("int");
+
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
@@ -388,6 +391,8 @@ namespace Pharmacy.System.Infrastructure.Migrations
                         .IsUnique();
 
                     b.HasIndex("CategoryId");
+
+                    b.HasIndex("DefaultPackagingId");
 
                     b.HasIndex("ManufacturerId");
 
@@ -925,6 +930,10 @@ namespace Pharmacy.System.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("Pharmacy.System.Core.Models.ProductPackagingLevel", "DefaultPackaging")
+                        .WithMany()
+                        .HasForeignKey("DefaultPackagingId");
+
                     b.HasOne("Pharmacy.System.Core.Models.Manufacturer", "Manufacturer")
                         .WithMany()
                         .HasForeignKey("ManufacturerId")
@@ -937,6 +946,8 @@ namespace Pharmacy.System.Infrastructure.Migrations
                         .IsRequired();
 
                     b.Navigation("Category");
+
+                    b.Navigation("DefaultPackaging");
 
                     b.Navigation("Manufacturer");
 

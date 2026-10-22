@@ -19,9 +19,11 @@ namespace Pharmacy.System.Services.Services
             _unitOfWork = unitOfWork;
         }
 
-        private async Task<ProductPacagingDetailsDto> MapToProductPackagingDetails(
+        private async Task<ProductPacagingDetailsDto?> MapToProductPackagingDetails(
             ProductPackagingLevel entity)
         {
+            if(entity == null) return null;
+
             var dto = entity.Adapt<ProductPacagingDetailsDto>();
 
             var childPackagingLevel = await _unitOfWork.ProductPackagingLevelRepository
@@ -278,5 +280,82 @@ namespace Pharmacy.System.Services.Services
             return Response.Success(
                 message: "Product packaging updated Successfully!");
         }
+
+
+        public async Task<Response> AddProductDefaultPackagingAsync(int productId, int packagingLevelId)
+        {
+            var product = await _unitOfWork.ProductRepository.GetByIdAsync(productId);
+            if (product == null)
+            {
+                return Response.NotFound(
+                    message: "Product not found!");
+            }
+
+            var packaging = await _unitOfWork.ProductPackagingLevelRepository
+                .GetWithSpecAsync(new ProductPackagingLevelSpecification(packagingLevelId));
+            if (packaging == null)
+            {
+                return Response.NotFound(
+                    message: "Packaging level not found!");
+            }
+
+            if (packaging.ProductId != productId)
+            {
+                return Response.Conflict(
+                    message: "Packaging level does not belong to the specified product!");
+            }
+
+            product.DefaultPackagingId = packagingLevelId;
+            await _unitOfWork.CompleteAsync();
+
+            return Response.Success(
+                message: "Default packaging added successfully!",
+                data: await MapToProductPackagingDetails(packaging));
+        }
+
+        public async Task<Response> GetProductDefaultPackagingAsync(int productId)
+        {
+            var product = await _unitOfWork.ProductRepository.
+                GetWithSpecAsync(new ProductSpecification(productId));
+            if (product == null)
+            {
+                return Response.NotFound(
+                    message: "Product not found!");
+            }
+
+            if (product.DefaultPackaging == null)
+            {
+                return Response.NotFound(
+                    message: "Default packaging not configured for this product!");
+            }
+
+            return Response.Success(
+                message: "Default packaging retrieved successfully!",
+                data: await MapToProductPackagingDetails(product.DefaultPackaging));
+        }
+
+        public async Task<Response> DeleteProductDefaultPackagingAsync(int productId)
+        {
+            var product = await _unitOfWork.ProductRepository.
+                GetWithSpecAsync(new ProductSpecification(productId));
+            if (product == null)
+            {
+                return Response.NotFound(
+                    message: "Product not found!");
+            }
+
+            if (product.DefaultPackaging == null)
+            {
+                return Response.NotFound(
+                    message: "Default packaging not configured for this product!");
+            }
+
+            product.DefaultPackagingId = null;
+            await _unitOfWork.CompleteAsync();
+
+            return Response.Success(
+                message: "Default packging deleted successfully!");
+        }
+
     }
 }

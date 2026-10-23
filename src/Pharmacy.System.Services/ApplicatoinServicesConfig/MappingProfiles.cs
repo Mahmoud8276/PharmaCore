@@ -10,6 +10,7 @@ using System.Linq;
 using Pharmacy.System.Core.Dtos.SupplyDtos;
 using Pharmacy.System.Core.Dtos.SupplyItemDtos;
 using Pharmacy.System.Core.Enums;
+using Pharmacy.System.Core.Dtos.ProductCategoryDtos;
 
 namespace Pharmacy.System.Services.ApplicatoinServicesConfig
 {
@@ -51,6 +52,10 @@ namespace Pharmacy.System.Services.ApplicatoinServicesConfig
                 {
                     Barcode = x
                 }));
+
+            TypeAdapterConfig<ProductCategory, ProductCategoryDetailsDto>
+                .NewConfig()
+                .Map(dest => dest.Image, src => src.Image == null ? null : $"{baseUrl}/files/CategoryImages/{src.Image}");
 
             TypeAdapterConfig<ProductActiveIngredient, ProductActiveIngredientDetailsDto>
                 .NewConfig()

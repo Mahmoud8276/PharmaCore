@@ -10,7 +10,9 @@ namespace Pharmacy.System.Services.IServices
         public Task<Response> CreateAsync(ProductCategoryDto dto);
         public Task<Response> GetAllAsync(ProductCategorySpecParams specParams);
         public Task<Response> GetByIdAsync(int id);
-        public Task<Response> UpdateAsync(ProductCategoryDto dto, int id);
+        public Task<Response> UpdateAsync(UpdateProductCategoryDto dto, int id);
         public Task<Response> DeleteAsync(int id);
+        public Task<Response> UpdateCategoryImageAsync(int id, UpdateCategoryImageDto dto);
+        public Task<Response> DeleteCategoryImageAsync(int id);
     }
 }

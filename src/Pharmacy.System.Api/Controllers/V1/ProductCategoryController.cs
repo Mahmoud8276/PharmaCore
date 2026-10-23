@@ -18,7 +18,7 @@ namespace Pharmacy.System.Api.Controllers.V1
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateAsync([FromBody] ProductCategoryDto dto)
+        public async Task<IActionResult> CreateAsync([FromForm] ProductCategoryDto dto)
         {
             var result = await _productCategoryService.CreateAsync(dto);
             return StatusCode(result.StatusCode, result);
@@ -39,7 +39,7 @@ namespace Pharmacy.System.Api.Controllers.V1
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateAsync(int id, [FromBody] ProductCategoryDto dto)
+        public async Task<IActionResult> UpdateAsync(int id, [FromBody] UpdateProductCategoryDto dto)
         {
             var result = await _productCategoryService.UpdateAsync(dto, id);
             return StatusCode(result.StatusCode, result);
@@ -49,6 +49,20 @@ namespace Pharmacy.System.Api.Controllers.V1
         public async Task<IActionResult> DeleteAsync(int id)
         {
             var result = await _productCategoryService.DeleteAsync(id);
+            return StatusCode(result.StatusCode, result);
+        }
+
+        [HttpPut("{id}/image")]
+        public async Task<IActionResult> UpdateCategoryImageAsync(int id, [FromForm] UpdateCategoryImageDto dto)
+        {
+            var result = await _productCategoryService.UpdateCategoryImageAsync(id, dto);
+            return StatusCode(result.StatusCode, result);
+        }
+
+        [HttpDelete("{id}/image")]
+        public async Task<IActionResult> DeleteCategoryImageAsync(int id)
+        {
+            var result = await _productCategoryService.DeleteCategoryImageAsync(id);
             return StatusCode(result.StatusCode, result);
         }
     }

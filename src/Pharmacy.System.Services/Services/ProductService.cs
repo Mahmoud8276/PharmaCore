@@ -14,6 +14,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Linq;
+using System.Security.Cryptography;
 
 namespace Pharmacy.System.Services.Services
 {
@@ -32,7 +33,13 @@ namespace Pharmacy.System.Services.Services
 
         private async Task<Response> ValidateProductDtoAsync(ProductDto dto, int? excludeProductId = null)
         {
-            if(await _unitOfWork.ProductRepository.AnyAsync(
+            if(dto.Barcodes.Distinct().Count() != dto.Barcodes.Count)
+            {
+                return Response.Fail(
+                    message: "Duplicate barcodes in the request!");
+            }
+
+            if (await _unitOfWork.ProductRepository.AnyAsync(
                 x => x.Name == dto.Name && (excludeProductId == null || x.Id != excludeProductId)))
             {
                 return Response.Conflict(
@@ -282,7 +289,32 @@ namespace Pharmacy.System.Services.Services
             return Response.Success(message: "Product image deleted successfully");
         }
 
+        public async Task<Response> GenerateBarcodeAsync()
+        {
+            const int maxAttempts = 10;
+            const string prefix = "200";
 
+            for (int attempt = 0; attempt < maxAttempts; attempt++)
+            {
+                var barcode = $"{prefix}{RandomNumberGenerator.GetInt32(0, 1_000_000_000):D9}";
+
+                var exists = await _unitOfWork.ProductBarcodeRepository
+                    .AnyAsync(x => x.Barcode == barcode);
+
+                if (!exists)
+                {
+                    return Response.Success(
+                        message: "Barcode generated successfully.",
+                        data: new
+                        {
+                            barcode = barcode
+                        });
+                }
+            }
+
+            return Response.InternalServerError(
+                message: "Unable to generate a unique barcode. Please try again.");
+        }
 
 
         public async Task<Response> AddProductActiveIngredientAsync(int productId, int activeIngredientId, ProductActiveIngredientDto dto)

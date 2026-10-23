@@ -74,6 +74,13 @@ namespace Pharmacy.System.Api.Controllers.V1
             return StatusCode(response.StatusCode, response);
         }
 
+        [HttpGet("generate-barcode")]
+        public async Task<IActionResult> GenerateBarcodeAsync()
+        {
+            var response = await _productService.GenerateBarcodeAsync();
+            return StatusCode(response.StatusCode, response);
+        }
+
 
 
         [HttpPost("{productId}/active-ingredients")]

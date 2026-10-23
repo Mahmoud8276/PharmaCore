@@ -67,6 +67,13 @@ namespace Pharmacy.System.Services.IServices
         public Task<Response> DeleteProductImageAsync(int productId);
 
         /// <summary>
+        /// Generates a new unique barcode for a product.
+        /// </summary>
+        /// <returns>A <see cref="Response"/> containing a failure, or a success
+        /// response containing the unique generated barcode.</returns>
+        public Task<Response> GenerateBarcodeAsync();
+
+        /// <summary>
         /// Associates a single active ingredient with a product.
         /// </summary>
         /// <param name="productId">The id of the product to associate the ingredient with.</param>

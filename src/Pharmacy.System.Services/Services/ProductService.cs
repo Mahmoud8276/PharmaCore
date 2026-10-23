@@ -69,17 +69,6 @@ namespace Pharmacy.System.Services.Services
 
             return Response.Success();
         }
-        private async Task TryDeleteImageAsync(string imageName)
-        {
-            try
-            {
-                await FileHelper.DeleteFileAsync(imageName, "ProductImages");
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Failed to delete image {ImageName}", imageName);
-            }
-        }
 
 
         public async Task<Response> CreateAsync(ProductDto dto)
@@ -189,44 +178,108 @@ namespace Pharmacy.System.Services.Services
                 message: "Product retrieved successfully");
         }
 
-        public async Task<Response> UpdateAsync(int id, ProductDto dto)
+        public async Task<Response> UpdateAsync(int id, UpdateProductDto dto)
         {
-            var product = await _unitOfWork.ProductRepository.GetWithSpecAsync(new ProductSpecification(id));
+            var product = await _unitOfWork.ProductRepository.GetByIdAsync(id);
             if (product == null)
                 return Response.NotFound(message: "Product not found!");
 
-            var validationResult = await ValidateProductDtoAsync(dto, excludeProductId: id);
+            var validationResult = await ValidateProductDtoAsync(dto.Adapt<ProductDto>(), excludeProductId: id);
             if (!validationResult.IsSuccess)
                 return validationResult;
 
-            var oldImage = product.Image;
-            string? newImage = null;
-
             dto.Adapt(product);
+            await _unitOfWork.CompleteAsync();
 
-            if (dto.Image != null)
+
+            var updatedProduct = await _unitOfWork.ProductRepository.GetWithSpecAsync(
+                new ProductSpecification(id));
+            return Response.Success(
+                data: updatedProduct.Adapt<ProductDetailsDto>(),
+                message: "Product updated successfully");
+        }
+
+        public async Task<Response> UpdateProductImageAsync(int productId, UpdateProductImageDto dto)
+        {
+            var product = await _unitOfWork.ProductRepository
+                .GetWithSpecAsync(new ProductSpecification(productId));
+            if (product == null)
+                return Response.NotFound(
+                    message: "Product not found!");
+            
+            var oldImage = product.Image;
+            string newImage;
+            try
             {
                 newImage = await FileHelper.UploadFileAsync(dto.Image, "ProductImages");
-                product.Image = newImage;
             }
+            catch(Exception ex)
+            {
+                _logger.LogError(ex, "Couldn't upload the image for product {ProductId}.", productId);
+                return Response.Fail(
+                    message: "Failed to upload the product image!");
+            }
+
+            product.Image = newImage;
 
             try
             {
                 await _unitOfWork.CompleteAsync();
             }
-            catch (Exception)
+            catch
             {
-                if (newImage != null)
-                    await TryDeleteImageAsync(newImage); 
+                try { await FileHelper.DeleteFileAsync(newImage, "ProductImages"); }
+                catch (Exception ex)
+                {
+                    _logger.LogWarning(ex, "Couldn't remove the orphaned image {Image} for product {ProductId}.",
+                        newImage, productId);
+                }
                 throw;
             }
 
-            if (newImage != null && !string.IsNullOrEmpty(oldImage))
-                await TryDeleteImageAsync(oldImage);       
+            if (!string.IsNullOrEmpty(oldImage))
+            {
+                try { await FileHelper.DeleteFileAsync(oldImage, "ProductImages"); }
+                catch (Exception ex)
+                {
+                    _logger.LogWarning(ex, "Couldn't delete the old image {Image} for product {ProductId}.",
+                        oldImage, productId);
+                }
+            }
 
             return Response.Success(
-                data: product.Adapt<ProductDetailsDto>(),
-                message: "Product updated successfully");
+                message: "Product image updated successfully",
+                data: product.Adapt<ProductDetailsDto>());
+        }
+
+        public async Task<Response> DeleteProductImageAsync(int productId)
+        {
+            var product = await _unitOfWork.ProductRepository
+                .GetWithSpecAsync(new ProductSpecification(productId));
+            if (product == null)
+                return Response.NotFound(
+                    message: "Product not found!");
+
+            if (product.Image == null)
+                return Response.NotFound(
+                    message: "The product has no image!");
+
+            var oldImage = product.Image;
+
+            product.Image = null;
+            await _unitOfWork.CompleteAsync();
+
+            try
+            {
+                await FileHelper.DeleteFileAsync(oldImage, "ProductImages");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "Couldn't delete the image file {Image} for product {ProductId}.",
+                    oldImage, productId);
+            }
+
+            return Response.Success(message: "Product image deleted successfully");
         }
 
 

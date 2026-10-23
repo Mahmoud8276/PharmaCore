@@ -45,6 +45,13 @@ namespace Pharmacy.System.Services.ApplicatoinServicesConfig
                     Barcode = x
                 }));
 
+            TypeAdapterConfig<UpdateProductDto, Product>
+                .NewConfig()
+                .Map(dest => dest.Barcodes, src => src.Barcodes.Select(x=> new ProductBarcode()
+                {
+                    Barcode = x
+                }));
+
             TypeAdapterConfig<ProductActiveIngredient, ProductActiveIngredientDetailsDto>
                 .NewConfig()
                 .Map(dest => dest.Name, src => src.ActiveIngredient.Name)

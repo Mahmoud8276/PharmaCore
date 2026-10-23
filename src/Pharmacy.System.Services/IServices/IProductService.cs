@@ -39,7 +39,7 @@ namespace Pharmacy.System.Services.IServices
         /// <param name="dto">The updated product details.</param>
         /// <returns>A <see cref="Response"/> containing the updated product on success, or a failure
         /// response if the product does not exist or the barcode collides with a different product.</returns>
-        public Task<Response> UpdateAsync(int id, ProductDto dto);
+        public Task<Response> UpdateAsync(int id, UpdateProductDto dto);
 
         /// <summary>
         /// Deletes a product.
@@ -48,6 +48,23 @@ namespace Pharmacy.System.Services.IServices
         /// <returns>A <see cref="Response"/> indicating success, or a conflict response if the product
         /// still has dependent data (packaging levels, stock, etc.) that prevents deletion.</returns>
         public Task<Response> DeleteAsync(int id);
+
+        /// <summary>
+        /// Used to update product image.
+        /// </summary>
+        /// <param name="productId">The target product for its image to be updated</param>
+        /// <param name="dto">The DTO containing the new Image</param>
+        /// <returns>A <see cref="Response"/> containing a success, or a failure
+        /// response</returns>
+        public Task<Response> UpdateProductImageAsync(int productId, UpdateProductImageDto dto);
+
+        /// <summary>
+        /// Used to delete product image.
+        /// </summary>
+        /// <param name="productId">The target product for its image to be deleted.</param>
+        /// <returns>A <see cref="Response"/> containing a success, or a failure
+        /// response</returns>
+        public Task<Response> DeleteProductImageAsync(int productId);
 
         /// <summary>
         /// Associates a single active ingredient with a product.

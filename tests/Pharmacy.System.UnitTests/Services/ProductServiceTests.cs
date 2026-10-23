@@ -398,8 +398,7 @@ namespace Pharmacy.System.UnitTests.Services
         {
             //Arrange
             int productId = 1;
-            var productDto = _fixture.Build<ProductDto>()
-                .With(x=>x.Image, (IFormFile?)null)
+            var productDto = _fixture.Build<UpdateProductDto>()
                 .With(x=>x.ManufacturerId, (int?)null)
                 .Create();
 
@@ -457,8 +456,7 @@ namespace Pharmacy.System.UnitTests.Services
         {
             //Arrange
             int productId = 1;
-            var productDto = _fixture.Build<ProductDto>()
-                .With(x => x.Image, (IFormFile?)null)
+            var productDto = _fixture.Build<UpdateProductDto>()
                 .With(x => x.ManufacturerId, (int?)null)
                 .Create();
 
@@ -489,8 +487,7 @@ namespace Pharmacy.System.UnitTests.Services
         {
             //Arrange
             int productId = 1;
-            var productDto = _fixture.Build<ProductDto>()
-                .With(x => x.Image, (IFormFile?)null)
+            var productDto = _fixture.Build<UpdateProductDto>()
                 .With(x => x.ManufacturerId, (int?)null)
                 .Create();
 
@@ -535,8 +532,7 @@ namespace Pharmacy.System.UnitTests.Services
         {
             //Arrange
             int productId = 1;
-            var productDto = _fixture.Build<ProductDto>()
-                .With(x => x.Image, (IFormFile?)null)
+            var productDto = _fixture.Build<UpdateProductDto>()
                 .With(x => x.ManufacturerId, 12)
                 .Create();
 
@@ -585,8 +581,7 @@ namespace Pharmacy.System.UnitTests.Services
         {
             //Arrange
             int productId = 1;
-            var productDto = _fixture.Build<ProductDto>()
-                .With(x => x.Image, (IFormFile?)null)
+            var productDto = _fixture.Build<UpdateProductDto>()
                 .With(x => x.ManufacturerId, (int?)null)
                 .Create();
 
@@ -635,8 +630,7 @@ namespace Pharmacy.System.UnitTests.Services
         {
             //Arrange
             int productId = 1;
-            var productDto = _fixture.Build<ProductDto>()
-                .With(x => x.Image, (IFormFile?)null)
+            var productDto = _fixture.Build<UpdateProductDto>()
                 .With(x => x.ManufacturerId, (int?)null)
                 .Create();
 

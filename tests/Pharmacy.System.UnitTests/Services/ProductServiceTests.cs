@@ -52,6 +52,10 @@ namespace Pharmacy.System.UnitTests.Services
             _unitOfWorkMock.Setup(uow => uow.ProductRepository
             .AnyAsync(It.IsAny<Expression<Func<Product, bool>>>()))
                 .ReturnsAsync(false);
+
+            _unitOfWorkMock.Setup(uow => uow.ProductBarcodeRepository
+            .AnyAsync(It.IsAny<Expression<Func<ProductBarcode, bool>>>()))
+                .ReturnsAsync(false);
             
             _unitOfWorkMock.Setup(uow => uow.ProductCategoryRepository
             .AnyAsync(It.IsAny<Expression<Func<ProductCategory, bool>>>()))
@@ -97,6 +101,66 @@ namespace Pharmacy.System.UnitTests.Services
         }
 
         [Fact]
+        public async Task CreateAsync_DuplicateProductBarcodes_ReturnsBadRequestResponse()
+        {
+            //Arrange
+            var productDto = _fixture.Build<ProductDto>()
+                .With(x=>x.Barcodes, new List<string>() { "111111", "111111" })
+                .With(x => x.Image, (IFormFile?)null)
+                .Create();
+
+            //Act
+            var result = await _sut.CreateAsync(productDto);
+
+            //Assert
+            result.StatusCode.Should().Be((int)HttpStatusCode.BadRequest);
+            result.Message.Should().Be("Duplicate barcodes in the request!");
+            result.Data.Should().BeNull();
+
+            _unitOfWorkMock.Verify(
+                uow => uow.ProductRepository.AddAsync(It.IsAny<Product>()),
+                Times.Never);
+
+            _unitOfWorkMock.Verify(
+                uow => uow.CompleteAsync(),
+                Times.Never);
+        }
+
+        [Fact]
+        public async Task CreateAsync_ProductNameAlreadyExists_ReturnsConflictResponse()
+        {
+            //Arrange
+            var productDto = _fixture.Build<ProductDto>()
+                .With(x => x.Image, (IFormFile?)null)
+                .Create();
+
+            _unitOfWorkMock.Setup(uow => uow.ProductRepository.AnyAsync(
+                It.IsAny<Expression<Func<Product, bool>>>()))
+                .ReturnsAsync(true);
+            
+            //Act
+            var result = await _sut.CreateAsync(productDto);
+            
+            //Assert
+            result.StatusCode.Should().Be((int)HttpStatusCode.Conflict);
+            result.Message.Should().Be("Product name already exists!");
+            result.Data.Should().BeNull();
+            
+            _unitOfWorkMock.Verify(
+                uow => uow.ProductRepository.AddAsync(It.IsAny<Product>()),
+                Times.Never);
+            
+            _unitOfWorkMock.Verify(
+                uow => uow.CompleteAsync(),
+                Times.Never);
+            
+            _unitOfWorkMock.Verify(
+                uow => uow.ProductCategoryRepository.AnyAsync(
+                    It.IsAny<Expression<Func<ProductCategory, bool>>>()),
+                Times.Never);
+        }
+
+        [Fact]
         public async Task CreateAsync_BarcodeAlreadyExists_ReturnsConflictResponse()
         {
             //Arrange
@@ -106,14 +170,18 @@ namespace Pharmacy.System.UnitTests.Services
 
             _unitOfWorkMock.Setup(uow => uow.ProductRepository.AnyAsync(
                 It.IsAny<Expression<Func<Product, bool>>>()))
-                .ReturnsAsync(true);
+                .ReturnsAsync(false);
+
+            _unitOfWorkMock.Setup(uow => uow.ProductBarcodeRepository
+                .AnyAsync(It.IsAny<Expression<Func<ProductBarcode, bool>>>()))
+                    .ReturnsAsync(true);
 
             //Act
             var result = await _sut.CreateAsync(productDto);
 
             //Assert
             result.StatusCode.Should().Be((int)HttpStatusCode.Conflict);
-            result.Message.Should().Be("Product barcode already exists!");
+            result.Message.Should().Be("One or more product barcode already exists!");
             result.Data.Should().BeNull();
 
             _unitOfWorkMock.Verify(
@@ -146,6 +214,10 @@ namespace Pharmacy.System.UnitTests.Services
             _unitOfWorkMock.Setup(uow => uow.ManufacturerRepository.AnyAsync(
                 It.IsAny<Expression<Func<Manufacturer, bool>>>()))
                 .ReturnsAsync(false);
+
+            _unitOfWorkMock.Setup(uow => uow.ProductBarcodeRepository
+                .AnyAsync(It.IsAny<Expression<Func<ProductBarcode, bool>>>()))
+                    .ReturnsAsync(false);
 
             //Act
             var result = await _sut.CreateAsync(productDto);
@@ -186,7 +258,11 @@ namespace Pharmacy.System.UnitTests.Services
             _unitOfWorkMock.Setup(uow => uow.ProductCategoryRepository.AnyAsync(
                 It.IsAny<Expression<Func<ProductCategory, bool>>>()))
                 .ReturnsAsync(false);
-            
+
+            _unitOfWorkMock.Setup(uow => uow.ProductBarcodeRepository
+                .AnyAsync(It.IsAny<Expression<Func<ProductBarcode, bool>>>()))
+                    .ReturnsAsync(false);
+
             //Act
             var result = await _sut.CreateAsync(productDto);
 
@@ -230,6 +306,10 @@ namespace Pharmacy.System.UnitTests.Services
                 It.IsAny<Expression<Func<ProductForm, bool>>>()))
                 .ReturnsAsync(false);
 
+            _unitOfWorkMock.Setup(uow => uow.ProductBarcodeRepository
+                .AnyAsync(It.IsAny<Expression<Func<ProductBarcode, bool>>>()))
+                    .ReturnsAsync(false);
+
             //Act
             var result = await _sut.CreateAsync(productDto);
             
@@ -260,6 +340,8 @@ namespace Pharmacy.System.UnitTests.Services
             Product productToDelete = _fixture.Build<Product>()
                 .With(p => p.Id, productId)
                 .With(p => p.Image, (string?)null)
+                .With(p =>p.Barcodes, new List<ProductBarcode>())
+                .With(p =>p.DefaultPackaging, new ProductPackagingLevel())
                 .With(p =>p.Manufacturer, (Manufacturer?)null)
                 .With(p =>p.ProductForm, (ProductForm?)null)
                 .With(p =>p.Category, (ProductCategory?)null)
@@ -338,12 +420,15 @@ namespace Pharmacy.System.UnitTests.Services
             Product product = _fixture.Build<Product>()
                 .With(p => p.Id, productId)
                 .With(p => p.Image, (string?)null)
+                .With(p => p.Barcodes, new List<ProductBarcode>())
+                .With(p => p.DefaultPackaging, new ProductPackagingLevel())
                 .With(p => p.Manufacturer, (Manufacturer?)null)
                 .With(p => p.ProductForm, (ProductForm?)null)
                 .With(p => p.Category, (ProductCategory?)null)
                 .With(p => p.ProductActiveIngredients, new HashSet<ProductActiveIngredient>())
                 .With(p => p.ProductPackagingLevels, new HashSet<ProductPackagingLevel>())
                 .Create();
+
 
             _unitOfWorkMock.Setup(uow => uow.ProductRepository.GetWithSpecAsync(
                 It.IsAny<ProductSpecification>()))
@@ -405,12 +490,18 @@ namespace Pharmacy.System.UnitTests.Services
             Product existingProduct = _fixture.Build<Product>()
                 .With(p => p.Id, productId)
                 .With(p => p.Image, (string?)null)
+                .With(p => p.Barcodes, new List<ProductBarcode>())
+                .With(p => p.DefaultPackaging, new ProductPackagingLevel())
                 .With(p => p.Manufacturer, (Manufacturer?)null)
                 .With(p => p.ProductForm, (ProductForm?)null)
                 .With(p => p.Category, (ProductCategory?)null)
                 .With(p => p.ProductActiveIngredients, new HashSet<ProductActiveIngredient>())
                 .With(p => p.ProductPackagingLevels, new HashSet<ProductPackagingLevel>())
                 .Create();
+
+            _unitOfWorkMock.Setup(uow => uow.ProductRepository.GetByIdAsync(
+                It.IsAny<int>()))
+                .ReturnsAsync(existingProduct);
 
             _unitOfWorkMock.Setup(uow=>uow.ProductRepository.GetWithSpecAsync(
                 It.IsAny<ProductSpecification>()))
@@ -427,6 +518,10 @@ namespace Pharmacy.System.UnitTests.Services
             _unitOfWorkMock.Setup(uow => uow.ProductFormRepository.AnyAsync(
                 It.IsAny<Expression<Func<ProductForm, bool>>>()))
                 .ReturnsAsync(true);
+
+            _unitOfWorkMock.Setup(uow => uow.ProductBarcodeRepository.AnyAsync(
+                It.IsAny<Expression<Func<ProductBarcode, bool>>>()))
+                .ReturnsAsync(false);
 
             _unitOfWorkMock.Setup(uow => uow.CompleteAsync())
                 .Returns(Task.CompletedTask);
@@ -460,10 +555,10 @@ namespace Pharmacy.System.UnitTests.Services
                 .With(x => x.ManufacturerId, (int?)null)
                 .Create();
 
-            _unitOfWorkMock.Setup(uow => uow.ProductRepository.GetWithSpecAsync(
-                It.IsAny<ProductSpecification>()))
-                .ReturnsAsync((Product?)null);
-            
+            _unitOfWorkMock.Setup(uow => uow.ProductRepository.GetByIdAsync(
+                It.IsAny<int>()))
+                .ReturnsAsync((Product)null);
+
             //Act
             var result = await _sut.UpdateAsync(productId, productDto);
             
@@ -473,8 +568,8 @@ namespace Pharmacy.System.UnitTests.Services
             result.Data.Should().BeNull();
 
             _unitOfWorkMock.Verify(
-                uow => uow.ProductRepository.GetWithSpecAsync(
-                    It.IsAny<ProductSpecification>()),
+                uow => uow.ProductRepository.GetByIdAsync(
+                    It.IsAny<int>()),
                 Times.Once);
 
             _unitOfWorkMock.Verify(
@@ -494,19 +589,25 @@ namespace Pharmacy.System.UnitTests.Services
             Product existingProduct = _fixture.Build<Product>()
                 .With(p => p.Id, productId)
                 .With(p => p.Image, (string?)null)
+                .With(p => p.Barcodes, new List<ProductBarcode>())
+                .With(p => p.DefaultPackaging, new ProductPackagingLevel())
                 .With(p => p.Manufacturer, (Manufacturer?)null)
                 .With(p => p.ProductForm, (ProductForm?)null)
                 .With(p => p.Category, (ProductCategory?)null)
                 .With(p => p.ProductActiveIngredients, new HashSet<ProductActiveIngredient>())
                 .With(p => p.ProductPackagingLevels, new HashSet<ProductPackagingLevel>())
                 .Create();
-            
-            _unitOfWorkMock.Setup(uow => uow.ProductRepository.GetWithSpecAsync(
-                It.IsAny<ProductSpecification>()))
+
+            _unitOfWorkMock.Setup(uow => uow.ProductRepository.GetByIdAsync(
+                It.IsAny<int>()))
                 .ReturnsAsync(existingProduct);
             
             _unitOfWorkMock.Setup(uow => uow.ProductRepository.AnyAsync(
                 It.IsAny<Expression<Func<Product, bool>>>()))
+                .ReturnsAsync(false);
+
+            _unitOfWorkMock.Setup(uow => uow.ProductBarcodeRepository.AnyAsync(
+                It.IsAny<Expression<Func<ProductBarcode, bool>>>()))
                 .ReturnsAsync(true);
 
             //Act
@@ -514,12 +615,12 @@ namespace Pharmacy.System.UnitTests.Services
             
             // Assert
             result.StatusCode.Should().Be((int)HttpStatusCode.Conflict);
-            result.Message.Should().Be("Product barcode already exists!");
+            result.Message.Should().Be("One or more product barcode already exists!");
             result.Data.Should().BeNull();
            
             _unitOfWorkMock.Verify(
-                uow => uow.ProductRepository.GetWithSpecAsync(
-                    It.IsAny<ProductSpecification>()),
+                uow => uow.ProductRepository.GetByIdAsync(
+                    It.IsAny<int>()),
                 Times.Once);
             
             _unitOfWorkMock.Verify(
@@ -539,6 +640,8 @@ namespace Pharmacy.System.UnitTests.Services
             Product existingProduct = _fixture.Build<Product>()
                 .With(p => p.Id, productId)
                 .With(p => p.Image, (string?)null)
+                .With(p => p.Barcodes, new List<ProductBarcode>())
+                .With(p => p.DefaultPackaging, new ProductPackagingLevel())
                 .With(p => p.Manufacturer, (Manufacturer?)null)
                 .With(p => p.ProductForm, (ProductForm?)null)
                 .With(p => p.Category, (ProductCategory?)null)
@@ -546,12 +649,16 @@ namespace Pharmacy.System.UnitTests.Services
                 .With(p => p.ProductPackagingLevels, new HashSet<ProductPackagingLevel>())
                 .Create();
 
-            _unitOfWorkMock.Setup(uow => uow.ProductRepository.GetWithSpecAsync(
-                It.IsAny<ProductSpecification>()))
+            _unitOfWorkMock.Setup(uow => uow.ProductRepository.GetByIdAsync(
+                It.IsAny<int>()))
                 .ReturnsAsync(existingProduct);
 
             _unitOfWorkMock.Setup(uow => uow.ProductRepository.AnyAsync(
                 It.IsAny<Expression<Func<Product, bool>>>()))
+                .ReturnsAsync(false);
+
+            _unitOfWorkMock.Setup(uow => uow.ProductBarcodeRepository.AnyAsync(
+                It.IsAny<Expression<Func<ProductBarcode, bool>>>()))
                 .ReturnsAsync(false);
 
             _unitOfWorkMock.Setup(uow => uow.ManufacturerRepository.AnyAsync(
@@ -567,8 +674,8 @@ namespace Pharmacy.System.UnitTests.Services
             result.Data.Should().BeNull();
 
             _unitOfWorkMock.Verify(
-                uow => uow.ProductRepository.GetWithSpecAsync(
-                    It.IsAny<ProductSpecification>()),
+                uow => uow.ProductRepository.GetByIdAsync(
+                    It.IsAny<int>()),
                 Times.Once);
 
             _unitOfWorkMock.Verify(
@@ -588,19 +695,25 @@ namespace Pharmacy.System.UnitTests.Services
             Product existingProduct = _fixture.Build<Product>()
                 .With(p => p.Id, productId)
                 .With(p => p.Image, (string?)null)
+                .With(p => p.Barcodes, new List<ProductBarcode>())
+                .With(p => p.DefaultPackaging, new ProductPackagingLevel())
                 .With(p => p.Manufacturer, (Manufacturer?)null)
                 .With(p => p.ProductForm, (ProductForm?)null)
                 .With(p => p.Category, (ProductCategory?)null)
                 .With(p => p.ProductActiveIngredients, new HashSet<ProductActiveIngredient>())
                 .With(p => p.ProductPackagingLevels, new HashSet<ProductPackagingLevel>())
                 .Create();
-            
-            _unitOfWorkMock.Setup(uow => uow.ProductRepository.GetWithSpecAsync(
-                It.IsAny<ProductSpecification>()))
+
+            _unitOfWorkMock.Setup(uow => uow.ProductRepository.GetByIdAsync(
+                It.IsAny<int>()))
                 .ReturnsAsync(existingProduct);
             
             _unitOfWorkMock.Setup(uow => uow.ProductRepository.AnyAsync(
                 It.IsAny<Expression<Func<Product, bool>>>()))
+                .ReturnsAsync(false);
+            
+            _unitOfWorkMock.Setup(uow => uow.ProductBarcodeRepository.AnyAsync(
+                It.IsAny<Expression<Func<ProductBarcode, bool>>>()))
                 .ReturnsAsync(false);
             
             _unitOfWorkMock.Setup(uow => uow.ProductCategoryRepository.AnyAsync(
@@ -616,8 +729,8 @@ namespace Pharmacy.System.UnitTests.Services
             result.Data.Should().BeNull();
             
             _unitOfWorkMock.Verify(
-                uow => uow.ProductRepository.GetWithSpecAsync(
-                    It.IsAny<ProductSpecification>()),
+                uow => uow.ProductRepository.GetByIdAsync(
+                    It.IsAny<int>()),
                 Times.Once);
             
             _unitOfWorkMock.Verify(
@@ -637,6 +750,8 @@ namespace Pharmacy.System.UnitTests.Services
             Product existingProduct = _fixture.Build<Product>()
                 .With(p => p.Id, productId)
                 .With(p => p.Image, (string?)null)
+                .With(p => p.Barcodes, new List<ProductBarcode>())
+                .With(p => p.DefaultPackaging, new ProductPackagingLevel())
                 .With(p => p.Manufacturer, (Manufacturer?)null)
                 .With(p => p.ProductForm, (ProductForm?)null)
                 .With(p => p.Category, (ProductCategory?)null)
@@ -644,12 +759,16 @@ namespace Pharmacy.System.UnitTests.Services
                 .With(p => p.ProductPackagingLevels, new HashSet<ProductPackagingLevel>())
                 .Create();
 
-            _unitOfWorkMock.Setup(uow => uow.ProductRepository.GetWithSpecAsync(
-                It.IsAny<ProductSpecification>()))
+            _unitOfWorkMock.Setup(uow => uow.ProductRepository.GetByIdAsync(
+                It.IsAny<int>()))
                 .ReturnsAsync(existingProduct);
 
             _unitOfWorkMock.Setup(uow => uow.ProductRepository.AnyAsync(
                 It.IsAny<Expression<Func<Product, bool>>>()))
+                .ReturnsAsync(false);
+
+            _unitOfWorkMock.Setup(uow => uow.ProductBarcodeRepository.AnyAsync(
+                It.IsAny<Expression<Func<ProductBarcode, bool>>>()))
                 .ReturnsAsync(false);
 
             _unitOfWorkMock.Setup(uow => uow.ProductCategoryRepository.AnyAsync(
@@ -669,8 +788,8 @@ namespace Pharmacy.System.UnitTests.Services
             result.Data.Should().BeNull();
 
             _unitOfWorkMock.Verify(
-                uow => uow.ProductRepository.GetWithSpecAsync(
-                    It.IsAny<ProductSpecification>()),
+                uow => uow.ProductRepository.GetByIdAsync(
+                    It.IsAny<int>()),
                 Times.Once);
 
             _unitOfWorkMock.Verify(

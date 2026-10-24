@@ -50,7 +50,7 @@ namespace Pharmacy.System.Services.Services
             if (supply.PaymentPlan != SupplyPaymentPlan.Installment)
             {
                 return Response.Fail(
-                    message: "Supply payment method is not Installments.");
+                    message: "Supply payment plan is not Installments.");
             }
 
             //Check that the supply is not already paid.
@@ -100,9 +100,42 @@ namespace Pharmacy.System.Services.Services
             throw new global::System.NotImplementedException();
         }
 
-        public Task<Response> GetInstallmentPlanAsync(int supplyId)
+        public async Task<Response> GetInstallmentPlanAsync(int supplyId)
         {
-            throw new global::System.NotImplementedException();
+            var supply = await _unitofWork.SupplyRepository
+                .GetByIdAsync(supplyId);
+            if(supply == null)
+            {
+                return Response.NotFound(
+                    message: "Supply not found!");
+            }
+
+            if (!supply.IsConfirmed)
+            {
+                return Response.Fail(
+                    message: "Supply is not confirmed yet!");
+            }
+
+            if(supply.PaymentPlan != SupplyPaymentPlan.Installment)
+            {
+                return Response.Fail(
+                    message: "Supply payment plan is not Installments.");
+            }
+
+            var installments = await _unitofWork.SupplyInstallmentRepository
+                .GetSupplyInstallments(supplyId);
+
+            if(installments == null || installments.Count == 0)
+            {
+                return Response.NotFound(
+                    message: "There are no installments configured for this supply yet!");
+            }
+
+            var result = installments.Adapt<List<SupplyInstallmentDetailsDto>>()
+                .OrderBy(x => x.DueDate);
+            return Response.Success(
+                message: "Supply installment retreived successfully",
+                data: result);
         }
 
         public Task<Response> UpdateInstallmentPlanAsync(int supplyId, List<SupplyInstallmentDto> dtos)

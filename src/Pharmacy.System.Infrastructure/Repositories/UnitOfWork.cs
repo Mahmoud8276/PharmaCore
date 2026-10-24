@@ -24,6 +24,7 @@ namespace Pharmacy.System.Infrastructure.Repositories
         private readonly Lazy<ISupplierRepository> _supplierRepository;
         private readonly Lazy<ISupplyRepository> _supplyRepository;
         private readonly Lazy<ISupplyPaymentRepository> _supplyPaymentRepository;
+        private readonly Lazy<ISupplyInstallmentRepository> _supplyInstallmentRepository;
         private readonly Lazy<IRepositoryRepository> _repositoryRepository;
         private readonly Lazy<IInventoryItemRepository> _inventoryItemRepository;
 
@@ -45,6 +46,7 @@ namespace Pharmacy.System.Infrastructure.Repositories
             _supplierRepository = new Lazy<ISupplierRepository>(() => new SupplierRepository(_context));
             _supplyRepository = new Lazy<ISupplyRepository>(() => new SupplyRepository(_context));
             _supplyPaymentRepository = new Lazy<ISupplyPaymentRepository>(() => new SupplyPaymentRepository(_context));
+            _supplyInstallmentRepository = new Lazy<ISupplyInstallmentRepository>(() => new SupplyInstallmentRepository(_context));
             _repositoryRepository = new Lazy<IRepositoryRepository>(() => new RepositoryRepository(_context));
             _inventoryItemRepository = new Lazy<IInventoryItemRepository>(() => new InventoryItemRepository(_context));
         }
@@ -62,6 +64,7 @@ namespace Pharmacy.System.Infrastructure.Repositories
         public ISupplierRepository SupplierRepository => _supplierRepository.Value;
         public ISupplyRepository SupplyRepository => _supplyRepository.Value;
         public ISupplyPaymentRepository SupplyPaymentRepository => _supplyPaymentRepository.Value;
+        public ISupplyInstallmentRepository SupplyInstallmentRepository => _supplyInstallmentRepository.Value;
         public IRepositoryRepository RepositoryRepository => _repositoryRepository.Value;
         public IInventoryItemRepository InventoryItemRepository => _inventoryItemRepository.Value;
 

@@ -14,6 +14,9 @@ namespace Pharmacy.System.Core.Attributes
 
             if (value is DateTime dateTime)
                 return dateTime <= DateTime.Now;
+            
+            if (value is DateOnly dateOnly)
+                return dateOnly <= DateOnly.FromDateTime(DateTime.Now);
 
             return false;
         }

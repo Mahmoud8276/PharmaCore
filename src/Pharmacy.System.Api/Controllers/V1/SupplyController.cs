@@ -154,5 +154,16 @@ namespace Pharmacy.System.Api.Controllers.V1
             var response = await _supplyInstallmentService.DeleteInstallmentAsync(supplyId, installmentId);
             return StatusCode(response.StatusCode, response);
         }
+
+        [HttpPost("{supplyId}/installments/{installmentId}/payments")]
+        public async Task<IActionResult> PaySupplyInstallmentAsync(
+            int supplyId, 
+            int installmentId, 
+            [FromBody] SupplyInstallmentPaymentDto dto)
+        {
+            var response = await _supplyInstallmentService
+                .PaySupplyInstallmentAsync(supplyId, installmentId, dto);
+            return StatusCode(response.StatusCode, response);
+        }
     }
 }

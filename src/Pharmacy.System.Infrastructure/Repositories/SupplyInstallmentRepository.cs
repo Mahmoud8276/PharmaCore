@@ -15,6 +15,7 @@ namespace Pharmacy.System.Infrastructure.Repositories
         public async Task<List<SupplyInstallment>> GetSupplyInstallments(int supplyId)
         {
             return await _context.SupplyInstallments
+                .Include(x=>x.Payments)
                 .Where(x=>x.SupplyId == supplyId)
                 .ToListAsync();
         }

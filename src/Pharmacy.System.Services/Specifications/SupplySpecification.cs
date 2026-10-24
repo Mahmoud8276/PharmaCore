@@ -18,6 +18,7 @@ namespace Pharmacy.System.Services.Specifications
                 AddInclude(x => x.Items);
                 AddInclude(x => x.Payments);
                 AddInclude(x => x.Installments);
+                AddInclude("Installments.Payments");
                 AddInclude(x => x.Returns);
             }
         }
@@ -28,6 +29,7 @@ namespace Pharmacy.System.Services.Specifications
             AddInclude(x => x.Items);
             AddInclude(x => x.Payments);
             AddInclude(x => x.Installments);
+            AddInclude("Installments.Payments");
             AddInclude(x => x.Returns);
         }
 

@@ -11,6 +11,7 @@ using Pharmacy.System.Core.Dtos.SupplyDtos;
 using Pharmacy.System.Core.Dtos.SupplyItemDtos;
 using Pharmacy.System.Core.Enums;
 using Pharmacy.System.Core.Dtos.ProductCategoryDtos;
+using Pharmacy.System.Core.Dtos.SupplyInstallmentDtos;
 
 namespace Pharmacy.System.Services.ApplicatoinServicesConfig
 {
@@ -136,6 +137,7 @@ namespace Pharmacy.System.Services.ApplicatoinServicesConfig
                 .Map(dest => dest.ReceivedBaseUnits, src => src.BaseUnitsPerReceivedUnit * src.Quantity)
                 .Map(dest => dest.OnHandBaseUnits, src => src.BaseUnitsPerReceivedUnit * src.Quantity)
                 .Map(dest => dest.PricePerBaseUnits, src => src.PricePerUnit / src.BaseUnitsPerReceivedUnit);
+
         }
     }
 }

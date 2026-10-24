@@ -12,7 +12,10 @@ namespace Pharmacy.System.Core.Dtos.SupplyDtos
         public decimal TotalCost { get; set; }
         public decimal DiscountPercentage { get; set; }
         public decimal FinalCost { get; set; }
+        public decimal RemainingAmount { get; set; }
+        public decimal PaidAmount { get; set; }
         public PaymentStatus PaymentStatus { get; set; }
+        public SupplyPaymentPlan PaymentPlan { get; set; }
         public DateOnly ReceivedAt { get; set; }
         public DateTime CreatedAt { get; set; }
         public bool IsConfirmed { get; set; }

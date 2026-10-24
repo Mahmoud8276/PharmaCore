@@ -803,6 +803,33 @@ namespace Pharmacy.System.Infrastructure.Migrations
                     b.ToTable("SupplyPayments");
                 });
 
+            modelBuilder.Entity("Pharmacy.System.Core.Models.SupplyReturn", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("DateTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Reason")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("SupplyId")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("TotalAmount")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("SupplyId");
+
+                    b.ToTable("SupplyReturns");
+                });
+
             modelBuilder.Entity("Pharmacy.System.Core.Models.UnitFamily", b =>
                 {
                     b.Property<int>("Id")
@@ -1247,6 +1274,17 @@ namespace Pharmacy.System.Infrastructure.Migrations
                     b.Navigation("SupplyInstallment");
                 });
 
+            modelBuilder.Entity("Pharmacy.System.Core.Models.SupplyReturn", b =>
+                {
+                    b.HasOne("Pharmacy.System.Core.Models.Supply", "Supply")
+                        .WithMany("Returns")
+                        .HasForeignKey("SupplyId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Supply");
+                });
+
             modelBuilder.Entity("Pharmacy.System.Core.Models.ActiveIngredient", b =>
                 {
                     b.Navigation("ProductActiveIngredients");
@@ -1273,6 +1311,8 @@ namespace Pharmacy.System.Infrastructure.Migrations
                     b.Navigation("Items");
 
                     b.Navigation("Payments");
+
+                    b.Navigation("Returns");
                 });
 
             modelBuilder.Entity("Pharmacy.System.Core.Models.SupplyInstallment", b =>

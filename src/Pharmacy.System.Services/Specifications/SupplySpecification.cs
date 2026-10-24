@@ -18,6 +18,7 @@ namespace Pharmacy.System.Services.Specifications
                 AddInclude(x => x.Items);
                 AddInclude(x => x.Payments);
                 AddInclude(x => x.Installments);
+                AddInclude(x => x.Returns);
             }
         }
 
@@ -27,11 +28,13 @@ namespace Pharmacy.System.Services.Specifications
             AddInclude(x => x.Items);
             AddInclude(x => x.Payments);
             AddInclude(x => x.Installments);
+            AddInclude(x => x.Returns);
         }
 
         private static Expression<Func<Supply, bool>> BuildCriteria(ISupplySpecParams specParams)
         {
             var paymentStatus = specParams.PaymentStatus;
+            var paymentPlan = specParams.PaymentPlan;
             var isConfirmed= specParams.IsConfirmed;
             var fromDate = specParams.FromDate;
             var toDate = specParams.ToDate;
@@ -39,6 +42,7 @@ namespace Pharmacy.System.Services.Specifications
 
             return x => (
             (paymentStatus == null || x.PaymentStatus == paymentStatus) &&
+            (paymentPlan == null || x.PaymentPlan == paymentPlan) &&
             (isConfirmed == null || x.IsConfirmed == isConfirmed) &&
             (fromDate == null || x.ReceivedAt >= fromDate) &&
             (toDate == null || x.ReceivedAt <= toDate) && 

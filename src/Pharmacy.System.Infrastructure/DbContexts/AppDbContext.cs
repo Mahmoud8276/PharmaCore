@@ -30,6 +30,7 @@ namespace Pharmacy.System.Infrastructure.DbContexts
         public DbSet<Supply> Supplies { get; set; }
         public DbSet<SupplyInstallment> SupplyInstallments { get; set; }
         public DbSet<SupplyPayment> SupplyPayments { get; set; }
+        public DbSet<SupplyReturn> SupplyReturns { get; set; }
         public DbSet<Repository> Repositories  { get; set; }
         public DbSet<Supplier> Suppliers { get; set; }
         public DbSet<RefreshToken> RefreshTokens { get; set; }

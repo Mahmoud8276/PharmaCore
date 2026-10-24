@@ -5,8 +5,6 @@ namespace Pharmacy.System.Core.Dtos.SupplyInstallmentDtos
 {
     public class SupplyInstallmentDto
     {
-        [Required(ErrorMessage = "Supply id is required!")]
-        public int SupplyId { get; set; }
         public string? Notes { get; set; }
 
         [Range(typeof(decimal), "0.01", "79228162514264337593543950335",

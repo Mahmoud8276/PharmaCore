@@ -23,6 +23,7 @@ namespace Pharmacy.System.Services.ApplicatoinServicesConfig
              services.AddScoped<ISupplierService, SupplierService>();
              services.AddScoped<ISupplyService, SupplyService>();
              services.AddScoped<ISupplyPaymentService, SupplyPaymentService>();
+             services.AddScoped<ISupplyInstallmentService, SupplyInstallmentService>();
              services.AddScoped<IRepositoryService, RepositoryService>();
 
             return services;

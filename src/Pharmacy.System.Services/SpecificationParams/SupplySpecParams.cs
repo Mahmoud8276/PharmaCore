@@ -7,6 +7,7 @@ namespace Pharmacy.System.Services.SpecificationParams
     public class SupplySpecParams : BaseSpecParams, ISupplySpecParams
     {
         public PaymentStatus? PaymentStatus { get; set; }
+        public SupplyPaymentPlan? PaymentPlan { get; set; }
         public bool? IsConfirmed { get; set; }
         public DateOnly? FromDate { get; set; }
         public DateOnly? ToDate { get; set; }

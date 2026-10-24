@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Linq;
 
 namespace Pharmacy.System.Core.Models
 {
@@ -10,6 +11,8 @@ namespace Pharmacy.System.Core.Models
         public decimal TotalCost { get; set; }
         public decimal DiscountPercentage { get; set; } = 0;
         public decimal FinalCost { get; set; }
+        public decimal RemainingAmount => ComputeRemainingAmount();
+        public decimal PaidAmount => ComputePaidAmount();
         public PaymentStatus PaymentStatus { get; set; }
         public DateOnly ReceivedAt { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
@@ -29,5 +32,20 @@ namespace Pharmacy.System.Core.Models
         public List<SupplyItem> Items { get; set; } = new List<SupplyItem>();
         public List<SupplyInstallment> Installments { get; set; } = new List<SupplyInstallment>();
         public List<SupplyPayment> Payments { get; set; } = new List<SupplyPayment>();
+        public List<SupplyReturn> Returns { get; set; } = new List<SupplyReturn>();
+
+
+        private decimal ComputeRemainingAmount()
+        {
+            decimal totalPaid = ComputePaidAmount();
+            decimal totalReturned = Returns.Sum(x => x.TotalAmount);
+            
+            return Math.Round(Math.Max(FinalCost - totalPaid - totalReturned, 0));
+        }
+
+        private decimal ComputePaidAmount()
+        {
+            return Payments.Sum(payment => payment.Amount);
+        }
     }
 }

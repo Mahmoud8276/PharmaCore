@@ -80,9 +80,38 @@ namespace Pharmacy.System.Services.Services
             throw new global::System.NotImplementedException();
         }
 
-        public Task<Response> DeleteInstallmentPlanAsync(int supplyId)
+        public async Task<Response> DeleteInstallmentsAsync(int supplyId)
         {
-            throw new global::System.NotImplementedException();
+            if(!await _unitofWork.SupplyRepository.AnyAsync(x=>x.Id == supplyId))
+            {
+                return Response.NotFound(
+                    message: "Supply not found!");
+            }
+
+            var installments = await _unitofWork.SupplyInstallmentRepository
+                .GetSupplyInstallmentsAsync(supplyId);
+            if(installments.Count() == 0)
+            {
+                return Response.Fail(
+                    message: "No installment configured for this supply!");
+            }
+
+            var paidInstallmentIds = installments
+                .Where(x => x.Payments.Count > 0)
+                .Select(x=>x.Id);
+            if(paidInstallmentIds.Count() > 0)
+            {
+                return Response.Conflict(
+                    message: "There are payments associated with one or more installments!",
+                    details: $"installments with Ids {string.Join(", ", paidInstallmentIds)} are associated with payments!");
+            }
+
+            _unitofWork.SupplyInstallmentRepository
+                .DeleteRange(installments);
+            await _unitofWork.CompleteAsync();
+
+            return Response.Success(
+                message: "Supply installments deleted successfully");
         }
 
         public async Task<Response> GetInstallmentPlanAsync(int supplyId)
@@ -108,7 +137,7 @@ namespace Pharmacy.System.Services.Services
             }
 
             var installments = await _unitofWork.SupplyInstallmentRepository
-                .GetSupplyInstallments(supplyId);
+                .GetSupplyInstallmentsAsync(supplyId);
 
             if(installments == null || installments.Count == 0)
             {

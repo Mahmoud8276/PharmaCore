@@ -10,7 +10,7 @@ namespace Pharmacy.System.Services.IServices
         public Task<Response> CreateInstallmentsAsync(int supplyId, List<SupplyInstallmentDto> dtos);
         public Task<Response> UpdateInstallmentPlanAsync(int supplyId, List<SupplyInstallmentDto> dtos);
         public Task<Response> GetInstallmentPlanAsync(int supplyId);
-        public Task<Response> DeleteInstallmentPlanAsync(int supplyId);
+        public Task<Response> DeleteInstallmentsAsync(int supplyId);
         public Task<Response> DeleteInstallmentAsync(int supplyId, int installmentId);
         public Task<Response> PaySupplyInstallmentAsync(int supplyId, int installmentId, SupplyInstallmentPaymentDto dto);
     }

@@ -144,7 +144,7 @@ namespace Pharmacy.System.Api.Controllers.V1
         [HttpDelete("{supplyId}/installments")]
         public async Task<IActionResult> DeleteInstallmentPlanAsync(int supplyId)
         {
-            var response = await _supplyInstallmentService.DeleteInstallmentPlanAsync(supplyId);
+            var response = await _supplyInstallmentService.DeleteInstallmentsAsync(supplyId);
             return StatusCode(response.StatusCode, response);
         }
 

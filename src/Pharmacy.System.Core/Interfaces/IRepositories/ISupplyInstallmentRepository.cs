@@ -6,6 +6,6 @@ namespace Pharmacy.System.Core.Interfaces.IRepositories
 {
     public interface ISupplyInstallmentRepository : IGenericRepository<SupplyInstallment, int>
     {
-        public Task<List<SupplyInstallment>> GetSupplyInstallments(int supplyId);
+        public Task<List<SupplyInstallment>> GetSupplyInstallmentsAsync(int supplyId);
     }
 }

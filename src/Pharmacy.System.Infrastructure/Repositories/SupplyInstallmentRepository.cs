@@ -12,7 +12,7 @@ namespace Pharmacy.System.Infrastructure.Repositories
     {
         public SupplyInstallmentRepository(AppDbContext context) : base(context) { }
 
-        public async Task<List<SupplyInstallment>> GetSupplyInstallments(int supplyId)
+        public async Task<List<SupplyInstallment>> GetSupplyInstallmentsAsync(int supplyId)
         {
             return await _context.SupplyInstallments
                 .Include(x=>x.Payments)

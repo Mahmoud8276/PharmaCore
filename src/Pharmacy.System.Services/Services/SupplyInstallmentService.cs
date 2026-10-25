@@ -75,9 +75,27 @@ namespace Pharmacy.System.Services.Services
                 data: result);
         }
 
-        public Task<Response> DeleteInstallmentAsync(int supplyId, int installmentId)
+        public async Task<Response> DeleteInstallmentAsync(int supplyId, int installmentId)
         {
-            throw new global::System.NotImplementedException();
+            var installment = await _unitofWork.SupplyInstallmentRepository
+                .GetWithSpecAsync(new SupplyInstallmentSpecification(installmentId));
+            if(installment == null || installment.SupplyId != supplyId)
+            {
+                return Response.NotFound(
+                    message: "Supply installment not found!");
+            }
+
+            if(installment.Payments.Count() > 0)
+            {
+                return Response.Conflict(
+                    message: "Installment is associated with payments!");
+            }
+
+            _unitofWork.SupplyInstallmentRepository.Delete(installment);
+            await _unitofWork.CompleteAsync();
+
+            return Response.Success(
+                message: "Installment deleted successfully");
         }
 
         public async Task<Response> DeleteInstallmentsAsync(int supplyId)

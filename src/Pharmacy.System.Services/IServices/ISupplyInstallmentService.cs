@@ -7,7 +7,7 @@ namespace Pharmacy.System.Services.IServices
 {
     public interface ISupplyInstallmentService
     {
-        public Task<Response> CreateInstallmentPlanAsync(int supplyId, List<SupplyInstallmentDto> dtos);
+        public Task<Response> CreateInstallmentsAsync(int supplyId, List<SupplyInstallmentDto> dtos);
         public Task<Response> UpdateInstallmentPlanAsync(int supplyId, List<SupplyInstallmentDto> dtos);
         public Task<Response> GetInstallmentPlanAsync(int supplyId);
         public Task<Response> DeleteInstallmentPlanAsync(int supplyId);

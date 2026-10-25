@@ -109,7 +109,7 @@ namespace Pharmacy.System.Api.Controllers.V1
 
 
 
-        [HttpPost("{supplyId}/installment-plan")]
+        [HttpPost("{supplyId}/installments")]
         public async Task<IActionResult> CreateInstallmentPlanAsync(int supplyId, [FromBody] List<SupplyInstallmentDto> dtos)
         {
             if (dtos == null || dtos.Count == 0)
@@ -118,18 +118,18 @@ namespace Pharmacy.System.Api.Controllers.V1
                     message : "Installment plan can not be empty!"));
             }
 
-            var response = await _supplyInstallmentService.CreateInstallmentPlanAsync(supplyId, dtos);
+            var response = await _supplyInstallmentService.CreateInstallmentsAsync(supplyId, dtos);
             return StatusCode(response.StatusCode, response);
         }
 
-        [HttpGet("{supplyId}/installment-plan")]
+        [HttpGet("{supplyId}/installments")]
         public async Task<IActionResult> GetInstallmentPlanAsync(int supplyId)
         {
             var response = await _supplyInstallmentService.GetInstallmentPlanAsync(supplyId);
             return StatusCode(response.StatusCode, response);
         }
 
-        [HttpPut("{supplyId}/installment-plan")]
+        [HttpPut("{supplyId}/installments")]
         public async Task<IActionResult> UpdateInstallmentPlanAsync(int supplyId, [FromBody] List<SupplyInstallmentDto> dtos)
         {
             if (dtos == null || dtos.Count == 0)
@@ -141,14 +141,14 @@ namespace Pharmacy.System.Api.Controllers.V1
             return StatusCode(response.StatusCode, response);
         }
 
-        [HttpDelete("{supplyId}/installment-plan")]
+        [HttpDelete("{supplyId}/installments")]
         public async Task<IActionResult> DeleteInstallmentPlanAsync(int supplyId)
         {
             var response = await _supplyInstallmentService.DeleteInstallmentPlanAsync(supplyId);
             return StatusCode(response.StatusCode, response);
         }
 
-        [HttpDelete("{supplyId}/installment-plan/{installmentId}")]
+        [HttpDelete("{supplyId}/installments/{installmentId}")]
         public async Task<IActionResult> DeleteInstallmentAsync(int supplyId, int installmentId)
         {
             var response = await _supplyInstallmentService.DeleteInstallmentAsync(supplyId, installmentId);

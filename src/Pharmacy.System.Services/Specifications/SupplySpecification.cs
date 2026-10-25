@@ -20,6 +20,7 @@ namespace Pharmacy.System.Services.Specifications
                 AddInclude(x => x.Installments);
                 AddInclude("Installments.Payments");
                 AddInclude(x => x.Returns);
+                AddInclude(x => x.Repository);
             }
         }
 
@@ -31,6 +32,7 @@ namespace Pharmacy.System.Services.Specifications
             AddInclude(x => x.Installments);
             AddInclude("Installments.Payments");
             AddInclude(x => x.Returns);
+            AddInclude(x => x.Repository);
         }
 
         private static Expression<Func<Supply, bool>> BuildCriteria(ISupplySpecParams specParams)

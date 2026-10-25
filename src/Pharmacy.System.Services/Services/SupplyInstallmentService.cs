@@ -21,7 +21,7 @@ namespace Pharmacy.System.Services.Services
             _unitofWork = unitofWork;
         }
 
-        public async Task<Response> CreateInstallmentPlanAsync(int supplyId, List<SupplyInstallmentDto> dtos)
+        public async Task<Response> CreateInstallmentsAsync(int supplyId, List<SupplyInstallmentDto> dtos)
         {
             //Check that the supply exists.
             var supply = await _unitofWork.SupplyRepository.GetWithSpecAsync(
@@ -39,13 +39,6 @@ namespace Pharmacy.System.Services.Services
                     message: "Supply is not confirmed, confirm it first and try again.");
             }
 
-            //Check if there is already a supply installment plan for this supply.
-            if (supply.Installments != null && supply.Installments.Count > 0)
-            {
-                return Response.Conflict(
-                    message: "Supply installment plan already exists.");
-            }
-
             //Check that the supply payment plan is paying by Installments.
             if (supply.PaymentPlan != SupplyPaymentPlan.Installment)
             {
@@ -53,18 +46,13 @@ namespace Pharmacy.System.Services.Services
                     message: "Supply payment plan is not Installments.");
             }
 
-            //Check that the supply is not already paid.
-            if(supply.PaymentStatus != PaymentStatus.NotPaid)
+            //Ckeck that the total amount of the installments is
+            //not greater than the remaining amount of the supply.
+            if(supply.Installments.Sum(x => x.Amount)
+                + dtos.Sum(x => x.Amount) > supply.RemainingAmount)
             {
                 return Response.Fail(
-                    message: "Supply is partially or fully paid.");
-            }
-
-            //Ckeck that the total amount of the installments is equal to the remaining amount of the supply.
-            if(dtos.Sum(x => x.Amount) != supply.RemainingAmount)
-            {
-                return Response.Fail(
-                    message: "Total amount of installments is not equal to the remaining amount of the supply.");
+                    message: "Total amount of installments is greater than the remaining amount of the supply.");
             }
 
             //Check that the installments due dates are not in the past.

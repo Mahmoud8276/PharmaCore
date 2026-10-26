@@ -174,7 +174,7 @@ namespace Pharmacy.System.Api.Controllers.V1
             [FromBody] SupplyInstallmentPaymentDto dto)
         {
             var response = await _supplyInstallmentService
-                .PayInstallmentAsync(supplyId, installmentId, dto);
+                .CreateInstallmentPaymentAsync(supplyId, installmentId, dto);
             return StatusCode(response.StatusCode, response);
         }
     }

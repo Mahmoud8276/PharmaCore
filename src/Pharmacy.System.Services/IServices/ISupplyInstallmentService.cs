@@ -13,6 +13,6 @@ namespace Pharmacy.System.Services.IServices
         public Task<Response> GetAsync(int supplyId, int installmentId);
         public Task<Response> DeleteAsync(int supplyId);
         public Task<Response> DeleteAsync(int supplyId, int installmentId);
-        public Task<Response> PayInstallmentAsync(int supplyId, int installmentId, SupplyInstallmentPaymentDto dto);
+        public Task<Response> CreateInstallmentPaymentAsync(int supplyId, int installmentId, SupplyInstallmentPaymentDto dto);
     }
 }

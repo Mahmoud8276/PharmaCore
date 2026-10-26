@@ -628,6 +628,35 @@ namespace Pharmacy.System.Infrastructure.Migrations
                     b.ToTable("Suppliers");
                 });
 
+            modelBuilder.Entity("Pharmacy.System.Core.Models.SupplierCredit", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<decimal>("Amount")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<bool>("IsSetteld")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("SupplierId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("SupplyReturnId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("SupplierId");
+
+                    b.HasIndex("SupplyReturnId");
+
+                    b.ToTable("SupplierCredits");
+                });
+
             modelBuilder.Entity("Pharmacy.System.Core.Models.Supply", b =>
                 {
                     b.Property<int>("Id")
@@ -1113,6 +1142,25 @@ namespace Pharmacy.System.Infrastructure.Migrations
                     b.Navigation("PhoneNumbers");
                 });
 
+            modelBuilder.Entity("Pharmacy.System.Core.Models.SupplierCredit", b =>
+                {
+                    b.HasOne("Pharmacy.System.Core.Models.Supplier", "Supplier")
+                        .WithMany("Credits")
+                        .HasForeignKey("SupplierId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Pharmacy.System.Core.Models.SupplyReturn", "SupplyReturn")
+                        .WithMany()
+                        .HasForeignKey("SupplyReturnId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Supplier");
+
+                    b.Navigation("SupplyReturn");
+                });
+
             modelBuilder.Entity("Pharmacy.System.Core.Models.Supply", b =>
                 {
                     b.HasOne("Pharmacy.System.Core.Models.Repository", "Repository")
@@ -1302,6 +1350,11 @@ namespace Pharmacy.System.Infrastructure.Migrations
                     b.Navigation("ProductActiveIngredients");
 
                     b.Navigation("ProductPackagingLevels");
+                });
+
+            modelBuilder.Entity("Pharmacy.System.Core.Models.Supplier", b =>
+                {
+                    b.Navigation("Credits");
                 });
 
             modelBuilder.Entity("Pharmacy.System.Core.Models.Supply", b =>

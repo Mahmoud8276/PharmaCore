@@ -10,6 +10,7 @@ namespace Pharmacy.System.Core.Models
         public string? Address { get; set; }
         public string? Logo { get; set; }
         public List<SupplierPhoneNumber> PhoneNumbers { get; set; } = new List<SupplierPhoneNumber>();
+        public List<SupplierCredit> Credits { get; set; } = new List<SupplierCredit>();
     }
 
     public class SupplierPhoneNumber

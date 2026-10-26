@@ -27,5 +27,12 @@ namespace Pharmacy.System.Core.Models
         {
             return Math.Round(Math.Max(Amount - PaidAmount, 0));
         }
+
+        public void RecalculateStatus()
+        {
+            Status = RemainingAmount == 0 ? SupplyInstallmentStatus.Paid :
+                RemainingAmount == Amount ? SupplyInstallmentStatus.Pending :
+                SupplyInstallmentStatus.PartiallyPaid;
+        }
     }
 }

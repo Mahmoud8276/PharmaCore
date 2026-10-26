@@ -185,7 +185,58 @@ namespace Pharmacy.System.Services.Services
                 data: installment.Adapt<SupplyInstallmentDetailsDto>());
         }
 
-        public async Task<Response> PayInstallmentAsync(int supplyId, int installmentId, SupplyInstallmentPaymentDto dto)
+        public async Task<Response> UpdateAsync(int supplyId, int installmentId, SupplyInstallmentDto dto)
+        {
+            if(dto.DueDate < DateOnly.FromDateTime(DateTime.Now))
+            {
+                return Response.Fail(
+                    message: "Due date can not be in the past!");
+            }
+
+            var supply = await _unitofWork.SupplyRepository.GetWithSpecAsync(
+                new SupplySpecification(supplyId));
+            if(supply == null)
+            {
+                return Response.NotFound(
+                    message: "Supply not found!");
+            }
+
+            var installment = supply.Installments.FirstOrDefault(x => x.Id == installmentId);
+            if (installment == null)
+            {
+                return Response.NotFound(
+                    message: "Installment not found!");
+            }
+
+            if(dto.Amount < installment.PaidAmount)
+            {
+                return Response.Fail(
+                    message: "Installment Amount can not be less than the already paid amount for that installment!");
+            }
+
+            dto.Adapt(installment);
+            var installmentsSum = supply.Installments.Sum(x => x.Amount);
+            if (installmentsSum > supply.RemainingAmount)
+            {
+                return Response.Fail(
+                    message: "Total amount of installments is greater than the remaining amount of the supply.",
+                    details: $"Total installments amount: {installmentsSum}, Supply remaining amount: {supply.RemainingAmount}");
+            }
+
+            if(installment.PaidAmount == dto.Amount) 
+                installment.Status = SupplyInstallmentStatus.Paid;
+
+            await _unitofWork.CompleteAsync();
+
+            return Response.Success(
+                message: "Installment updated successfully",
+                data: installment.Adapt<SupplyInstallmentDetailsDto>());
+        }
+
+
+
+
+        public async Task<Response> CreateInstallmentPaymentAsync(int supplyId, int installmentId, SupplyInstallmentPaymentDto dto)
         {
             //Check if the supply exists or not.
             var supply = await _unitofWork.SupplyRepository
@@ -261,54 +312,6 @@ namespace Pharmacy.System.Services.Services
             return Response.Created(
                 message: "Supply installment paid successfully",
                 data: result);
-        }
-
-        public async Task<Response> UpdateAsync(int supplyId, int installmentId, SupplyInstallmentDto dto)
-        {
-            if(dto.DueDate < DateOnly.FromDateTime(DateTime.Now))
-            {
-                return Response.Fail(
-                    message: "Due date can not be in the past!");
-            }
-
-            var supply = await _unitofWork.SupplyRepository.GetWithSpecAsync(
-                new SupplySpecification(supplyId));
-            if(supply == null)
-            {
-                return Response.NotFound(
-                    message: "Supply not found!");
-            }
-
-            var installment = supply.Installments.FirstOrDefault(x => x.Id == installmentId);
-            if (installment == null)
-            {
-                return Response.NotFound(
-                    message: "Installment not found!");
-            }
-
-            if(dto.Amount < installment.PaidAmount)
-            {
-                return Response.Fail(
-                    message: "Installment Amount can not be less than the already paid amount for that installment!");
-            }
-
-            dto.Adapt(installment);
-            var installmentsSum = supply.Installments.Sum(x => x.Amount);
-            if (installmentsSum > supply.RemainingAmount)
-            {
-                return Response.Fail(
-                    message: "Total amount of installments is greater than the remaining amount of the supply.",
-                    details: $"Total installments amount: {installmentsSum}, Supply remaining amount: {supply.RemainingAmount}");
-            }
-
-            if(installment.PaidAmount == dto.Amount) 
-                installment.Status = SupplyInstallmentStatus.Paid;
-
-            await _unitofWork.CompleteAsync();
-
-            return Response.Success(
-                message: "Installment updated successfully",
-                data: installment.Adapt<SupplyInstallmentDetailsDto>());
         }
     }
 }

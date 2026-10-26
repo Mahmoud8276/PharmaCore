@@ -7,9 +7,9 @@ namespace Pharmacy.System.Services.IServices
     public interface ISupplyPaymentService
     {
         public Task<Response> CreateAsync(int supplyId, SupplyPaymentDto dto);
-        public Task<Response> UpdateAsync(int supplyId, int id, SupplyPaymentDto dto);
-        public Task<Response> DeleteAsync(int supplyId, int id);
-        public Task<Response> GetByIdAsync(int supplyId, int id);
+        public Task<Response> UpdateAsync(int supplyId, int paymentId, SupplyPaymentDto dto);
+        public Task<Response> DeleteAsync(int supplyId, int paymentId);
+        public Task<Response> GetByIdAsync(int supplyId, int paymentId);
         public Task<Response> GetAllBySupplyIdAsync(int supplyId);
     }
 }

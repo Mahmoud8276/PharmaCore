@@ -60,7 +60,7 @@ namespace Pharmacy.System.Services.Services
                 data: payment.Adapt<SupplyPaymentDetailsDto>());
         }
 
-        public Task<Response> DeleteAsync(int supplyId, int id)
+        public Task<Response> DeleteAsync(int supplyId, int paymentId)
         {
             throw new global::System.NotImplementedException();
         }
@@ -70,12 +70,22 @@ namespace Pharmacy.System.Services.Services
             throw new global::System.NotImplementedException();
         }
 
-        public Task<Response> GetByIdAsync(int supplyId, int id)
+        public async Task<Response> GetByIdAsync(int supplyId, int paymentId)
         {
-            throw new global::System.NotImplementedException();
+            var payment = await _unitOfWork.SupplyPaymentRepository
+                .GetByIdAsync(paymentId);
+            if(payment == null || payment.SupplyId != supplyId)
+            {
+                return Response.NotFound(
+                    message: "Payment not found!");
+            }
+
+            return Response.Success(
+                message: "Payment retreived successfully",
+                data: payment.Adapt<SupplyPaymentDetailsDto>());
         }
 
-        public Task<Response> UpdateAsync(int supplyId, int id, SupplyPaymentDto dto)
+        public Task<Response> UpdateAsync(int supplyId, int paymentId, SupplyPaymentDto dto)
         {
             throw new global::System.NotImplementedException();
         }

@@ -6,6 +6,7 @@ using Pharmacy.System.Core.Models;
 using Pharmacy.System.Services.IServices;
 using Pharmacy.System.Services.Responses;
 using Pharmacy.System.Services.Specifications;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Pharmacy.System.Services.Services
@@ -65,9 +66,19 @@ namespace Pharmacy.System.Services.Services
             throw new global::System.NotImplementedException();
         }
 
-        public Task<Response> GetAllBySupplyIdAsync(int supplyId)
+        public async Task<Response> GetAllBySupplyIdAsync(int supplyId)
         {
-            throw new global::System.NotImplementedException();
+            var payments = await _unitOfWork.SupplyPaymentRepository
+                .GetAllBySupplyId(supplyId);
+            if(payments.Count == 0)
+            {
+                return Response.NotFound(
+                    message: "No payments found for this supply!");
+            }
+
+            return Response.Success(
+                message: "Payments retrieved successfully",
+                data:  payments.Adapt<List<SupplyPaymentDetailsDto>>());
         }
 
         public async Task<Response> GetByIdAsync(int supplyId, int paymentId)

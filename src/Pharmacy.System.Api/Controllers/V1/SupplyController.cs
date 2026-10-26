@@ -72,6 +72,9 @@ namespace Pharmacy.System.Api.Controllers.V1
 
 
 
+
+
+
         [HttpPost("{supplyId}/payments")]
         public async Task<IActionResult> CreatePaymentAsync(int supplyId, [FromBody] SupplyPaymentDto dto)
         {
@@ -106,6 +109,9 @@ namespace Pharmacy.System.Api.Controllers.V1
             var response = await _supplyPaymentService.DeleteAsync(supplyId, id);
             return StatusCode(response.StatusCode, response);
         }
+
+
+
 
 
 

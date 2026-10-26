@@ -12,7 +12,6 @@ using Pharmacy.System.Core.Dtos.SupplyItemDtos;
 using Pharmacy.System.Core.Enums;
 using Pharmacy.System.Core.Dtos.ProductCategoryDtos;
 using Pharmacy.System.Core.Dtos.SupplyInstallmentDtos;
-using Pharmacy.System.Core.Dtos.SupplyPaymentDtos;
 
 namespace Pharmacy.System.Services.ApplicatoinServicesConfig
 {

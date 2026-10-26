@@ -1,7 +1,11 @@
-﻿using Pharmacy.System.Core.Dtos.SupplyPaymentDtos;
+﻿using Mapster;
+using Pharmacy.System.Core.Dtos.SupplyPaymentDtos;
+using Pharmacy.System.Core.Enums;
 using Pharmacy.System.Core.Interfaces;
+using Pharmacy.System.Core.Models;
 using Pharmacy.System.Services.IServices;
 using Pharmacy.System.Services.Responses;
+using Pharmacy.System.Services.Specifications;
 using System.Threading.Tasks;
 
 namespace Pharmacy.System.Services.Services
@@ -15,9 +19,45 @@ namespace Pharmacy.System.Services.Services
         }
 
         
-        public Task<Response> CreateAsync(int supplyId, SupplyPaymentDto dto)
+        public async Task<Response> CreateAsync(int supplyId, SupplyPaymentDto dto)
         {
-            throw new global::System.NotImplementedException();
+            var supply = await _unitOfWork.SupplyRepository
+                .GetWithSpecAsync(new SupplySpecification(supplyId));
+            if(supply == null)
+            {
+                return Response.NotFound(
+                    message: "Supply not found!");
+            }
+
+            if (!supply.IsConfirmed)
+            {
+                return Response.Fail(
+                    message: "Supply is not confirmed!");
+            }
+
+            if(supply.PaymentPlan != SupplyPaymentPlan.FreePayment)
+            {
+                return Response.Fail(
+                    message: "Supply payment plan is not free payment!");
+            }
+
+            if(dto.Amount > supply.RemainingAmount)
+            {
+                return Response.Fail(
+                    message: "The payment amount is larger than the supply remaining amount!",
+                    details: $"Payment amount: {dto.Amount}, Supply remaining amount: {supply.RemainingAmount}");
+            }
+
+            var payment = dto.Adapt<SupplyPayment>();
+            payment.Supply = supply;
+            supply.RecalculatePaymentStatus();
+
+            await _unitOfWork.SupplyPaymentRepository.AddAsync(payment);
+            await _unitOfWork.CompleteAsync();
+
+            return Response.Created(
+                message: "Supply payment created successfully",
+                data: payment.Adapt<SupplyPaymentDetailsDto>());
         }
 
         public Task<Response> DeleteAsync(int supplyId, int id)

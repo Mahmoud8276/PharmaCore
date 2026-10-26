@@ -47,5 +47,14 @@ namespace Pharmacy.System.Core.Models
         {
             return Payments.Sum(payment => payment.Amount);
         }
+
+        public void RecalculatePaymentStatus()
+        {
+            var remainingAmount = RemainingAmount;
+
+            PaymentStatus = remainingAmount == 0 ? PaymentStatus.FullyPaid :
+                remainingAmount == FinalCost ? PaymentStatus.NotPaid :
+                PaymentStatus.PartiallyPaid;
+        }
     }
 }

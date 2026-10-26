@@ -7,11 +7,6 @@ namespace Pharmacy.System.Core.Dtos.SupplyPaymentDtos
 {
     public class SupplyPaymentDto
     {
-        public int? SupplyInstallmentId { get; set; }
-
-        [Required(ErrorMessage = "Supply Id is required!")]
-        public int SupplyId { get; set; }
-
         public string? Notes { get; set; }
 
         [Range(typeof(decimal), "0.01", "79228162514264337593543950335",
@@ -21,7 +16,7 @@ namespace Pharmacy.System.Core.Dtos.SupplyPaymentDtos
 
         [Required(ErrorMessage = "Payment date is required!")]
         [NotInFuture(ErrorMessage = "Payment date can not be in the future!")]
-        public DateTime PaidAt { get; set; }
+        public DateOnly PaidAt { get; set; }
         public PaymentMethod Method { get; set; } = PaymentMethod.Other;
     }
 }

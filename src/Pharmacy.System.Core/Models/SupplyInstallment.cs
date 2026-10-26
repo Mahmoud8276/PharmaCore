@@ -15,6 +15,7 @@ namespace Pharmacy.System.Core.Models
         public string? Notes { get; set; }
         public decimal Amount { get; set; }
         public decimal RemainingAmount => ComputeRemainingAmount();
+        public decimal PaidAmount => Payments.Sum(x => x.Amount);
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public DateOnly DueDate { get; set; }
         public SupplyInstallmentStatus Status { get; set; } = SupplyInstallmentStatus.Pending;
@@ -24,9 +25,7 @@ namespace Pharmacy.System.Core.Models
         
         private decimal ComputeRemainingAmount()
         {
-            var paidAmount = Payments.Sum(x => x.Amount);
-
-            return Math.Round(Math.Max(Amount - paidAmount, 0));
+            return Math.Round(Math.Max(Amount - PaidAmount, 0));
         }
     }
 }

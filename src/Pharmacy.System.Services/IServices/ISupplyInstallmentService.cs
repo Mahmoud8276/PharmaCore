@@ -7,11 +7,12 @@ namespace Pharmacy.System.Services.IServices
 {
     public interface ISupplyInstallmentService
     {
-        public Task<Response> CreateInstallmentsAsync(int supplyId, List<SupplyInstallmentDto> dtos);
-        public Task<Response> UpdateInstallmentPlanAsync(int supplyId, List<SupplyInstallmentDto> dtos);
-        public Task<Response> GetInstallmentPlanAsync(int supplyId);
-        public Task<Response> DeleteInstallmentsAsync(int supplyId);
-        public Task<Response> DeleteInstallmentAsync(int supplyId, int installmentId);
-        public Task<Response> PaySupplyInstallmentAsync(int supplyId, int installmentId, SupplyInstallmentPaymentDto dto);
+        public Task<Response> CreateAsync(int supplyId, List<SupplyInstallmentDto> dtos);
+        public Task<Response> UpdateAsync(int supplyId, int installmentId, SupplyInstallmentDto dto);
+        public Task<Response> GetAsync(int supplyId);
+        public Task<Response> GetAsync(int supplyId, int installmentId);
+        public Task<Response> DeleteAsync(int supplyId);
+        public Task<Response> DeleteAsync(int supplyId, int installmentId);
+        public Task<Response> PayInstallmentAsync(int supplyId, int installmentId, SupplyInstallmentPaymentDto dto);
     }
 }

@@ -21,7 +21,7 @@ namespace Pharmacy.System.Services.Services
             _unitofWork = unitofWork;
         }
 
-        public async Task<Response> CreateInstallmentsAsync(int supplyId, List<SupplyInstallmentDto> dtos)
+        public async Task<Response> CreateAsync(int supplyId, List<SupplyInstallmentDto> dtos)
         {
             //Check that the supply exists.
             var supply = await _unitofWork.SupplyRepository.GetWithSpecAsync(
@@ -75,7 +75,7 @@ namespace Pharmacy.System.Services.Services
                 data: result);
         }
 
-        public async Task<Response> DeleteInstallmentAsync(int supplyId, int installmentId)
+        public async Task<Response> DeleteAsync(int supplyId, int installmentId)
         {
             var installment = await _unitofWork.SupplyInstallmentRepository
                 .GetWithSpecAsync(new SupplyInstallmentSpecification(installmentId));
@@ -98,7 +98,7 @@ namespace Pharmacy.System.Services.Services
                 message: "Installment deleted successfully");
         }
 
-        public async Task<Response> DeleteInstallmentsAsync(int supplyId)
+        public async Task<Response> DeleteAsync(int supplyId)
         {
             if(!await _unitofWork.SupplyRepository.AnyAsync(x=>x.Id == supplyId))
             {
@@ -132,7 +132,7 @@ namespace Pharmacy.System.Services.Services
                 message: "Supply installments deleted successfully");
         }
 
-        public async Task<Response> GetInstallmentPlanAsync(int supplyId)
+        public async Task<Response> GetAsync(int supplyId)
         {
             var supply = await _unitofWork.SupplyRepository
                 .GetByIdAsync(supplyId);
@@ -170,7 +170,12 @@ namespace Pharmacy.System.Services.Services
                 data: result);
         }
 
-        public async Task<Response> PaySupplyInstallmentAsync(int supplyId, int installmentId, SupplyInstallmentPaymentDto dto)
+        public Task<Response> GetAsync(int supplyId, int installmentId)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task<Response> PayInstallmentAsync(int supplyId, int installmentId, SupplyInstallmentPaymentDto dto)
         {
             //Check if the supply exists or not.
             var supply = await _unitofWork.SupplyRepository
@@ -248,9 +253,53 @@ namespace Pharmacy.System.Services.Services
                 data: result);
         }
 
-        public Task<Response> UpdateInstallmentPlanAsync(int supplyId, List<SupplyInstallmentDto> dtos)
+        public async Task<Response> UpdateAsync(int supplyId, int installmentId, SupplyInstallmentDto dto)
         {
-            throw new global::System.NotImplementedException();
+            if(dto.DueDate < DateOnly.FromDateTime(DateTime.Now))
+            {
+                return Response.Fail(
+                    message: "Due date can not be in the past!");
+            }
+
+            var supply = await _unitofWork.SupplyRepository.GetWithSpecAsync(
+                new SupplySpecification(supplyId));
+            if(supply == null)
+            {
+                return Response.NotFound(
+                    message: "Supply not found!");
+            }
+
+            var installment = supply.Installments.FirstOrDefault(x => x.Id == installmentId);
+            if (installment == null)
+            {
+                return Response.NotFound(
+                    message: "Installment not found!");
+            }
+
+            if(dto.Amount < installment.PaidAmount)
+            {
+                return Response.Fail(
+                    message: "Installment Amount can not be less than the already paid amount for that installment!");
+            }
+
+            dto.Adapt(installment);
+            var installmentsSum = supply.Installments.Sum(x => x.Amount);
+            if (installmentsSum > supply.RemainingAmount)
+            {
+                return Response.Fail(
+                    message: "Total amount of installments is greater than the remaining amount of the supply.",
+                    details: $"Total installments amount: {installmentsSum}, Supply remaining amount: {supply.RemainingAmount}");
+            }
+
+            if(installment.PaidAmount == dto.Amount) 
+                installment.Status = SupplyInstallmentStatus.Paid;
+
+            await _unitofWork.CompleteAsync();
+
+            return Response.Success(
+                message: "Installment updated successfully",
+                data: installment.Adapt<SupplyInstallmentDetailsDto>());
         }
     }
 }
+    

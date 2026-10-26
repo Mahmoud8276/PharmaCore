@@ -118,51 +118,50 @@ namespace Pharmacy.System.Api.Controllers.V1
                     message : "Installment plan can not be empty!"));
             }
 
-            var response = await _supplyInstallmentService.CreateInstallmentsAsync(supplyId, dtos);
+            var response = await _supplyInstallmentService.CreateAsync(supplyId, dtos);
             return StatusCode(response.StatusCode, response);
         }
 
         [HttpGet("{supplyId}/installments")]
         public async Task<IActionResult> GetInstallmentPlanAsync(int supplyId)
         {
-            var response = await _supplyInstallmentService.GetInstallmentPlanAsync(supplyId);
+            var response = await _supplyInstallmentService.GetAsync(supplyId);
             return StatusCode(response.StatusCode, response);
         }
 
-        [HttpPut("{supplyId}/installments")]
-        public async Task<IActionResult> UpdateInstallmentPlanAsync(int supplyId, [FromBody] List<SupplyInstallmentDto> dtos)
+
+        [HttpPut("{supplyId}/installments/{installmentId}")]
+        public async Task<IActionResult> UpdateInstallmentAsync(
+            int supplyId,
+            int installmentId, 
+            [FromBody] SupplyInstallmentDto dto)
         {
-            if (dtos == null || dtos.Count == 0)
-            {
-                return BadRequest(ApiResponse.Fail(
-                    message: "Installment plan can not be empty!"));
-            }
-            var response = await _supplyInstallmentService.UpdateInstallmentPlanAsync(supplyId, dtos);
+            var response = await _supplyInstallmentService.UpdateAsync(supplyId, installmentId, dto);
             return StatusCode(response.StatusCode, response);
         }
 
         [HttpDelete("{supplyId}/installments")]
         public async Task<IActionResult> DeleteInstallmentPlanAsync(int supplyId)
         {
-            var response = await _supplyInstallmentService.DeleteInstallmentsAsync(supplyId);
+            var response = await _supplyInstallmentService.DeleteAsync(supplyId);
             return StatusCode(response.StatusCode, response);
         }
 
         [HttpDelete("{supplyId}/installments/{installmentId}")]
         public async Task<IActionResult> DeleteInstallmentAsync(int supplyId, int installmentId)
         {
-            var response = await _supplyInstallmentService.DeleteInstallmentAsync(supplyId, installmentId);
+            var response = await _supplyInstallmentService.DeleteAsync(supplyId, installmentId);
             return StatusCode(response.StatusCode, response);
         }
 
-        [HttpPost("{supplyId}/installments/{installmentId}/payments")]
+        [HttpPost("{supplyId}/installments/{installmentId}/pay")]
         public async Task<IActionResult> PaySupplyInstallmentAsync(
             int supplyId, 
             int installmentId, 
             [FromBody] SupplyInstallmentPaymentDto dto)
         {
             var response = await _supplyInstallmentService
-                .PaySupplyInstallmentAsync(supplyId, installmentId, dto);
+                .PayInstallmentAsync(supplyId, installmentId, dto);
             return StatusCode(response.StatusCode, response);
         }
     }

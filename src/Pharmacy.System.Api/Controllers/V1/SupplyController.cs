@@ -129,6 +129,13 @@ namespace Pharmacy.System.Api.Controllers.V1
             return StatusCode(response.StatusCode, response);
         }
 
+        [HttpGet("{supplyId}/installments/{installmentId}")]
+        public async Task<IActionResult> GetInstallmentAsync(int supplyId, int installmentId)
+        {
+            var response = await _supplyInstallmentService.GetAsync(supplyId, installmentId);
+            return StatusCode(response.StatusCode, response);
+        }
+
 
         [HttpPut("{supplyId}/installments/{installmentId}")]
         public async Task<IActionResult> UpdateInstallmentAsync(

@@ -166,13 +166,23 @@ namespace Pharmacy.System.Services.Services
             var result = installments.Adapt<List<SupplyInstallmentDetailsDto>>()
                 .OrderBy(x => x.DueDate);
             return Response.Success(
-                message: "Supply installment retreived successfully",
+                message: "Supply installments retreived successfully",
                 data: result);
         }
 
-        public Task<Response> GetAsync(int supplyId, int installmentId)
+        public async Task<Response> GetAsync(int supplyId, int installmentId)
         {
-            throw new NotImplementedException();
+            var installment = await _unitofWork.SupplyInstallmentRepository
+                .GetWithSpecAsync(new SupplyInstallmentSpecification(installmentId));
+            if(installment == null || installment.SupplyId != supplyId)
+            {
+                return Response.NotFound(
+                    message: "Installment not found!");
+            }
+
+            return Response.Success(
+                message: "Supply installment retreived successfully",
+                data: installment.Adapt<SupplyInstallmentDetailsDto>());
         }
 
         public async Task<Response> PayInstallmentAsync(int supplyId, int installmentId, SupplyInstallmentPaymentDto dto)

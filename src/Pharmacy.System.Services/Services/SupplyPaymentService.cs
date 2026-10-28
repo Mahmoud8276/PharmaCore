@@ -164,9 +164,28 @@ namespace Pharmacy.System.Services.Services
                 data: payment.Adapt<SupplyPaymentDetailsDto>());
         }
 
-        public Task<Response> UpdateAsync(int supplyId, int paymentId, SupplyPaymentDto dto)
+        public async Task<Response> UpdateAsync(int supplyId, int paymentId, UpdateSupplyPaymentDto dto)
         {
-            throw new global::System.NotImplementedException();
+            if(!await _unitOfWork.SupplyRepository.AnyAsync(x=>x.Id == supplyId))
+            {
+                return Response.NotFound(
+                    message: "Supply not found!");
+            }
+
+            var payment = await _unitOfWork.SupplyPaymentRepository
+                .GetByIdAsync(paymentId);
+            if(payment==null || payment.SupplyId != supplyId)
+            {
+                return Response.NotFound(
+                    message: "Payment not found!");
+            }
+
+            dto.Adapt(payment);
+            await _unitOfWork.CompleteAsync();
+
+            return Response.Success(
+                message: "Supply payment updated successfully",
+                data: payment.Adapt<SupplyPaymentDetailsDto>());
         }
     }
 }

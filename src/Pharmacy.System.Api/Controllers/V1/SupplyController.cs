@@ -96,8 +96,8 @@ namespace Pharmacy.System.Api.Controllers.V1
             return StatusCode(response.StatusCode, response);
         }
 
-        [HttpPut("{supplyId}/payments/{paymentId}")]
-        public async Task<IActionResult> UpdatePaymentAsync(int supplyId, int paymentId, [FromBody] SupplyPaymentDto dto)
+        [HttpPatch("{supplyId}/payments/{paymentId}")]
+        public async Task<IActionResult> UpdatePaymentAsync(int supplyId, int paymentId, [FromBody] UpdateSupplyPaymentDto dto)
         {
             var response = await _supplyPaymentService.UpdateAsync(supplyId, paymentId, dto);
             return StatusCode(response.StatusCode, response);

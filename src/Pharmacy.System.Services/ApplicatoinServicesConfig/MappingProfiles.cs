@@ -12,6 +12,7 @@ using Pharmacy.System.Core.Dtos.SupplyItemDtos;
 using Pharmacy.System.Core.Enums;
 using Pharmacy.System.Core.Dtos.ProductCategoryDtos;
 using Pharmacy.System.Core.Dtos.SupplyInstallmentDtos;
+using Pharmacy.System.Core.Dtos.SupplyPaymentDtos;
 
 namespace Pharmacy.System.Services.ApplicatoinServicesConfig
 {
@@ -94,6 +95,10 @@ namespace Pharmacy.System.Services.ApplicatoinServicesConfig
                 .Map(dest => dest.PaymentPlan, src => src.PaymentPlan)
                 .Map(dest => dest.PaymentStatus, src =>
                 src.PaymentPlan == SupplyPaymentPlan.FullPayment ? PaymentStatus.FullyPaid : PaymentStatus.NotPaid);
+
+            TypeAdapterConfig<UpdateSupplyPaymentDto, SupplyPayment>
+                .NewConfig()
+                .IgnoreNullValues(true);
 
             TypeAdapterConfig<SupplyItemDto, SupplyItem>
                 .NewConfig()

@@ -7,6 +7,7 @@ using Pharmacy.System.Services.IServices;
 using Pharmacy.System.Services.Responses;
 using Pharmacy.System.Services.Specifications;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Pharmacy.System.Services.Services
@@ -20,6 +21,7 @@ namespace Pharmacy.System.Services.Services
         }
 
         
+
         public async Task<Response> CreateAsync(int supplyId, SupplyPaymentDto dto)
         {
             var supply = await _unitOfWork.SupplyRepository
@@ -50,10 +52,9 @@ namespace Pharmacy.System.Services.Services
             }
 
             var payment = dto.Adapt<SupplyPayment>();
-            payment.Supply = supply;
+            supply.Payments.Add(payment);
             supply.RecalculatePaymentStatus();
 
-            await _unitOfWork.SupplyPaymentRepository.AddAsync(payment);
             await _unitOfWork.CompleteAsync();
 
             return Response.Created(
@@ -61,9 +62,76 @@ namespace Pharmacy.System.Services.Services
                 data: payment.Adapt<SupplyPaymentDetailsDto>());
         }
 
-        public Task<Response> DeleteAsync(int supplyId, int paymentId)
+        public async Task<Response> DeleteAsync(int supplyId, int paymentId)
         {
-            throw new global::System.NotImplementedException();
+            var supply = await _unitOfWork.SupplyRepository
+                .GetWithSpecAsync(new SupplySpecification(supplyId));
+            if(supply == null)
+            {
+                return Response.NotFound(
+                    message: "Supply not found!");
+            }
+
+            if(supply.PaymentPlan != SupplyPaymentPlan.FreePayment)
+            {
+                return Response.Fail(
+                    message: "Payment plan is not free payment!");
+            }
+
+            var payment = supply.Payments.FirstOrDefault(x=>x.Id == paymentId);
+            if(payment == null)
+            {
+                return Response.NotFound(
+                    message: "Payment not found!");
+            }
+
+            //Handle the case if there are supplier credits related to this supply
+            var supplierCredits = await _unitOfWork.SupplierCreditRepository
+                .GetUnSettledCreditsBySupplyIdAsync(supplyId);
+            if(supplierCredits.Count() > 0)
+            {
+                if (supplierCredits.Sum(x => x.Amount) <= payment.Amount)
+                {
+                    _unitOfWork.SupplierCreditRepository.DeleteRange(supplierCredits);
+                }
+                else
+                {
+                    List<SupplierCredit> creditsToBeDeleted = new();
+                    var amount = payment.Amount;
+                    foreach (var credit in supplierCredits)
+                    {
+                        var rem = amount - credit.Amount;
+                        if (rem > 0)
+                        {
+                            creditsToBeDeleted.Add(credit);
+                            amount = rem;
+                        }
+                        else if (rem == 0)
+                        {
+                            creditsToBeDeleted.Add(credit);
+                            break;
+                        }
+                        else
+                        {
+                            credit.Amount = rem * -1;
+                            break;
+                        }
+                    }
+
+                    if (creditsToBeDeleted.Count() > 0)
+                        _unitOfWork.SupplierCreditRepository.DeleteRange(creditsToBeDeleted);
+                }
+
+            }
+
+            supply.Payments.Remove(payment);
+            _unitOfWork.SupplyPaymentRepository.Delete(payment);
+            supply.RecalculatePaymentStatus();
+            await _unitOfWork.CompleteAsync();
+
+            return Response.Success(
+                message: "Payment deleted successfully");
+
         }
 
         public async Task<Response> GetAllBySupplyIdAsync(int supplyId)

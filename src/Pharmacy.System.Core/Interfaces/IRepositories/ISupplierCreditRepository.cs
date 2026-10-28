@@ -6,6 +6,6 @@ namespace Pharmacy.System.Core.Interfaces.IRepositories
 {
     public interface ISupplierCreditRepository : IGenericRepository<SupplierCredit, int>
     {
-        public Task<IReadOnlyList<SupplierCredit>> GetBySupplyIdAsync(int supplyId);
+        public Task<IReadOnlyList<SupplierCredit>> GetUnSettledCreditsBySupplyIdAsync(int supplyId);
     }
 }

@@ -12,11 +12,12 @@ namespace Pharmacy.System.Infrastructure.Repositories
     {
         public SupplierCreditRepository(AppDbContext context) : base(context) { }
 
-        public async Task<IReadOnlyList<SupplierCredit>> GetBySupplyIdAsync(int supplyId)
+        public async Task<IReadOnlyList<SupplierCredit>> GetUnSettledCreditsBySupplyIdAsync(int supplyId)
         {
             return await _context.SupplierCredits
                 .Include(x => x.SupplyReturn)
-                .Where(sc => sc.SupplyReturn.SupplyId == supplyId)
+                .Where(sc => sc.SupplyReturn.SupplyId == supplyId && sc.IsSetteld == false)
+                .OrderBy(sc=> sc.SupplyReturn.DateTime)
                 .ToListAsync();
         }
     }

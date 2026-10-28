@@ -89,24 +89,24 @@ namespace Pharmacy.System.Api.Controllers.V1
             return StatusCode(response.StatusCode, response);
         }
 
-        [HttpGet("{supplyId}/payments/{id}")]
-        public async Task<IActionResult> GetPaymentByIdAsync(int supplyId, int id)
+        [HttpGet("{supplyId}/payments/{paymentId}")]
+        public async Task<IActionResult> GetPaymentByIdAsync(int supplyId, int paymentId)
         {
-            var response = await _supplyPaymentService.GetByIdAsync(supplyId, id);
+            var response = await _supplyPaymentService.GetByIdAsync(supplyId, paymentId);
             return StatusCode(response.StatusCode, response);
         }
 
-        [HttpPut("{supplyId}/payments/{id}")]
-        public async Task<IActionResult> UpdatePaymentAsync(int supplyId, int id, [FromBody] SupplyPaymentDto dto)
+        [HttpPut("{supplyId}/payments/{paymentId}")]
+        public async Task<IActionResult> UpdatePaymentAsync(int supplyId, int paymentId, [FromBody] SupplyPaymentDto dto)
         {
-            var response = await _supplyPaymentService.UpdateAsync(supplyId, id, dto);
+            var response = await _supplyPaymentService.UpdateAsync(supplyId, paymentId, dto);
             return StatusCode(response.StatusCode, response);
         }
 
-        [HttpDelete("{supplyId}/payments/{id}")]
-        public async Task<IActionResult> DeletePaymentAsync(int supplyId, int id)
+        [HttpDelete("{supplyId}/payments/{paymentId}")]
+        public async Task<IActionResult> DeletePaymentAsync(int supplyId, int paymentId)
         {
-            var response = await _supplyPaymentService.DeleteAsync(supplyId, id);
+            var response = await _supplyPaymentService.DeleteAsync(supplyId, paymentId);
             return StatusCode(response.StatusCode, response);
         }
 
@@ -167,8 +167,8 @@ namespace Pharmacy.System.Api.Controllers.V1
             return StatusCode(response.StatusCode, response);
         }
 
-        [HttpPost("{supplyId}/installments/{installmentId}/pay")]
-        public async Task<IActionResult> PaySupplyInstallmentAsync(
+        [HttpPost("{supplyId}/installments/{installmentId}/payments")]
+        public async Task<IActionResult> CreateSupplyInstallmentPaymentAsync(
             int supplyId, 
             int installmentId, 
             [FromBody] SupplyInstallmentPaymentDto dto)

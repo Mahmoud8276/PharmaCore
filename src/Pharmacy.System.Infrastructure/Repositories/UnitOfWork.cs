@@ -22,6 +22,7 @@ namespace Pharmacy.System.Infrastructure.Repositories
         private readonly Lazy<IProductPackagingLevelRepository> _productPackagingLevelRepository;
         private readonly Lazy<IPackagingUnitRepository> _packagingUnitRepository;
         private readonly Lazy<ISupplierRepository> _supplierRepository;
+        private readonly Lazy<ISupplierCreditRepository> _supplierCreditRepository;
         private readonly Lazy<ISupplyRepository> _supplyRepository;
         private readonly Lazy<ISupplyPaymentRepository> _supplyPaymentRepository;
         private readonly Lazy<ISupplyInstallmentRepository> _supplyInstallmentRepository;
@@ -44,6 +45,7 @@ namespace Pharmacy.System.Infrastructure.Repositories
             _productPackagingLevelRepository = new Lazy<IProductPackagingLevelRepository>(() => new ProductPackagingLevelRepository(_context));
             _packagingUnitRepository = new Lazy<IPackagingUnitRepository>(() => new PackagingUnitRepository(_context));
             _supplierRepository = new Lazy<ISupplierRepository>(() => new SupplierRepository(_context));
+            _supplierCreditRepository = new Lazy<ISupplierCreditRepository>(() => new SupplierCreditRepository(_context));
             _supplyRepository = new Lazy<ISupplyRepository>(() => new SupplyRepository(_context));
             _supplyPaymentRepository = new Lazy<ISupplyPaymentRepository>(() => new SupplyPaymentRepository(_context));
             _supplyInstallmentRepository = new Lazy<ISupplyInstallmentRepository>(() => new SupplyInstallmentRepository(_context));
@@ -62,6 +64,7 @@ namespace Pharmacy.System.Infrastructure.Repositories
         public IProductPackagingLevelRepository ProductPackagingLevelRepository => _productPackagingLevelRepository.Value;
         public IPackagingUnitRepository PackagingUnitRepository => _packagingUnitRepository.Value;
         public ISupplierRepository SupplierRepository => _supplierRepository.Value;
+        public ISupplierCreditRepository SupplierCreditRepository => _supplierCreditRepository.Value;
         public ISupplyRepository SupplyRepository => _supplyRepository.Value;
         public ISupplyPaymentRepository SupplyPaymentRepository => _supplyPaymentRepository.Value;
         public ISupplyInstallmentRepository SupplyInstallmentRepository => _supplyInstallmentRepository.Value;

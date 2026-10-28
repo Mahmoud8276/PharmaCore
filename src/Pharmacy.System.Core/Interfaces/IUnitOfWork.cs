@@ -18,6 +18,7 @@ namespace Pharmacy.System.Core.Interfaces
         public IProductPackagingLevelRepository ProductPackagingLevelRepository { get; }
         public IPackagingUnitRepository PackagingUnitRepository { get; }
         public ISupplierRepository SupplierRepository { get; }
+        public ISupplierCreditRepository SupplierCreditRepository { get; }
         public ISupplyRepository SupplyRepository { get; }
         public ISupplyPaymentRepository SupplyPaymentRepository { get; }
         public ISupplyInstallmentRepository SupplyInstallmentRepository { get; }

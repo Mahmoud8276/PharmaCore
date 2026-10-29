@@ -72,12 +72,6 @@ namespace Pharmacy.System.Services.Services
                     message: "Supply not found!");
             }
 
-            if(supply.PaymentPlan != SupplyPaymentPlan.FreePayment)
-            {
-                return Response.Fail(
-                    message: "Payment plan is not free payment!");
-            }
-
             var payment = supply.Payments.FirstOrDefault(x=>x.Id == paymentId);
             if(payment == null)
             {
@@ -124,9 +118,23 @@ namespace Pharmacy.System.Services.Services
 
             }
 
+            // Handle the installment status if the payment is related to any instllment
+            if(payment.SupplyInstallmentId != null)
+            {
+                var installment = await _unitOfWork.SupplyInstallmentRepository
+                    .GetWithSpecAsync(
+                    new SupplyInstallmentSpecification((int)payment.SupplyInstallmentId));
+                if(installment != null)
+                {
+                    installment.Payments.Remove(payment);
+                    installment.RecalculateStatus();
+                }
+            }
+
             supply.Payments.Remove(payment);
             _unitOfWork.SupplyPaymentRepository.Delete(payment);
             supply.RecalculatePaymentStatus();
+
             await _unitOfWork.CompleteAsync();
 
             return Response.Success(

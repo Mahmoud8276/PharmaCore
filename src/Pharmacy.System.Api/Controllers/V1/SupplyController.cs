@@ -64,7 +64,7 @@ namespace Pharmacy.System.Api.Controllers.V1
         }
 
         [HttpPost("{id}/confirm")]
-        public async Task<IActionResult> ConfirmAsync(int id, [FromQuery] SupplyPaymentConfirmationDto dto)
+        public async Task<IActionResult> ConfirmAsync(int id, [FromBody] SupplyPaymentConfirmationDto dto)
         {
             var response = await _supplyService.ConfirmAsync(id, dto);
             return StatusCode(response.StatusCode, response);
@@ -121,7 +121,7 @@ namespace Pharmacy.System.Api.Controllers.V1
             if (dtos == null || dtos.Count == 0)
             {
                 return BadRequest(ApiResponse.Fail(
-                    message : "Installment plan can not be empty!"));
+                    message: "Installment plan can not be empty!"));
             }
 
             var response = await _supplyInstallmentService.CreateAsync(supplyId, dtos);
@@ -146,7 +146,7 @@ namespace Pharmacy.System.Api.Controllers.V1
         [HttpPut("{supplyId}/installments/{installmentId}")]
         public async Task<IActionResult> UpdateInstallmentAsync(
             int supplyId,
-            int installmentId, 
+            int installmentId,
             [FromBody] SupplyInstallmentDto dto)
         {
             var response = await _supplyInstallmentService.UpdateAsync(supplyId, installmentId, dto);
@@ -168,9 +168,9 @@ namespace Pharmacy.System.Api.Controllers.V1
         }
 
         [HttpPost("{supplyId}/installments/{installmentId}/payments")]
-        public async Task<IActionResult> CreateSupplyInstallmentPaymentAsync(
-            int supplyId, 
-            int installmentId, 
+        public async Task<IActionResult> CreateInstallmentPaymentAsync(
+            int supplyId,
+            int installmentId,
             [FromBody] SupplyInstallmentPaymentDto dto)
         {
             var response = await _supplyInstallmentService

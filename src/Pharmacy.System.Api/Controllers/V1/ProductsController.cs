@@ -28,57 +28,57 @@ namespace Pharmacy.System.Api.Controllers.V1
         [HttpPost]
         public async Task<IActionResult> CreateAsync([FromForm] ProductDto dto)
         {
-            var response = await _productService.CreateAsync(dto);
-            return StatusCode(response.StatusCode, response);
+            return FromResponse(
+                await _productService.CreateAsync(dto));
         }
 
         [HttpGet]
         public async Task<IActionResult> GetAllAsync([FromQuery] ProductSpecParams specParams)
         {
-            var response = await _productService.GetAllAsync(specParams);
-            return StatusCode(response.StatusCode, response);
+            return FromResponse(
+                await _productService.GetAllAsync(specParams));
         }
 
         [HttpGet("{id}")]
         public async Task<IActionResult> GetByIdAsync(int id)
         {
-            var response = await _productService.GetByIdAsync(id);
-            return StatusCode(response.StatusCode, response);
+            return FromResponse(
+                await _productService.GetByIdAsync(id));
         }
 
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateAsync(int id, [FromForm] UpdateProductDto dto)
         {
-            var response = await _productService.UpdateAsync(id, dto);
-            return StatusCode(response.StatusCode, response);
+            return FromResponse(
+                await _productService.UpdateAsync(id, dto));
         }
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteAsync(int id)
         {
-            var response = await _productService.DeleteAsync(id);
-            return StatusCode(response.StatusCode, response);
+            return FromResponse(
+                await _productService.DeleteAsync(id));
         }
 
         [HttpPut("{id}/image")]
         public async Task<IActionResult> UpdateProductImageAsync(int id, [FromForm] UpdateProductImageDto dto)
         {
-            var response = await _productService.UpdateProductImageAsync(id, dto);
-            return StatusCode(response.StatusCode, response);
+            return FromResponse(
+                await _productService.UpdateProductImageAsync(id, dto));
         }
 
         [HttpDelete("{id}/image")]
         public async Task<IActionResult> DeleteProductImageAsync(int id)
         {
-            var response = await _productService.DeleteProductImageAsync(id);
-            return StatusCode(response.StatusCode, response);
+            return FromResponse(
+                await _productService.DeleteProductImageAsync(id));
         }
 
         [HttpGet("generate-barcode")]
         public async Task<IActionResult> GenerateBarcodeAsync()
         {
-            var response = await _productService.GenerateBarcodeAsync();
-            return StatusCode(response.StatusCode, response);
+            return FromResponse(
+                await _productService.GenerateBarcodeAsync());
         }
 
 
@@ -90,11 +90,13 @@ namespace Pharmacy.System.Api.Controllers.V1
         {
             if(dtos.Count == 0)
             {
-                return BadRequest(ApiResponse.Fail(message: "The list of active ingredients cannot be empty."));
+                return FromResponse(
+                    ApiResponse.Fail(
+                        message: "The list of active ingredients cannot be empty."));
             }
 
-            var result = await _productService.AddProductActiveIngredientsAsync(productId, dtos);
-            return StatusCode(result.StatusCode, result);
+            return FromResponse(
+                await _productService.AddProductActiveIngredientsAsync(productId, dtos));
         }
         
         [HttpPost("{productId}/active-ingredients/{activeIngredientId}")]
@@ -103,8 +105,8 @@ namespace Pharmacy.System.Api.Controllers.V1
             int activeIngredientId, 
             ProductActiveIngredientDto dto)
         {
-            var result = await _productService.AddProductActiveIngredientAsync(productId, activeIngredientId, dto);
-            return StatusCode(result.StatusCode, result);
+            return FromResponse(
+                await _productService.AddProductActiveIngredientAsync(productId, activeIngredientId, dto));
         }
 
 
@@ -112,8 +114,8 @@ namespace Pharmacy.System.Api.Controllers.V1
         [HttpGet("{productId}/active-ingredients")]
         public async Task<IActionResult> GetProductActiveIngredientsAsync(int productId)
         {
-            var result = await _productService.GetProductActiveIngredientsAsync(productId);
-            return StatusCode(result.StatusCode, result);
+            return FromResponse(
+                await _productService.GetProductActiveIngredientsAsync(productId));
         }
 
 
@@ -125,11 +127,13 @@ namespace Pharmacy.System.Api.Controllers.V1
         {
             if (dtos.Count == 0)
             {
-                return BadRequest(ApiResponse.Fail(message: "The list of active ingredients cannot be empty."));
+                return FromResponse(
+                    ApiResponse.Fail(
+                        message: "The list of active ingredients cannot be empty."));
             }
 
-            var result = await _productService.UpdateProductActiveIngredientsAsync(productId, dtos);
-            return StatusCode(result.StatusCode, result);
+            return FromResponse(
+                await _productService.UpdateProductActiveIngredientsAsync(productId, dtos));
         }
 
         [HttpPut("{productId}/active-ingredients/{activeIngredientId}")]
@@ -138,8 +142,8 @@ namespace Pharmacy.System.Api.Controllers.V1
             int activeIngredientId,
             ProductActiveIngredientDto dto)
         {
-            var result = await _productService.UpdateProductActiveIngredientAsync(productId, activeIngredientId, dto);
-            return StatusCode(result.StatusCode, result);
+            return FromResponse(
+                await _productService.UpdateProductActiveIngredientAsync(productId, activeIngredientId, dto));
         }
 
 
@@ -147,15 +151,15 @@ namespace Pharmacy.System.Api.Controllers.V1
         [HttpDelete("{productId}/active-ingredients")]
         public async Task<IActionResult> DeleteProductActiveIngredientsAsync(int productId)
         {
-            var result = await _productService.DeleteProductActiveIngredientsAsync(productId);
-            return StatusCode(result.StatusCode, result);
+            return FromResponse(
+                await _productService.DeleteProductActiveIngredientsAsync(productId));
         }
 
         [HttpDelete("{productId}/active-ingredients/{activeIngredientId}")]
         public async Task<IActionResult> DeleteProductActiveIngredientAsync(int productId, int activeIngredientId)
         {
-            var result = await _productService.DeleteProductActiveIngredientAsync(productId, activeIngredientId);
-            return StatusCode(result.StatusCode, result);
+            return FromResponse(
+                await _productService.DeleteProductActiveIngredientAsync(productId, activeIngredientId));
         }
 
 
@@ -164,64 +168,67 @@ namespace Pharmacy.System.Api.Controllers.V1
         [HttpPost("{productId}/packaging")]
         public async Task<IActionResult> AddProductPackagingAsync(int productId, ProductPackagingDto dto)
         {
-            var result = await _productPackagingService.CreateAsync(productId, dto);
-            return StatusCode(result.StatusCode, result);
+            return FromResponse(
+                await _productPackagingService.CreateAsync(productId, dto));
         }
 
         [HttpGet("{productId}/packaging")]
         public async Task<IActionResult> GetAllProductPackagingAsync(int productId)
         {
-            var result = await _productPackagingService.GetProductPackagingLevelsAsync(productId);
-            return StatusCode(result.StatusCode, result);
+            return FromResponse(
+                await _productPackagingService.GetProductPackagingLevelsAsync(productId));
         }
 
         [HttpPut("{productId}/packaging/{productPackagingId}")]
-        public async Task<IActionResult> UpdateProductPackagingAsync(int productId, int productPackagingId, UpdateProductPackagingDto dto)
+        public async Task<IActionResult> UpdateProductPackagingAsync(
+            int productId, 
+            int productPackagingId, 
+            [FromBody] UpdateProductPackagingDto dto)
         {
-            var result = await _productPackagingService.UpdateAsync(productId, productPackagingId, dto);
-            return StatusCode(result.StatusCode, result);
+            return FromResponse(
+                await _productPackagingService.UpdateAsync(productId, productPackagingId, dto));
         }
 
         [HttpDelete("{productId}/packaging")]
         public async Task<IActionResult> DeleteProductPackagingLevelsAsync(int productId)
         {
-            var result = await _productPackagingService.DeleteProductPackagingLevelsAsync(productId);
-            return StatusCode(result.StatusCode, result);
+            return FromResponse(
+                await _productPackagingService.DeleteProductPackagingLevelsAsync(productId));
         }
 
         [HttpDelete("{productId}/packaging/{productPackagingId}")]
         public async Task<IActionResult> DeleteProductPackagingAsync(int productId, int productPackagingId)
         {
-            var result = await _productPackagingService.DeleteAsync(productId, productPackagingId);
-            return StatusCode(result.StatusCode, result);
+            return FromResponse(
+                await _productPackagingService.DeleteAsync(productId, productPackagingId));
         }
 
         [HttpGet("{productId}/packaging/base-unit")]
         public async Task<IActionResult> GetProductBaseUnitAsync(int productId)
         {
-            var result = await _productPackagingService.GetProductBaseUnit(productId);
-            return StatusCode(result.StatusCode, result);
+            return FromResponse(
+                await _productPackagingService.GetProductBaseUnit(productId));
         }
 
         [HttpPut("{productId}/default-packaging/{productPackagingId}")]
         public async Task<IActionResult> AddProductDefaultPackagingAsync(int productId, int productPackagingId)
         {
-            var result = await _productPackagingService.AddProductDefaultPackagingAsync(productId, productPackagingId);
-            return StatusCode(result.StatusCode, result);
+            return FromResponse(
+                await _productPackagingService.AddProductDefaultPackagingAsync(productId, productPackagingId));
         }
 
         [HttpGet("{productId}/default-packaging")]
         public async Task<IActionResult> GetProductDefaultPackagingAsync(int productId)
         {
-            var result = await _productPackagingService.GetProductDefaultPackagingAsync(productId);
-            return StatusCode(result.StatusCode, result);
+            return FromResponse(
+                await _productPackagingService.GetProductDefaultPackagingAsync(productId));
         }
 
         [HttpDelete("{productId}/default-packaging")]
         public async Task<IActionResult> DeleteProductDefaultPackagingAsync(int productId)
         {
-            var result = await _productPackagingService.DeleteProductDefaultPackagingAsync(productId);
-            return StatusCode(result.StatusCode, result);
+            return FromResponse(
+                await _productPackagingService.DeleteProductDefaultPackagingAsync(productId));
         }
     }
 }

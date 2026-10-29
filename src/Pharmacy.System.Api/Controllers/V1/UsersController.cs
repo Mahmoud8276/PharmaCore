@@ -22,16 +22,16 @@ namespace Pharmacy.System.Api.Controllers.V1
         [HttpGet]
         public async Task<IActionResult> GetAllUsers([FromQuery] UserSpecParams specParams)
         {
-            var result = await _userService.GetAllAsync(specParams);
-            return StatusCode((int)result.StatusCode, result);
+            return FromResponse(
+                await _userService.GetAllAsync(specParams));
         }
 
         // GET api/v1/users/{id}
         [HttpGet("{id}")]
         public async Task<IActionResult> GetUserById(string id)
         {
-            var result = await _userService.GetByIdAsync(id);
-            return StatusCode((int)result.StatusCode, result);
+            return FromResponse(
+                await _userService.GetByIdAsync(id));
         }
     }
 }

@@ -16,39 +16,43 @@ namespace Pharmacy.System.Api.Controllers.V1
             _activeIngredientService = activeIngredientService;
         }
 
+
+
         [HttpPost]
         public async Task<IActionResult> CreateAsync([FromBody] ActiveIngredientDto activeIngredientDto)
         {
-            var result = await _activeIngredientService.CreateAsync(activeIngredientDto);
-            return StatusCode(result.StatusCode, result);
+            return FromResponse(
+                await _activeIngredientService.CreateAsync(activeIngredientDto));
         }
 
         [HttpGet]
         public async Task<IActionResult> GetAllAsync([FromQuery] ActiveIngredientSpecParams specParams)
         {
-            var result = await _activeIngredientService.GetAllAsync(specParams);
-            return StatusCode(result.StatusCode, result);
+            return FromResponse(
+                await _activeIngredientService.GetAllAsync(specParams));
         }
 
         [HttpGet("{id}")]
         public async Task<IActionResult> GetByIdAsync(int id)
         {
-            var result = await _activeIngredientService.GetByIdAsync(id);
-            return StatusCode(result.StatusCode, result);
+            return FromResponse(
+                await _activeIngredientService.GetByIdAsync(id));
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateAsync(int id, [FromBody] ActiveIngredientDto activeIngredientDto)
+        public async Task<IActionResult> UpdateAsync(
+            int id,
+            [FromBody] ActiveIngredientDto activeIngredientDto)
         {
-            var result = await _activeIngredientService.UpdateAsync(activeIngredientDto, id);
-            return StatusCode(result.StatusCode, result);
+            return FromResponse(
+                await _activeIngredientService.UpdateAsync(activeIngredientDto, id));
         }
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteAsync(int id)
         {
-            var result = await _activeIngredientService.DeleteAsync(id);
-            return StatusCode(result.StatusCode, result);
+            return FromResponse(
+                await _activeIngredientService.DeleteAsync(id));
         }
     }
 }

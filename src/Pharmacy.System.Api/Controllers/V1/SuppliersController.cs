@@ -16,53 +16,55 @@ namespace Pharmacy.System.Api.Controllers.V1
             _supplierService = supplierService;
         }
 
+
+
         [HttpPost]
         public async Task<IActionResult> CreateAsync([FromForm] SupplierDto dto)
         {
-            var response = await _supplierService.CreateAsync(dto);
-            return StatusCode(response.StatusCode, response);
+            return FromResponse(
+                await _supplierService.CreateAsync(dto));
         }
 
         [HttpGet]
         public async Task<IActionResult> GetAllAsync([FromQuery] SupplierSpecParams specParams)
         {
-            var response = await _supplierService.GetAllAsync(specParams);
-            return StatusCode(response.StatusCode, response);
+            return FromResponse(
+                await _supplierService.GetAllAsync(specParams));
         }
 
         [HttpGet("{id}")]
         public async Task<IActionResult> GetByIdAsync(int id)
         {
-            var response = await _supplierService.GetByIdAsync(id);
-            return StatusCode(response.StatusCode, response);
+            return FromResponse(
+                await _supplierService.GetByIdAsync(id));
         }
 
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateAsync(int id, [FromForm] UpdateSupplierDto dto)
         {
-            var response = await _supplierService.UpdateAsync(id, dto);
-            return StatusCode(response.StatusCode, response);
+            return FromResponse(
+                await _supplierService.UpdateAsync(id, dto));
         }
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteAsync(int id)
         {
-            var response = await _supplierService.DeleteAsync(id);
-            return StatusCode(response.StatusCode, response);
+            return FromResponse(
+                await _supplierService.DeleteAsync(id));
         }
 
         [HttpPut("{id}/logo")]
         public async Task<IActionResult> UpdateLogoAsync(int id, [FromForm] UpdateSupplierLogoDto dto)
         {
-            var response = await _supplierService.UpdateLogoAsync(id, dto);
-            return StatusCode(response.StatusCode, response);
+            return FromResponse(
+                await _supplierService.UpdateLogoAsync(id, dto));
         }
 
         [HttpDelete("{id}/logo")]
         public async Task<IActionResult> DeleteLogoAsync(int id)
         {
-            var response = await _supplierService.DeleteLogoAsync(id);
-            return StatusCode(response.StatusCode, response);
+            return FromResponse(
+                await _supplierService.DeleteLogoAsync(id));
         }
     }
 }

@@ -31,43 +31,37 @@ namespace Pharmacy.System.Api.Controllers.V1
         [HttpPost]
         public async Task<IActionResult> CreateAsync([FromBody] SupplyDto dto)
         {
-            var response = await _supplyService.CreateAsync(dto);
-            return StatusCode(response.StatusCode, response);
+            return FromResponse(await _supplyService.CreateAsync(dto));
         }
 
         [HttpGet]
         public async Task<IActionResult> GetAllAsync([FromQuery] SupplySpecParams specParams)
         {
-            var response = await _supplyService.GetAllAsync(specParams);
-            return StatusCode(response.StatusCode, response);
+            return FromResponse(await _supplyService.GetAllAsync(specParams));
         }
 
         [HttpGet("{id}")]
         public async Task<IActionResult> GetByIdAsync(int id)
         {
-            var response = await _supplyService.GetByIdAsync(id);
-            return StatusCode(response.StatusCode, response);
+            return FromResponse(await _supplyService.GetByIdAsync(id));
         }
 
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateAsync(int id, [FromBody] SupplyDto dto)
         {
-            var response = await _supplyService.UpdateAsync(id, dto);
-            return StatusCode(response.StatusCode, response);
+            return FromResponse(await _supplyService.UpdateAsync(id, dto));
         }
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteAsync(int id)
         {
-            var response = await _supplyService.DeleteAsync(id);
-            return StatusCode(response.StatusCode, response);
+            return FromResponse(await _supplyService.DeleteAsync(id));
         }
 
         [HttpPost("{id}/confirm")]
         public async Task<IActionResult> ConfirmAsync(int id, [FromBody] SupplyPaymentConfirmationDto dto)
         {
-            var response = await _supplyService.ConfirmAsync(id, dto);
-            return StatusCode(response.StatusCode, response);
+            return FromResponse(await _supplyService.ConfirmAsync(id, dto));
         }
 
 
@@ -78,36 +72,34 @@ namespace Pharmacy.System.Api.Controllers.V1
         [HttpPost("{supplyId}/payments")]
         public async Task<IActionResult> CreatePaymentAsync(int supplyId, [FromBody] SupplyPaymentDto dto)
         {
-            var response = await _supplyPaymentService.CreateAsync(supplyId, dto);
-            return StatusCode(response.StatusCode, response);
+            return FromResponse(await _supplyPaymentService.CreateAsync(supplyId, dto));
         }
 
         [HttpGet("{supplyId}/payments")]
         public async Task<IActionResult> GetAllPaymentsAsync(int supplyId)
         {
-            var response = await _supplyPaymentService.GetAllBySupplyIdAsync(supplyId);
-            return StatusCode(response.StatusCode, response);
+            return FromResponse(
+                await _supplyPaymentService.GetAllBySupplyIdAsync(supplyId));
         }
 
         [HttpGet("{supplyId}/payments/{paymentId}")]
         public async Task<IActionResult> GetPaymentByIdAsync(int supplyId, int paymentId)
         {
-            var response = await _supplyPaymentService.GetByIdAsync(supplyId, paymentId);
-            return StatusCode(response.StatusCode, response);
+            return FromResponse(
+                await _supplyPaymentService.GetByIdAsync(supplyId, paymentId));
         }
 
         [HttpPatch("{supplyId}/payments/{paymentId}")]
         public async Task<IActionResult> UpdatePaymentAsync(int supplyId, int paymentId, [FromBody] UpdateSupplyPaymentDto dto)
         {
-            var response = await _supplyPaymentService.UpdateAsync(supplyId, paymentId, dto);
-            return StatusCode(response.StatusCode, response);
+            return FromResponse(
+                await _supplyPaymentService.UpdateAsync(supplyId, paymentId, dto));
         }
 
         [HttpDelete("{supplyId}/payments/{paymentId}")]
         public async Task<IActionResult> DeletePaymentAsync(int supplyId, int paymentId)
         {
-            var response = await _supplyPaymentService.DeleteAsync(supplyId, paymentId);
-            return StatusCode(response.StatusCode, response);
+            return FromResponse(await _supplyPaymentService.DeleteAsync(supplyId, paymentId));
         }
 
 
@@ -120,26 +112,24 @@ namespace Pharmacy.System.Api.Controllers.V1
         {
             if (dtos == null || dtos.Count == 0)
             {
-                return BadRequest(ApiResponse.Fail(
+                return FromResponse(ApiResponse.Fail(
                     message: "Installment plan can not be empty!"));
             }
 
-            var response = await _supplyInstallmentService.CreateAsync(supplyId, dtos);
-            return StatusCode(response.StatusCode, response);
+            return FromResponse(await _supplyInstallmentService.CreateAsync(supplyId, dtos));
         }
 
         [HttpGet("{supplyId}/installments")]
         public async Task<IActionResult> GetInstallmentPlanAsync(int supplyId)
         {
-            var response = await _supplyInstallmentService.GetAsync(supplyId);
-            return StatusCode(response.StatusCode, response);
+            return FromResponse(await _supplyInstallmentService.GetAsync(supplyId));
         }
 
         [HttpGet("{supplyId}/installments/{installmentId}")]
         public async Task<IActionResult> GetInstallmentAsync(int supplyId, int installmentId)
         {
-            var response = await _supplyInstallmentService.GetAsync(supplyId, installmentId);
-            return StatusCode(response.StatusCode, response);
+            return FromResponse(
+                await _supplyInstallmentService.GetAsync(supplyId, installmentId));
         }
 
 
@@ -149,22 +139,22 @@ namespace Pharmacy.System.Api.Controllers.V1
             int installmentId,
             [FromBody] SupplyInstallmentDto dto)
         {
-            var response = await _supplyInstallmentService.UpdateAsync(supplyId, installmentId, dto);
-            return StatusCode(response.StatusCode, response);
+            return FromResponse(
+                await _supplyInstallmentService.UpdateAsync(supplyId, installmentId, dto));
         }
 
         [HttpDelete("{supplyId}/installments")]
         public async Task<IActionResult> DeleteInstallmentPlanAsync(int supplyId)
         {
-            var response = await _supplyInstallmentService.DeleteAsync(supplyId);
-            return StatusCode(response.StatusCode, response);
+            return FromResponse(
+                await _supplyInstallmentService.DeleteAsync(supplyId));
         }
 
         [HttpDelete("{supplyId}/installments/{installmentId}")]
         public async Task<IActionResult> DeleteInstallmentAsync(int supplyId, int installmentId)
         {
-            var response = await _supplyInstallmentService.DeleteAsync(supplyId, installmentId);
-            return StatusCode(response.StatusCode, response);
+            return FromResponse(
+                await _supplyInstallmentService.DeleteAsync(supplyId, installmentId));
         }
 
         [HttpPost("{supplyId}/installments/{installmentId}/payments")]
@@ -173,9 +163,9 @@ namespace Pharmacy.System.Api.Controllers.V1
             int installmentId,
             [FromBody] SupplyInstallmentPaymentDto dto)
         {
-            var response = await _supplyInstallmentService
-                .CreateInstallmentPaymentAsync(supplyId, installmentId, dto);
-            return StatusCode(response.StatusCode, response);
+            return FromResponse(
+                await _supplyInstallmentService
+                .CreateInstallmentPaymentAsync(supplyId, installmentId, dto));
         }
     }
 }

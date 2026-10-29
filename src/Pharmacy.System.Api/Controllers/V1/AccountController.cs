@@ -24,8 +24,8 @@ namespace Pharmacy.System.Api.Controllers.V1
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromForm] RegisterDto dto)
         {
-            var result = await _accountService.RegisterUserAsync(dto);
-            return StatusCode((int)result.StatusCode, result);
+            return FromResponse(
+                await _accountService.RegisterUserAsync(dto));
         }
 
 
@@ -37,7 +37,7 @@ namespace Pharmacy.System.Api.Controllers.V1
             if(result.IsSuccess)
                 SetRefreshTokenInCookie(result.Data.RefreshToken, result.Data.RefreshTokenExpiration);
             
-            return StatusCode((int)result.StatusCode, result);
+            return FromResponse(result);
         }
 
 
@@ -45,32 +45,32 @@ namespace Pharmacy.System.Api.Controllers.V1
         [HttpGet("confirm-email")]
         public async Task<IActionResult> ConfirmEmail([FromQuery] string userId, [FromQuery] string token)
         {
-            var result = await _accountService.ConfirmEmailAsync(userId, token);
-            return StatusCode((int)result.StatusCode, result);
+            return FromResponse(
+                await _accountService.ConfirmEmailAsync(userId, token));
         }
 
         // POST api/v1/account/confirm-email
         [HttpPost("confirm-email")]
         public async Task<IActionResult> ConfirmEmail([FromBody] ConfirmEmailDto dto)
         {
-            var result = await _accountService.SendConfirmEmailAsync(dto);
-            return StatusCode((int)result.StatusCode, result);
+            return FromResponse(
+                await _accountService.SendConfirmEmailAsync(dto));
         }
 
         // POST api/v1/account/forget-password
         [HttpPost("forget-password")]
         public async Task<IActionResult> ForgetPassword([FromBody] ForgetPasswordDto dto)
         {
-            var result = await _accountService.ForgetPasswordAsync(dto);
-            return StatusCode((int)result.StatusCode, result);
+            return FromResponse(
+                await _accountService.ForgetPasswordAsync(dto));
         }
 
         // POST api/v1/account/reset-password
         [HttpPost("reset-password")]
         public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordDto dto)
         {
-            var result = await _accountService.ResetPasswordAsync(dto);
-            return StatusCode((int)result.StatusCode, result);
+            return FromResponse(
+                await _accountService.ResetPasswordAsync(dto));
         }
 
         // GET api/v1/account/refresh-token
@@ -79,13 +79,13 @@ namespace Pharmacy.System.Api.Controllers.V1
         {
             var refreshToken = Request.Cookies["refreshToken"];
             if (string.IsNullOrEmpty(refreshToken))
-                return StatusCode(400, ApiResponse.Fail("Refresh token is required."));
+                return FromResponse(ApiResponse.Fail("Refresh token is required."));
 
             var result = await _accountService.RefreshTokenAsync(refreshToken);
             if (result.IsSuccess)
                 SetRefreshTokenInCookie(result.Data.RefreshToken, result.Data.RefreshTokenExpiration);
             
-            return StatusCode((int)result.StatusCode, result);
+            return FromResponse(result);
         }
 
         // POST api/v1/account/revoke-token
@@ -94,10 +94,11 @@ namespace Pharmacy.System.Api.Controllers.V1
         {
             var refreshToken = dto.RefreshToken ?? Request.Cookies["refreshToken"];
             if (string.IsNullOrEmpty(refreshToken))
-                return StatusCode(400, ApiResponse.Fail("Refresh token is required."));
+                return FromResponse(
+                    ApiResponse.Fail("Refresh token is required."));
 
-            var result = await _accountService.RevokeRefreshTokenAsync(refreshToken);
-            return StatusCode((int)result.StatusCode, result);
+            return FromResponse(
+                await _accountService.RevokeRefreshTokenAsync(refreshToken));
         }
 
 
@@ -106,8 +107,8 @@ namespace Pharmacy.System.Api.Controllers.V1
         [HttpGet("me")]
         public async Task<IActionResult> GetUserData()
         {
-            var result = await _accountService.GetUserDataAsync();
-            return StatusCode((int)result.StatusCode, result);
+            return FromResponse(
+                await _accountService.GetUserDataAsync());
         }
 
         // POST api/v1/account/change-password
@@ -115,8 +116,8 @@ namespace Pharmacy.System.Api.Controllers.V1
         [HttpPost("me/change-password")]
         public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordDto dto)
         {
-            var result = await _accountService.ChangePasswordAsync(dto);
-            return StatusCode((int)result.StatusCode, result);
+            return FromResponse(
+                await _accountService.ChangePasswordAsync(dto));
         }
 
         // PUT api/v1/account/me
@@ -124,8 +125,8 @@ namespace Pharmacy.System.Api.Controllers.V1
         [HttpPatch("me")]
         public async Task<IActionResult> UpdateUserData([FromForm] UpdateUserDto dto)
         {
-            var result = await _accountService.UpdateUserDataAsync(dto);
-            return StatusCode((int)result.StatusCode, result);
+            return FromResponse(
+                await _accountService.UpdateUserDataAsync(dto));
         }
 
         // DELETE api/v1/account/me
@@ -133,8 +134,8 @@ namespace Pharmacy.System.Api.Controllers.V1
         [HttpDelete("me")]
         public async Task<IActionResult> DeleteUserData()
         {
-            var result = await _accountService.DeleteUserDataAsync();
-            return StatusCode((int)result.StatusCode, result);
+            return FromResponse(
+                await _accountService.DeleteUserDataAsync());
         }
 
         private void SetRefreshTokenInCookie(string refreshToken, DateTime expires)

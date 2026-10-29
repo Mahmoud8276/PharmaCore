@@ -16,39 +16,41 @@ namespace Pharmacy.System.Api.Controllers.V1
             _repositoryService = repositoryService;
         }
 
+
+
         [HttpPost]
         public async Task<IActionResult> CreateAsync([FromBody] RepositoryDto dto)
         {
-            var response = await _repositoryService.CreateAsync(dto);
-            return StatusCode(response.StatusCode, response);
+            return FromResponse(
+                await _repositoryService.CreateAsync(dto));
         }
 
         [HttpGet]
         public async Task<IActionResult> GetAllAsync([FromQuery] RepositorySpecParams specParams)
         {
-            var response = await _repositoryService.GetAllAsync(specParams);
-            return StatusCode(response.StatusCode, response);
+            return FromResponse(
+                await _repositoryService.GetAllAsync(specParams));
         }
 
         [HttpGet("{id}")]
         public async Task<IActionResult> GetByIdAsync(int id)
         {
-            var response = await _repositoryService.GetByIdAsync(id);
-            return StatusCode(response.StatusCode, response);
+            return FromResponse(
+                await _repositoryService.GetByIdAsync(id));
         }
 
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateAsync(int id, [FromBody] RepositoryDto dto)
         {
-            var response = await _repositoryService.UpdateAsync(dto, id);
-            return StatusCode(response.StatusCode, response);
+            return FromResponse(
+                await _repositoryService.UpdateAsync(dto, id));
         }
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteAsync(int id)
         {
-            var response = await _repositoryService.DeleteAsync(id);
-            return StatusCode(response.StatusCode, response);
+            return FromResponse(
+                await _repositoryService.DeleteAsync(id));
         }
     }
 }

@@ -15,39 +15,42 @@ namespace Pharmacy.System.Api.Controllers.V1
         {
             _packagingUnitService = packagingUnitService;
         }
+
+
+
         [HttpPost]
         public async Task<IActionResult> CreateAsync([FromBody] PackagingUnitDto packagingUnitDto)
         {
-            var result = await _packagingUnitService.CreateAsync(packagingUnitDto);
-            return StatusCode(result.StatusCode, result);
+            return FromResponse(
+                await _packagingUnitService.CreateAsync(packagingUnitDto));
         }
 
         [HttpGet]
         public async Task<IActionResult> GetAllAsync([FromQuery] PackagingUnitSpecParams specParams)
         {
-            var result = await _packagingUnitService.GetAllAsync(specParams);
-            return StatusCode(result.StatusCode, result);
+            return FromResponse(
+                await _packagingUnitService.GetAllAsync(specParams));
         }
 
         [HttpGet("{id}")]
         public async Task<IActionResult> GetByIdAsync(int id)
         {
-            var result = await _packagingUnitService.GetByIdAsync(id);
-            return StatusCode(result.StatusCode, result);
+            return FromResponse(
+                await _packagingUnitService.GetByIdAsync(id));
         }
 
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateAsync(int id, [FromBody] PackagingUnitDto packagingUnitDto)
         {
-            var result = await _packagingUnitService.UpdateAsync(packagingUnitDto, id);
-            return StatusCode(result.StatusCode, result);
+            return FromResponse(
+                await _packagingUnitService.UpdateAsync(packagingUnitDto, id));
         }
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteAsync(int id)
         {
-            var result = await _packagingUnitService.DeleteAsync(id);
-            return StatusCode(result.StatusCode, result);
+            return FromResponse(
+                await _packagingUnitService.DeleteAsync(id));
         }
     }
 }

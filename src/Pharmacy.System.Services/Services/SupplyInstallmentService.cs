@@ -1,10 +1,12 @@
 ﻿using Mapster;
+using Pharmacy.System.Core.Dtos;
 using Pharmacy.System.Core.Dtos.SupplyInstallmentDtos;
 using Pharmacy.System.Core.Enums;
 using Pharmacy.System.Core.Interfaces;
 using Pharmacy.System.Core.Models;
 using Pharmacy.System.Services.IServices;
 using Pharmacy.System.Services.Responses;
+using Pharmacy.System.Services.SpecificationParams;
 using Pharmacy.System.Services.Specifications;
 using System;
 using System.Collections.Generic;
@@ -132,7 +134,7 @@ namespace Pharmacy.System.Services.Services
                 message: "Supply installments deleted successfully");
         }
 
-        public async Task<Response> GetAsync(int supplyId)
+        public async Task<Response> GetBySupplyIdAsync(int supplyId)
         {
             var supply = await _unitofWork.SupplyRepository
                 .GetByIdAsync(supplyId);
@@ -170,7 +172,7 @@ namespace Pharmacy.System.Services.Services
                 data: result);
         }
 
-        public async Task<Response> GetAsync(int supplyId, int installmentId)
+        public async Task<Response> GetByIdAsync(int supplyId, int installmentId)
         {
             var installment = await _unitofWork.SupplyInstallmentRepository
                 .GetWithSpecAsync(new SupplyInstallmentSpecification(installmentId));
@@ -183,6 +185,25 @@ namespace Pharmacy.System.Services.Services
             return Response.Success(
                 message: "Supply installment retreived successfully",
                 data: installment.Adapt<SupplyInstallmentDetailsDto>());
+        }
+
+        public async Task<Response> GetAllAsync(SupplyInstallmentSpecParams specParams)
+        {
+            var countSpec = new SupplyInstallmentSpecification(specParams, true);
+            var count = await _unitofWork.SupplyInstallmentRepository.GetCountWithSpecAsync(countSpec);
+
+            var spec = new SupplyInstallmentSpecification(specParams);
+            var data = await _unitofWork.SupplyInstallmentRepository.GetAllWithSpecAsync(spec);
+
+            var result = new Pagination(
+                specParams.PageIndex,
+                specParams.PageSize,
+                count,
+                data.Adapt<List<SupplyInstallmentDetailsDto>>());
+
+            return Response.Success(
+                message: "Installments retrieved successfully",
+                data: result);
         }
 
         public async Task<Response> UpdateAsync(int supplyId, int installmentId, SupplyInstallmentDto dto)

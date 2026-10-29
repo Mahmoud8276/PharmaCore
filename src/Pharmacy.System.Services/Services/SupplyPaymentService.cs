@@ -10,7 +10,6 @@ using Pharmacy.System.Services.Specifications;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Mapster;
 using Pharmacy.System.Core.Dtos;
 
 namespace Pharmacy.System.Services.Services

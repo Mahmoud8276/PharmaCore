@@ -72,6 +72,13 @@ namespace Pharmacy.System.Api.Controllers.V1
                 await _supplyPaymentService.GetAllAsync(specParams));
         }
 
+        [HttpGet("installments")]
+        public async Task<IActionResult> GetAllInstallmentsAsync(
+            [FromQuery] SupplyInstallmentSpecParams specParams)
+        {
+            return FromResponse(
+                await _supplyInstallmentService.GetAllAsync(specParams));
+        }
 
 
 
@@ -128,14 +135,14 @@ namespace Pharmacy.System.Api.Controllers.V1
         [HttpGet("{supplyId}/installments")]
         public async Task<IActionResult> GetInstallmentPlanAsync(int supplyId)
         {
-            return FromResponse(await _supplyInstallmentService.GetAsync(supplyId));
+            return FromResponse(await _supplyInstallmentService.GetBySupplyIdAsync(supplyId));
         }
 
         [HttpGet("{supplyId}/installments/{installmentId}")]
         public async Task<IActionResult> GetInstallmentAsync(int supplyId, int installmentId)
         {
             return FromResponse(
-                await _supplyInstallmentService.GetAsync(supplyId, installmentId));
+                await _supplyInstallmentService.GetByIdAsync(supplyId, installmentId));
         }
 
 

@@ -12,12 +12,12 @@ using System.Threading.Tasks;
 namespace Pharmacy.System.Api.Controllers.V1
 {
     [ApiVersion("1.0")]
-    public class SupplyController : BaseController
+    public class SuppliesController : BaseController
     {
         private readonly ISupplyService _supplyService;
         private readonly ISupplyPaymentService _supplyPaymentService;
         private readonly ISupplyInstallmentService _supplyInstallmentService;
-        public SupplyController(
+        public SuppliesController(
             ISupplyService supplyService,
             ISupplyPaymentService supplyPaymentService,
             ISupplyInstallmentService supplyInstallmentService)

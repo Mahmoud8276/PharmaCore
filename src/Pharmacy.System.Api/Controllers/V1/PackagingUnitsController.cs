@@ -8,10 +8,10 @@ using System.Threading.Tasks;
 namespace Pharmacy.System.Api.Controllers.V1
 {
     [ApiVersion("1.0")]
-    public class PackagingUnitController :BaseController
+    public class PackagingUnitsController :BaseController
     {
         private readonly IPackagingUnitService _packagingUnitService;
-        public PackagingUnitController(IPackagingUnitService packagingUnitService)
+        public PackagingUnitsController(IPackagingUnitService packagingUnitService)
         {
             _packagingUnitService = packagingUnitService;
         }

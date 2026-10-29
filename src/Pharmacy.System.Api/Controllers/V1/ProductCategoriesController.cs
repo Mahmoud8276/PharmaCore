@@ -8,11 +8,11 @@ using System.Threading.Tasks;
 namespace Pharmacy.System.Api.Controllers.V1
 {
     [ApiVersion("1.0")]
-    public class ProductCategoryController : BaseController
+    public class ProductCategoriesController : BaseController
     {
         private readonly IProductCategoryService _productCategoryService;
 
-        public ProductCategoryController(IProductCategoryService productCategoryService)
+        public ProductCategoriesController(IProductCategoryService productCategoryService)
         {
             _productCategoryService = productCategoryService;
         }

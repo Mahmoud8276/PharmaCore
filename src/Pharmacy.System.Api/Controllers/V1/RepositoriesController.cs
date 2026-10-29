@@ -8,10 +8,10 @@ using System.Threading.Tasks;
 namespace Pharmacy.System.Api.Controllers.V1
 {
     [ApiVersion("1.0")]
-    public class RepositoryController : BaseController
+    public class RepositoriesController : BaseController
     {
         private readonly IRepositoryService _repositoryService;
-        public RepositoryController(IRepositoryService repositoryService)
+        public RepositoriesController(IRepositoryService repositoryService)
         {
             _repositoryService = repositoryService;
         }

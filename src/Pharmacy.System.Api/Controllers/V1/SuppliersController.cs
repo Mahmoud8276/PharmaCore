@@ -8,10 +8,10 @@ using System.Threading.Tasks;
 namespace Pharmacy.System.Api.Controllers.V1
 {
     [ApiVersion("1.0")]
-    public class SupplierController : BaseController
+    public class SuppliersController : BaseController
     {
         private readonly ISupplierService _supplierService;
-        public SupplierController(ISupplierService supplierService)
+        public SuppliersController(ISupplierService supplierService)
         {
             _supplierService = supplierService;
         }

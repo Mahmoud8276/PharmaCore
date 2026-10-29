@@ -5,10 +5,13 @@ using Pharmacy.System.Core.Interfaces;
 using Pharmacy.System.Core.Models;
 using Pharmacy.System.Services.IServices;
 using Pharmacy.System.Services.Responses;
+using Pharmacy.System.Services.SpecificationParams;
 using Pharmacy.System.Services.Specifications;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Mapster;
+using Pharmacy.System.Core.Dtos;
 
 namespace Pharmacy.System.Services.Services
 {
@@ -155,6 +158,25 @@ namespace Pharmacy.System.Services.Services
             return Response.Success(
                 message: "Payments retrieved successfully",
                 data:  payments.Adapt<List<SupplyPaymentDetailsDto>>());
+        }
+
+        public async Task<Response> GetAllAsync(SupplyPaymentSpecParams specParams)
+        {
+            var countSpec = new SupplyPaymentSpecification(specParams, true);
+            var count = await _unitOfWork.SupplyPaymentRepository.GetCountWithSpecAsync(countSpec);
+
+            var spec = new SupplyPaymentSpecification(specParams);
+            var data = await _unitOfWork.SupplyPaymentRepository.GetAllWithSpecAsync(spec);
+
+            var result = new Pagination(
+                specParams.PageIndex,
+                specParams.PageSize,
+                count,
+                data.Adapt<List<SupplyPaymentDetailsDto>>());
+
+            return Response.Success(
+                message: "Payments retrieved successfully",
+                data: result);
         }
 
         public async Task<Response> GetByIdAsync(int supplyId, int paymentId)

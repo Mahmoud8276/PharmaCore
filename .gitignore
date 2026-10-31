@@ -486,6 +486,7 @@ $RECYCLE.BIN/
 **/appsettings.Development.json
 **/appsettings.Staging.json
 **/appsettings.Production.json
+**/appsettings.Testing.json
 
 src/Pharmacy.System.Api/wwwroot/files/UserImages/*
 

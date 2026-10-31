@@ -14,7 +14,10 @@ namespace Pharmacy.System.Api.StartupExtensions
             using var scope = app.Services.CreateScope();
 
             var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-            await context.Database.MigrateAsync();
+            if (context.Database.IsRelational())
+            {
+                await context.Database.MigrateAsync();
+            }
 
             await scope.SeedDataAsync();
         }

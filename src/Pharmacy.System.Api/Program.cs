@@ -122,3 +122,6 @@ app.UseStaticFiles();
 app.MapControllers();
 
 app.Run();
+
+// For integration testing
+public partial class Program { }

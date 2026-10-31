@@ -267,16 +267,18 @@ namespace Pharmacy.System.Services.Services
                     message: "Supply already confirmed!");
             }
 
+            //Check if the user deletes any supply product before confirming it
+            if(supply.Items.Any(x=>x.ProductId == null))
+            {
+                return Response.NotFound(
+                    message: "One or more products are not found!",
+                    details: "You may have deleted one or more products that is inside the supply before confirming it!");
+            }
+
             //Translate the supply items into the corresponding inventory items.
             //(group them by product type, price, and expiry date)
             //(convert supply items quantities into its base units to be stored)
             var inventoryItems = supply.Items.Select(x => x.Adapt<InventoryItem>());
-            if(inventoryItems.Any(x=>x.ProductId == -1))
-            {
-                return Response.NotFound(
-                    message: "One or more product are not found!",
-                    details: "You may have deleted one or more products that is inside the supply before confirming it!");
-            }
 
             inventoryItems = inventoryItems.GroupBy(x => new
             {

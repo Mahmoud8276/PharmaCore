@@ -490,5 +490,5 @@ $RECYCLE.BIN/
 
 src/Pharmacy.System.Api/wwwroot/files/UserImages/*
 
-docs/.$Database Schema.drawio.bkp
-docs/.$Database Schema.drawio.dtmp
+"docs/.$Database Schema.drawio.bkp"
+"docs/.$Database Schema.drawio.dtmp"

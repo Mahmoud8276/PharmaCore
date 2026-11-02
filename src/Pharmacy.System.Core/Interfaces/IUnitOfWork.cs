@@ -24,6 +24,7 @@ namespace Pharmacy.System.Core.Interfaces
         public ISupplyInstallmentRepository SupplyInstallmentRepository { get; }
         public IRepositoryRepository RepositoryRepository { get; }
         public IInventoryItemRepository InventoryItemRepository { get; }
+        public IInventoryRepository InventoryRepository { get; }
 
         public Task CompleteAsync();
         public Task<IDbContextTransaction> BeginTransactionAsync();

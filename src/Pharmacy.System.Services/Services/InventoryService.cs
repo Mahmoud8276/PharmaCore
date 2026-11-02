@@ -1,5 +1,6 @@
 ﻿using Pharmacy.System.Core.Interfaces;
 using Pharmacy.System.Services.IServices;
+using Pharmacy.System.Services.Responses;
 using Pharmacy.System.Services.SpecificationParams;
 using System.Threading.Tasks;
 
@@ -15,9 +16,14 @@ namespace Pharmacy.System.Services.Services
         }
 
 
-        public Task GetAllAsync(InventorySpecParams spec)
+        public async Task<Response> GetAllAsync(InventorySpecParams specParams)
         {
-            throw new global::System.NotImplementedException();
+            var pagination = await _unitOfWork.InventoryRepository
+                .GetAllInventoryGroupedByProduct(specParams);
+
+            return Response.Success(
+                message: "Inventory retrieved successfully",
+                data: pagination);
         }
     }
 }

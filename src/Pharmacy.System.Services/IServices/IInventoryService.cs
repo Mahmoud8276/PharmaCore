@@ -1,10 +1,11 @@
-﻿using Pharmacy.System.Services.SpecificationParams;
+﻿using Pharmacy.System.Services.Responses;
+using Pharmacy.System.Services.SpecificationParams;
 using System.Threading.Tasks;
 
 namespace Pharmacy.System.Services.IServices
 {
     public interface IInventoryService
     {
-        public Task GetAllAsync(InventorySpecParams spec);
+        public Task<Response> GetAllAsync(InventorySpecParams specParams);
     }
 }

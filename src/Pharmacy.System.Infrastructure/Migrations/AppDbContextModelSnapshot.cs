@@ -305,7 +305,7 @@ namespace Pharmacy.System.Infrastructure.Migrations
 
                     b.HasIndex("SupplyItemId");
 
-                    b.ToTable("InventoryItem");
+                    b.ToTable("InventoryItems");
                 });
 
             modelBuilder.Entity("Pharmacy.System.Core.Models.Manufacturer", b =>

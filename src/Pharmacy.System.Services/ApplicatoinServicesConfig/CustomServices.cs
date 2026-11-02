@@ -25,6 +25,7 @@ namespace Pharmacy.System.Services.ApplicatoinServicesConfig
              services.AddScoped<ISupplyPaymentService, SupplyPaymentService>();
              services.AddScoped<ISupplyInstallmentService, SupplyInstallmentService>();
              services.AddScoped<IRepositoryService, RepositoryService>();
+             services.AddScoped<IInventoryService, InventoryService>();
 
             return services;
         }

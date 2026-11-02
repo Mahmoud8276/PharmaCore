@@ -2,5 +2,9 @@
 {
     public interface IInventorySpecParams : IBaseSpecParams
     {
+        public int? RepositoryId { get; set; }
+        public int? CategoryId { get; set; }
+        public string? Name { get; set; }
+        public string? Barcode { get; set; }
     }
 }

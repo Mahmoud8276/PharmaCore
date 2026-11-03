@@ -28,7 +28,8 @@ namespace Pharmacy.System.Services.Services
             Supplier supplier,
             Repository repository,
             Dictionary<int, Product> Products,
-            Dictionary<int, ProductPackagingLevel> Levels);
+            Dictionary<int, ProductPackagingLevel> Levels,
+            Dictionary<int, ProductBatch> productBatches);
 
         private async Task<(ValidatedSupply? Data, Response? Error)> ValidateAsync(SupplyDto dto)
         {
@@ -52,6 +53,16 @@ namespace Pharmacy.System.Services.Services
             {
                 return new (null, Response.NotFound(
                     message: "Repository not found!"));
+            }
+
+            //Check the existance of the product batch for each supply item
+            var productBatchIds = dto.Items.Select(x => x.ProductBatchId).Distinct().ToList();
+            var productBatches = await _unitOfWork.ProductBatchRepository
+                .FindAsync(x => productBatchIds.Contains(x.Id));
+            if(productBatches.Count != productBatchIds.Count)
+            {
+                return new(null, Response.NotFound(
+                    message: "One or more product batch not found!"));
             }
 
             var productIds = dto.Items.Select(x => x.ProductId).ToHashSet();
@@ -106,7 +117,8 @@ namespace Pharmacy.System.Services.Services
                 supplier: supplier,
                 repository: repository,
                 Products: productsLookup,
-                Levels: packagingLevelsLookup
+                Levels: packagingLevelsLookup,
+                productBatches: productBatches.ToDictionary(pb=>pb.Id)
             ), null);
         }
 
@@ -117,9 +129,11 @@ namespace Pharmacy.System.Services.Services
             {
                 var packagingLevel = data.Levels[item.PackagingLevelId];
                 var product = data.Products[item.ProductId];
+                var productBatch = data.productBatches[item.ProductBatchId];
 
                 var supplyItem = item.Adapt<SupplyItem>();
                 supplyItem.Supply = supply;
+                supplyItem.ProductBatch = productBatch;
                 supplyItem.BaseUnitsPerReceivedUnit = packagingLevel.QuantityOfBaseUnit;
                 supplyItem.TotalBaseUnits = supplyItem.BaseUnitsPerReceivedUnit * item.Quantity;
                 supplyItem.UnitName = packagingLevel.PackagingUnit.Name;
@@ -276,30 +290,9 @@ namespace Pharmacy.System.Services.Services
             }
 
             //Translate the supply items into the corresponding inventory items.
-            //(group them by product type, price, and expiry date)
             //(convert supply items quantities into its base units to be stored)
             var inventoryItems = supply.Items.Select(x => x.Adapt<InventoryItem>());
 
-            inventoryItems = inventoryItems.GroupBy(x => new
-            {
-                x.ProductId,
-                x.SupplyItemId,
-                x.RepositoryId,
-                x.ExpiryDate,
-                x.PricePerBaseUnits
-
-            }).Select(g => new InventoryItem
-            {
-                ProductId = g.Key.ProductId,
-                SupplyItemId = g.Key.SupplyItemId,
-                RepositoryId = g.Key.RepositoryId,
-                ExpiryDate = g.Key.ExpiryDate,
-                PricePerBaseUnits = g.Key.PricePerBaseUnits,
-
-                ReceivedBaseUnits = g.Sum(x=>x.ReceivedBaseUnits),
-                OnHandBaseUnits = g.Sum(x=>x.OnHandBaseUnits),
-            
-            }).ToList();
             //Store the inventory items into the corresponding repository.
             await _unitOfWork.InventoryItemRepository.AddRangeAsync(inventoryItems);
 

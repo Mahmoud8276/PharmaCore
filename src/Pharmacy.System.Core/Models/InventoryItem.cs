@@ -19,8 +19,6 @@ namespace Pharmacy.System.Core.Models
         public int SupplyItemId { get; set; }
         public SupplyItem SupplyItem { get; set; } = null!;
 
-        public DateOnly ExpiryDate { get; set; }
-
         public decimal ReceivedBaseUnits { get; set; } 
         public decimal OnHandBaseUnits { get; set; }
         public decimal PricePerBaseUnits { get; set; }

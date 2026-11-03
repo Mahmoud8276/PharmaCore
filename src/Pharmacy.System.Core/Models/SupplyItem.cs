@@ -16,7 +16,6 @@ namespace Pharmacy.System.Core.Models
         public string UnitName { get; set; } = null!; // Not covered with mapping
         public decimal PricePerUnit { get; set; }
         public decimal EffectiveUnitCost { get; set; } // Not covered with mapping
-        public DateOnly ExpiryDate { get; set; }
         public ProductSnapshot ProductSnapshot { get; set; } = null!;
         public List<PackagingLevelSnapshot> PackagingLevelsSnapshot { get; set; } = new List<PackagingLevelSnapshot>();
 

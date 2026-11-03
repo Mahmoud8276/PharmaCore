@@ -104,7 +104,7 @@ namespace Pharmacy.System.Services.ApplicatoinServicesConfig
                 .NewConfig()
                 .Map(dest => dest.Quantity, src => src.Quantity)
                 .Map(dest => dest.PricePerUnit, src => src.PricePerUnit)
-                .Map(dest => dest.ExpiryDate, src => src.ExpiryDate)
+                .Map(dest => dest.ProductBatchId, src => src.ProductBatchId)
                 .Map(dest => dest.ProductId, src => src.ProductId)
                 .Map(dest => dest.PackagingLevelId, src => src.PackagingLevelId);
 
@@ -135,10 +135,12 @@ namespace Pharmacy.System.Services.ApplicatoinServicesConfig
 
             TypeAdapterConfig<SupplyItem, InventoryItem>
                 .NewConfig()
+                .Ignore(dest=>dest.ProductBatch)
+                .Ignore(dest=>dest.Id)
                 .Map(dest => dest.ProductId, src => src.ProductId ?? -1)
                 .Map(dest => dest.RepositoryId, src => src.Supply.RepositoryId)
                 .Map(dest => dest.SupplyItemId, src => src.Id)
-                .Map(dest => dest.ExpiryDate, src => src.ExpiryDate)
+                .Map(dest => dest.ProductBatchId, src => src.ProductBatchId)
                 .Map(dest => dest.ReceivedBaseUnits, src => src.BaseUnitsPerReceivedUnit * src.Quantity)
                 .Map(dest => dest.OnHandBaseUnits, src => src.BaseUnitsPerReceivedUnit * src.Quantity)
                 .Map(dest => dest.PricePerBaseUnits, src => src.PricePerUnit / src.BaseUnitsPerReceivedUnit);

@@ -16,13 +16,13 @@ namespace Pharmacy.System.Core.Dtos.SupplyItemDtos
         ErrorMessage = "Price must be greater than zero.")]
         public decimal PricePerUnit { get; set; }
         
-        
-        [Required(ErrorMessage = "Product Expiry Date Is Rquired!")]
-        public DateOnly ExpiryDate { get; set; }
-        
 
         [Required(ErrorMessage = "Product Id Is Rquired!")]
         public int ProductId { get; set; }
+
+
+        [Required(ErrorMessage = "Product Batch Id Is Rquired!")]
+        public int ProductBatchId { get; set; }
         
         
         [Required(ErrorMessage = "Product Packaging Id Is Rquired!")]

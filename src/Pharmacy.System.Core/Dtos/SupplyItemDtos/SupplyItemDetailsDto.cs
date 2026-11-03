@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Pharmacy.System.Core.Dtos.ProductBatchDtos;
+using System;
 
 namespace Pharmacy.System.Core.Dtos.SupplyItemDtos
 {
@@ -8,11 +9,11 @@ namespace Pharmacy.System.Core.Dtos.SupplyItemDtos
         public string UnitName { get; set; } = null!;
         public decimal Quantity { get; set; }
         public decimal PricePerUnit { get; set; }
-        public DateOnly ExpiryDate { get; set; }
         public decimal EffectiveUnitCost { get; set; }
         public string ProductName { get; set; } = null!;
         public string ProductCategoryName { get; set; } = null!;
         public string ProductFormName { get; set; } = null!;
+        public ProductBatchDetailsDto ProductBatch { get; set; } = null!;
 
     }
 }

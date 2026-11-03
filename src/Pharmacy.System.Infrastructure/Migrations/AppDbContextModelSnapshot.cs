@@ -276,9 +276,6 @@ namespace Pharmacy.System.Infrastructure.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<DateOnly>("ExpiryDate")
-                        .HasColumnType("date");
-
                     b.Property<decimal>("OnHandBaseUnits")
                         .HasColumnType("decimal(18,2)");
 
@@ -789,9 +786,6 @@ namespace Pharmacy.System.Infrastructure.Migrations
                     b.Property<decimal>("EffectiveUnitCost")
                         .HasPrecision(18, 4)
                         .HasColumnType("decimal(18,4)");
-
-                    b.Property<DateOnly>("ExpiryDate")
-                        .HasColumnType("date");
 
                     b.Property<int?>("PackagingLevelId")
                         .HasColumnType("int");

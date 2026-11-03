@@ -24,6 +24,7 @@ namespace Pharmacy.System.Infrastructure.Repositories
         private readonly Lazy<ISupplierRepository> _supplierRepository;
         private readonly Lazy<ISupplierCreditRepository> _supplierCreditRepository;
         private readonly Lazy<ISupplyRepository> _supplyRepository;
+        private readonly Lazy<ISupplyItemRepository> _supplyItemRepository;
         private readonly Lazy<ISupplyPaymentRepository> _supplyPaymentRepository;
         private readonly Lazy<ISupplyInstallmentRepository> _supplyInstallmentRepository;
         private readonly Lazy<IRepositoryRepository> _repositoryRepository;
@@ -49,6 +50,7 @@ namespace Pharmacy.System.Infrastructure.Repositories
             _supplierRepository = new Lazy<ISupplierRepository>(() => new SupplierRepository(_context));
             _supplierCreditRepository = new Lazy<ISupplierCreditRepository>(() => new SupplierCreditRepository(_context));
             _supplyRepository = new Lazy<ISupplyRepository>(() => new SupplyRepository(_context));
+            _supplyItemRepository = new Lazy<ISupplyItemRepository>(() => new SupplyItemRepository(_context));
             _supplyPaymentRepository = new Lazy<ISupplyPaymentRepository>(() => new SupplyPaymentRepository(_context));
             _supplyInstallmentRepository = new Lazy<ISupplyInstallmentRepository>(() => new SupplyInstallmentRepository(_context));
             _repositoryRepository = new Lazy<IRepositoryRepository>(() => new RepositoryRepository(_context));
@@ -70,6 +72,7 @@ namespace Pharmacy.System.Infrastructure.Repositories
         public ISupplierRepository SupplierRepository => _supplierRepository.Value;
         public ISupplierCreditRepository SupplierCreditRepository => _supplierCreditRepository.Value;
         public ISupplyRepository SupplyRepository => _supplyRepository.Value;
+        public ISupplyItemRepository SupplyItemRepository => _supplyItemRepository.Value;
         public ISupplyPaymentRepository SupplyPaymentRepository => _supplyPaymentRepository.Value;
         public ISupplyInstallmentRepository SupplyInstallmentRepository => _supplyInstallmentRepository.Value;
         public IRepositoryRepository RepositoryRepository => _repositoryRepository.Value;

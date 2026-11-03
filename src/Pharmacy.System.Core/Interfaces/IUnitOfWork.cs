@@ -20,6 +20,7 @@ namespace Pharmacy.System.Core.Interfaces
         public ISupplierRepository SupplierRepository { get; }
         public ISupplierCreditRepository SupplierCreditRepository { get; }
         public ISupplyRepository SupplyRepository { get; }
+        public ISupplyItemRepository SupplyItemRepository { get; }
         public ISupplyPaymentRepository SupplyPaymentRepository { get; }
         public ISupplyInstallmentRepository SupplyInstallmentRepository { get; }
         public IRepositoryRepository RepositoryRepository { get; }

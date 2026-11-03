@@ -29,6 +29,7 @@ namespace Pharmacy.System.Infrastructure.Repositories
         private readonly Lazy<IRepositoryRepository> _repositoryRepository;
         private readonly Lazy<IInventoryItemRepository> _inventoryItemRepository;
         private readonly Lazy<IInventoryRepository> _inventoryRepository;
+        private readonly Lazy<IProductBatchRepository> _productBatchRepository;
 
 
         public UnitOfWork(AppDbContext context)
@@ -53,6 +54,7 @@ namespace Pharmacy.System.Infrastructure.Repositories
             _repositoryRepository = new Lazy<IRepositoryRepository>(() => new RepositoryRepository(_context));
             _inventoryItemRepository = new Lazy<IInventoryItemRepository>(() => new InventoryItemRepository(_context));
             _inventoryRepository = new Lazy<IInventoryRepository>(() => new InventoryRepository(_context));
+            _productBatchRepository = new Lazy<IProductBatchRepository>(() => new ProductBatchRepository(_context));
         }
 
         public IProductRepository ProductRepository => _productRepository.Value;
@@ -73,6 +75,7 @@ namespace Pharmacy.System.Infrastructure.Repositories
         public IRepositoryRepository RepositoryRepository => _repositoryRepository.Value;
         public IInventoryItemRepository InventoryItemRepository => _inventoryItemRepository.Value;
         public IInventoryRepository InventoryRepository => _inventoryRepository.Value;
+        public IProductBatchRepository ProductBatchRepository => _productBatchRepository.Value;
 
 
 

@@ -31,8 +31,8 @@ builder.Services.AddEndpointsApiExplorer();
 
 builder.Services.AddSwaggerGen(options => {
 
-    options.SwaggerDoc("v1", new OpenApiInfo() { Title = "Pharmacy System", Version = "1.0" });
-    options.SwaggerDoc("v2", new OpenApiInfo() { Title = "Pharmacy System", Version = "2.0" });
+    options.SwaggerDoc("v1", new OpenApiInfo() { Title = "PharmaCore", Version = "1.0" });
+    options.SwaggerDoc("v2", new OpenApiInfo() { Title = "PharmaCore", Version = "2.0" });
     options.UseInlineDefinitionsForEnums();
     options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
@@ -98,16 +98,16 @@ await app.ExecuteStartupExtensions();
 app.UseHsts();
 app.UseHttpsRedirection();
 
-if (app.Environment.IsDevelopment())
-{
+//if (app.Environment.IsDevelopment())
+//{
     app.UseDeveloperExceptionPage();
     app.UseSwagger();
     app.UseSwaggerUI(options =>
     {
-        options.SwaggerEndpoint("/swagger/v1/swagger.json", "Atlas Template v1");
-        options.SwaggerEndpoint("/swagger/v2/swagger.json", "Atlas Template v2");
+        options.SwaggerEndpoint("/swagger/v1/swagger.json", "PharmaCore v1");
+        options.SwaggerEndpoint("/swagger/v2/swagger.json", "PharmaCore v2");
     });
-}
+//}
 
 app.UseExceptionHandler();
 

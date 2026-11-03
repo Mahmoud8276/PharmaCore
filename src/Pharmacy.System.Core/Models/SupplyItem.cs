@@ -24,8 +24,14 @@ namespace Pharmacy.System.Core.Models
         public int? ProductId { get; set; }
         public Product? Product { get; set; }
 
+
         [ForeignKey("PackagingLevel")]
         public int? PackagingLevelId { get; set; }
         public ProductPackagingLevel? PackagingLevel { get; set; }
+
+
+        [ForeignKey("ProductBatch")]
+        public int ProductBatchId { get; set; }
+        public ProductBatch ProductBatch { get; set; } = null!;
     }
 }

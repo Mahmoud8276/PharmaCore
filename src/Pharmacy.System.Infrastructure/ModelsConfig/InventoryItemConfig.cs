@@ -12,6 +12,11 @@ namespace Pharmacy.System.Infrastructure.ModelsConfig
                    .WithMany()
                    .HasForeignKey(x => x.ProductId)
                    .OnDelete(DeleteBehavior.Restrict);
+
+            builder.HasOne(x => x.ProductBatch)
+                .WithMany()
+                .HasForeignKey(x => x.ProductBatchId)
+                .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }

@@ -26,5 +26,9 @@ namespace Pharmacy.System.Core.Models
         public decimal PricePerBaseUnits { get; set; }
 
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+
+        [ForeignKey("ProductBatch")]
+        public int ProductBatchId { get; set; }
+        public ProductBatch ProductBatch { get; set; } = null!;
     }
 }

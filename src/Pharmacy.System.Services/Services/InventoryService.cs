@@ -19,7 +19,7 @@ namespace Pharmacy.System.Services.Services
         public async Task<Response> GetAllAsync(InventorySpecParams specParams)
         {
             var pagination = await _unitOfWork.InventoryRepository
-                .GetAllInventoryGroupedByProduct(specParams);
+                .GetAllInventoryWithSpecAsync(specParams);
 
             return Response.Success(
                 message: "Inventory retrieved successfully",

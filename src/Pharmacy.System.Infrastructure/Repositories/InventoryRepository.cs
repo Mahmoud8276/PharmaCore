@@ -88,7 +88,7 @@ namespace Pharmacy.System.Infrastructure.Repositories
         }
 
 
-        public async Task<Pagination> GetAllInventoryGroupedByProduct(IInventorySpecParams specParams)
+        public async Task<Pagination> GetAllInventoryWithSpecAsync(IInventorySpecParams specParams)
         {
             var items = _context.InventoryItems.AsNoTracking()
                 .Where(x => x.OnHandBaseUnits > 0);
@@ -140,7 +140,7 @@ namespace Pharmacy.System.Infrastructure.Repositories
                     new List<InventoryRowDetailsDto>());
 
             // Get the inventory items associated with the retrieved product IDs
-            var inventoryItems = await items.Where(x => productIds.Contains(x.Id))
+            var inventoryItems = await items.Where(x => productIds.Contains(x.ProductId))
                         .Include(x => x.Product)
                         .ThenInclude(p => p.Barcodes)
                     .Include(x => x.Product)
@@ -188,5 +188,7 @@ namespace Pharmacy.System.Infrastructure.Repositories
                 totalCount,
                 groupedItems);
         }
+    
+        
     }
 }

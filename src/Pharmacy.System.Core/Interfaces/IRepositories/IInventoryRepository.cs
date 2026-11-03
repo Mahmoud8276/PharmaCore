@@ -6,6 +6,6 @@ namespace Pharmacy.System.Core.Interfaces.IRepositories
 {
     public interface IInventoryRepository
     {
-        public Task<Pagination> GetAllInventoryGroupedByProduct(IInventorySpecParams specParams);
+        public Task<Pagination> GetAllInventoryWithSpecAsync(IInventorySpecParams specParams);
     }
 }

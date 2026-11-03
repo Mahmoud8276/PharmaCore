@@ -285,6 +285,9 @@ namespace Pharmacy.System.Infrastructure.Migrations
                     b.Property<decimal>("PricePerBaseUnits")
                         .HasColumnType("decimal(18,2)");
 
+                    b.Property<int>("ProductBatchId")
+                        .HasColumnType("int");
+
                     b.Property<int>("ProductId")
                         .HasColumnType("int");
 
@@ -298,6 +301,8 @@ namespace Pharmacy.System.Infrastructure.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("ProductBatchId");
 
                     b.HasIndex("ProductId");
 
@@ -447,6 +452,35 @@ namespace Pharmacy.System.Infrastructure.Migrations
                     b.HasIndex("ProductId");
 
                     b.ToTable("ProductBarcode");
+                });
+
+            modelBuilder.Entity("Pharmacy.System.Core.Models.ProductBatch", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateOnly>("ExpiryDate")
+                        .HasColumnType("date");
+
+                    b.Property<DateOnly?>("ManufactureDate")
+                        .HasColumnType("date");
+
+                    b.Property<string>("Number")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Number")
+                        .IsUnique();
+
+                    b.ToTable("ProductBatches");
                 });
 
             modelBuilder.Entity("Pharmacy.System.Core.Models.ProductCategory", b =>
@@ -766,6 +800,9 @@ namespace Pharmacy.System.Infrastructure.Migrations
                         .HasPrecision(18, 4)
                         .HasColumnType("decimal(18,4)");
 
+                    b.Property<int>("ProductBatchId")
+                        .HasColumnType("int");
+
                     b.Property<int?>("ProductId")
                         .HasColumnType("int");
 
@@ -786,6 +823,8 @@ namespace Pharmacy.System.Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("PackagingLevelId");
+
+                    b.HasIndex("ProductBatchId");
 
                     b.HasIndex("ProductId");
 
@@ -974,6 +1013,12 @@ namespace Pharmacy.System.Infrastructure.Migrations
 
             modelBuilder.Entity("Pharmacy.System.Core.Models.InventoryItem", b =>
                 {
+                    b.HasOne("Pharmacy.System.Core.Models.ProductBatch", "ProductBatch")
+                        .WithMany()
+                        .HasForeignKey("ProductBatchId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.HasOne("Pharmacy.System.Core.Models.Product", "Product")
                         .WithMany()
                         .HasForeignKey("ProductId")
@@ -993,6 +1038,8 @@ namespace Pharmacy.System.Infrastructure.Migrations
                         .IsRequired();
 
                     b.Navigation("Product");
+
+                    b.Navigation("ProductBatch");
 
                     b.Navigation("Repository");
 
@@ -1198,6 +1245,12 @@ namespace Pharmacy.System.Infrastructure.Migrations
                         .HasForeignKey("PackagingLevelId")
                         .OnDelete(DeleteBehavior.Restrict);
 
+                    b.HasOne("Pharmacy.System.Core.Models.ProductBatch", "ProductBatch")
+                        .WithMany()
+                        .HasForeignKey("ProductBatchId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.HasOne("Pharmacy.System.Core.Models.Product", "Product")
                         .WithMany()
                         .HasForeignKey("ProductId")
@@ -1298,6 +1351,8 @@ namespace Pharmacy.System.Infrastructure.Migrations
                     b.Navigation("PackagingLevelsSnapshot");
 
                     b.Navigation("Product");
+
+                    b.Navigation("ProductBatch");
 
                     b.Navigation("ProductSnapshot")
                         .IsRequired();

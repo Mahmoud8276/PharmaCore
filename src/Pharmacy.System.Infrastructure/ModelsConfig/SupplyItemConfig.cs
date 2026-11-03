@@ -28,6 +28,11 @@ namespace Pharmacy.System.Infrastructure.ModelsConfig
                    .HasForeignKey(x => x.PackagingLevelId)
                    .OnDelete(DeleteBehavior.Restrict);
 
+            builder.HasOne(x=>x.ProductBatch)
+                .WithMany()
+                .HasForeignKey(x=>x.ProductBatchId)
+                .OnDelete(DeleteBehavior.Restrict);
+
             builder.OwnsOne(x => x.ProductSnapshot, b =>
             {
                 b.ToJson();

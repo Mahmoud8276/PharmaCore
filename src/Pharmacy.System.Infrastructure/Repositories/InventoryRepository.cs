@@ -95,21 +95,21 @@ namespace Pharmacy.System.Infrastructure.Repositories
 
             // Filter using spacification parameters
             if (specParams.RepositoryId.HasValue)
-                items.Where(x => x.RepositoryId == specParams.RepositoryId);
+                items = items.Where(x => x.RepositoryId == specParams.RepositoryId);
 
             if(specParams.CategoryId.HasValue)
-                items.Where(x=>x.Product.CategoryId == specParams.CategoryId);
+                items = items.Where(x=>x.Product.CategoryId == specParams.CategoryId);
             
             if(!string.IsNullOrEmpty(specParams.Name))
             {
                 var name = specParams.Name.Trim().ToLower();
-                items.Where(x => x.Product.Name.Contains(name));
+                items = items.Where(x => x.Product.Name.Contains(name));
             }
 
             if (!string.IsNullOrEmpty(specParams.Barcode))
             {
                 var barcode = specParams.Barcode.Trim();
-                items.Where(x => x.Product.Barcodes.Any(x => x.Barcode == barcode));
+                items = items.Where(x => x.Product.Barcodes.Any(b => b.Barcode == barcode));
             }
 
             // Get the total count of the products inside the inventory

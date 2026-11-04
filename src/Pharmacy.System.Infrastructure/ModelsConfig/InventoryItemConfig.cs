@@ -17,6 +17,8 @@ namespace Pharmacy.System.Infrastructure.ModelsConfig
                 .WithMany()
                 .HasForeignKey(x => x.ProductBatchId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Property(x => x.PricePerBaseUnits).HasPrecision(18, 4);
         }
     }
 }

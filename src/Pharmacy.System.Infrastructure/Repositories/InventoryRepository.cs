@@ -194,7 +194,11 @@ namespace Pharmacy.System.Infrastructure.Repositories
         {
             // Return default values if the product is null
             if (product == null)
-                return new ProductStockDetailsDto();
+                return new ProductStockDetailsDto()
+                {
+                    Product = product.Adapt<ProductDetailsDto>(),
+                    TotalQuantity = "--"
+                };
 
             // Get all inventory items for the specified product that have on-hand stock
             var items = await _context.InventoryItems.AsNoTracking()
@@ -206,7 +210,11 @@ namespace Pharmacy.System.Infrastructure.Repositories
 
             // If there are no items, return default values
             if (!items.Any())
-                return new ProductStockDetailsDto();
+                return new ProductStockDetailsDto()
+                {
+                    Product = product.Adapt<ProductDetailsDto>(),
+                    TotalQuantity = "--"
+                };
 
             // Calculate total quantity, and total selling price
             // TODO: Calculate total purchase cost

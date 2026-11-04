@@ -280,7 +280,8 @@ namespace Pharmacy.System.Infrastructure.Migrations
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<decimal>("PricePerBaseUnits")
-                        .HasColumnType("decimal(18,2)");
+                        .HasPrecision(18, 4)
+                        .HasColumnType("decimal(18,4)");
 
                     b.Property<int>("ProductBatchId")
                         .HasColumnType("int");

@@ -143,7 +143,7 @@ namespace Pharmacy.System.Services.ApplicatoinServicesConfig
                 .Map(dest => dest.ProductBatchId, src => src.ProductBatchId)
                 .Map(dest => dest.ReceivedBaseUnits, src => src.BaseUnitsPerReceivedUnit * src.Quantity)
                 .Map(dest => dest.OnHandBaseUnits, src => src.BaseUnitsPerReceivedUnit * src.Quantity)
-                .Map(dest => dest.PricePerBaseUnits, src => src.PricePerUnit / src.BaseUnitsPerReceivedUnit);
+                .Map(dest => dest.PricePerBaseUnits, src => src.EffectiveUnitCost / src.BaseUnitsPerReceivedUnit);
 
             TypeAdapterConfig<SupplyInstallment, SupplyInstallmentDetailsDto>
                 .NewConfig()

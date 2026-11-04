@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Pharmacy.System.Core.Dtos;
 using Pharmacy.System.Core.Dtos.InventoryDtos;
 using Pharmacy.System.Core.Dtos.ProductDtos;
+using Pharmacy.System.Core.Dtos.RepositoryDtos;
 using Pharmacy.System.Core.Enums;
 using Pharmacy.System.Core.Interfaces.IRepositories;
 using Pharmacy.System.Core.Interfaces.ISpecificationParams;
@@ -24,10 +25,9 @@ namespace Pharmacy.System.Infrastructure.Repositories
             _context = context;
         }
 
-
-
         private static string CalculateQuantity(
-            IEnumerable<InventoryItem> inventoryItems)
+            IEnumerable<InventoryItem> inventoryItems,
+            string baseUnit = null)
         {
             var quantities = new Dictionary<string, decimal>(
                 StringComparer.OrdinalIgnoreCase);
@@ -62,7 +62,7 @@ namespace Pharmacy.System.Infrastructure.Repositories
                 }
 
                 // Remaining base units
-                var baseUnitName =
+                var baseUnitName = baseUnit??
                     item.Product.ProductForm.BaseUnit.Name;
 
                 if (remainingUnits > 0)
@@ -88,7 +88,8 @@ namespace Pharmacy.System.Infrastructure.Repositories
         }
 
 
-        public async Task<Pagination> GetAllInventoryWithSpecAsync(IInventorySpecParams specParams)
+
+        public async Task<Pagination> GetAllInventoryDetailsWithSpecAsync(IInventorySpecParams specParams)
         {
             var items = _context.InventoryItems.AsNoTracking()
                 .Where(x => x.OnHandBaseUnits > 0);
@@ -168,7 +169,7 @@ namespace Pharmacy.System.Infrastructure.Repositories
                     var quantity = CalculateQuantity(group);
 
                     var status =
-                        product.MinimumStockLevel.HasValue &&
+                        !product.MinimumStockLevel.HasValue ? InventoryStatus.Undefiend :
                         totalBaseUnits <= (decimal)product.MinimumStockLevel.Value
                             ? InventoryStatus.Low
                             : InventoryStatus.Normal;
@@ -188,7 +189,57 @@ namespace Pharmacy.System.Infrastructure.Repositories
                 totalCount,
                 groupedItems);
         }
-    
-        
+
+        public async Task<ProductStockDetailsDto> GetProductStockDetailsAsync(Product product)
+        {
+            // Return default values if the product is null
+            if (product == null)
+                return new ProductStockDetailsDto();
+
+            // Get all inventory items for the specified product that have on-hand stock
+            var items = await _context.InventoryItems.AsNoTracking()
+                .Where(x => x.ProductId == product.Id && x.OnHandBaseUnits > 0)
+                .Include(x => x.Repository)
+                .Include(x => x.SupplyItem)
+                    .ThenInclude(s => s.PackagingLevelsSnapshot)
+                .ToListAsync();
+
+            // If there are no items, return default values
+            if (!items.Any())
+                return new ProductStockDetailsDto();
+
+            // Calculate total quantity, and total selling price
+            // TODO: Calculate total purchase cost
+            var totalQuantity = CalculateQuantity(items, product.ProductForm.BaseUnit.Name);
+            var totalSellingPrice = items.Sum(x => x.OnHandBaseUnits * x.PricePerBaseUnits);
+            var status = !product.MinimumStockLevel.HasValue? InventoryStatus.Undefiend :
+                items.Sum(x => x.OnHandBaseUnits) <= (decimal)product.MinimumStockLevel.Value
+                    ? InventoryStatus.Low
+                    : InventoryStatus.Normal;
+
+            // Calculate quantity per repository
+            var quantityPerRepository = items
+                .GroupBy(x => x.RepositoryId)
+                .Select(group =>
+                {
+                    var repository = group.First().Repository;
+                    return new TotalQuantityPerRepositoryDetailsDto
+                    {
+                        Repository = repository.Adapt<RepositoryDetailsDto>(),
+                        Quantity = CalculateQuantity(group, product.ProductForm.BaseUnit.Name)
+                    };
+                })
+                .ToList();
+
+            return new ProductStockDetailsDto()
+            {
+                Product = product.Adapt<ProductDetailsDto>(),
+                TotalQuantity = totalQuantity,
+                Status = status,
+                QuantityPerRepository = quantityPerRepository,
+                TotalPurchaseCost = 0, // TODO: Calculate total purchase cost
+                TotalSellingPrice = totalSellingPrice
+            };
+        }
     }
 }

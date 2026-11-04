@@ -3,6 +3,8 @@
     public enum InventoryStatus
     {
         Low,
-        Normal
+        Normal,
+        OutOfStock,
+        Undefiend
     }
 }

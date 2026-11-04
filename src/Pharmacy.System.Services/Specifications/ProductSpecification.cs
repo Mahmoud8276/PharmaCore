@@ -21,6 +21,7 @@ namespace Pharmacy.System.Services.Specifications
             AddInclude(x => x.Category);
             AddInclude(x => x.Barcodes);
             AddInclude(x => x.ProductForm);
+            AddInclude("ProductForm.BaseUnit");
             AddInclude(x => x.Manufacturer);
             AddInclude(x => x.ProductActiveIngredients);
             AddInclude(x => x.ProductPackagingLevels);
@@ -34,6 +35,7 @@ namespace Pharmacy.System.Services.Specifications
             AddInclude(x => x.Category);
             AddInclude(x => x.Barcodes);
             AddInclude(x => x.ProductForm);
+            AddInclude("ProductForm.BaseUnit");
             AddInclude(x => x.Manufacturer);
             AddInclude(x => x.ProductActiveIngredients);
             AddInclude(x => x.ProductPackagingLevels);
@@ -48,6 +50,7 @@ namespace Pharmacy.System.Services.Specifications
             AddInclude(x => x.Category);
             AddInclude(x => x.Barcodes);
             AddInclude(x => x.ProductForm);
+            AddInclude("ProductForm.BaseUnit");
             AddInclude(x => x.Manufacturer);
             AddInclude(x => x.ProductActiveIngredients);
             AddInclude(x => x.ProductPackagingLevels);

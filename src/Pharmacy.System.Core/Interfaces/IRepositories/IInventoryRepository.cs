@@ -1,5 +1,8 @@
 ﻿using Pharmacy.System.Core.Dtos;
+using Pharmacy.System.Core.Dtos.InventoryDtos;
+using Pharmacy.System.Core.Enums;
 using Pharmacy.System.Core.Interfaces.ISpecificationParams;
+using Pharmacy.System.Core.Models;
 using System.Threading.Tasks;
 
 namespace Pharmacy.System.Core.Interfaces.IRepositories
@@ -45,6 +48,7 @@ namespace Pharmacy.System.Core.Interfaces.IRepositories
         /// <see cref="CalculateQuantity(IEnumerable{InventoryItem})"/>.
         /// </para>
         /// </remarks>
-        public Task<Pagination> GetAllInventoryWithSpecAsync(IInventorySpecParams specParams);
+        public Task<Pagination> GetAllInventoryDetailsWithSpecAsync(IInventorySpecParams specParams);
+        public Task<ProductStockDetailsDto> GetProductStockDetailsAsync(Product product);
     }
 }

@@ -27,6 +27,7 @@ namespace Pharmacy.System.Infrastructure.Repositories
 
         private static string CalculateQuantity(
             IEnumerable<InventoryItem> inventoryItems,
+            bool remaining = true,
             string baseUnit = null)
         {
             var quantities = new Dictionary<string, decimal>(
@@ -34,7 +35,7 @@ namespace Pharmacy.System.Infrastructure.Repositories
 
             foreach (var item in inventoryItems)
             {
-                var remainingUnits = item.OnHandBaseUnits;
+                var units = remaining? item.OnHandBaseUnits : item.ReceivedBaseUnits;
 
                 var packagingLevels = item.SupplyItem.PackagingLevelsSnapshot?
                     .Where(x =>
@@ -46,7 +47,7 @@ namespace Pharmacy.System.Infrastructure.Repositories
                 foreach (var level in packagingLevels)
                 {
                     var quantity = decimal.Floor(
-                        remainingUnits / level.QuantityOfBaseUnit);
+                        units / level.QuantityOfBaseUnit);
 
                     if (quantity <= 0)
                         continue;
@@ -58,14 +59,14 @@ namespace Pharmacy.System.Infrastructure.Repositories
 
                     quantities[unitName] += quantity;
 
-                    remainingUnits -= quantity * level.QuantityOfBaseUnit;
+                    units -= quantity * level.QuantityOfBaseUnit;
                 }
 
                 // Remaining base units
                 var baseUnitName = baseUnit??
                     item.Product.ProductForm.BaseUnit.Name;
 
-                if (remainingUnits > 0)
+                if (units > 0)
                 {
                     if (string.IsNullOrWhiteSpace(baseUnitName))
                         baseUnitName = "Base units";
@@ -75,7 +76,7 @@ namespace Pharmacy.System.Infrastructure.Repositories
                     if (!quantities.ContainsKey(baseUnitName))
                         quantities[baseUnitName] = 0;
 
-                    quantities[baseUnitName] += remainingUnits;
+                    quantities[baseUnitName] += units;
                 }
             }
 
@@ -218,7 +219,7 @@ namespace Pharmacy.System.Infrastructure.Repositories
 
             // Calculate total quantity, and total selling price
             // TODO: Calculate total purchase cost
-            var totalQuantity = CalculateQuantity(items, product.ProductForm.BaseUnit.Name);
+            var totalQuantity = CalculateQuantity(items, true, product.ProductForm.BaseUnit.Name);
             var totalSellingPrice = items.Sum(x => x.OnHandBaseUnits * x.PricePerBaseUnits);
             var status = !product.MinimumStockLevel.HasValue? InventoryStatus.Undefiend :
                 items.Sum(x => x.OnHandBaseUnits) <= (decimal)product.MinimumStockLevel.Value
@@ -234,7 +235,7 @@ namespace Pharmacy.System.Infrastructure.Repositories
                     return new TotalQuantityPerRepositoryDetailsDto
                     {
                         Repository = repository.Adapt<RepositoryDetailsDto>(),
-                        Quantity = CalculateQuantity(group, product.ProductForm.BaseUnit.Name)
+                        Quantity = CalculateQuantity(group, true, product.ProductForm.BaseUnit.Name)
                     };
                 })
                 .ToList();
@@ -248,6 +249,85 @@ namespace Pharmacy.System.Infrastructure.Repositories
                 TotalPurchaseCost = 0, // TODO: Calculate total purchase cost
                 TotalSellingPrice = totalSellingPrice
             };
+        }
+
+        public async Task<Pagination> GetProductStockGroupDetailsWithSpecAsync(
+            Product product,
+            IProductStockGroupSpecParams specParams)
+        {
+            // Apply the filtering to the inventory items for the specified product
+            var query = _context.InventoryItems.AsNoTracking()
+                .Include(x => x.ProductBatch)
+                .Include(x => x.Product)
+                    .ThenInclude(p => p.ProductForm)
+                        .ThenInclude(f => f.BaseUnit)
+                .Include(p => p.Product)
+                    .ThenInclude(p => p.ProductPackagingLevels)
+                .Include(x=>x.Product)
+                    .ThenInclude(p=>p.Category)
+                .Include(x=>x.Product)
+                    .ThenInclude(p => p.Barcodes)
+                .Include(x => x.Repository)
+                .Include(x => x.SupplyItem)
+                    .ThenInclude(s => s.Supply)
+                        .ThenInclude(s => s.Supplier)
+                .Where(x => x.ProductId == product.Id && x.OnHandBaseUnits > 0);
+
+            if(specParams.RepositoryId.HasValue)
+                query = query.Where(x => x.RepositoryId == specParams.RepositoryId);
+
+            if(specParams.SupplierId.HasValue)
+                query = query.Where(x => x.SupplyItem.Supply.SupplierId== specParams.SupplierId);
+
+            if (!string.IsNullOrEmpty(specParams.BatchNumber))
+            {
+                var batchNumber = specParams.BatchNumber.Trim().ToLower();
+                query = query.Where(x => x.ProductBatch.Number.ToLower().Contains(batchNumber));
+            }
+
+            if(specParams.FromExpiryDate.HasValue)
+                query = query.Where(x => x.ProductBatch.ExpiryDate >= specParams.FromExpiryDate);
+
+            if (specParams.ToExpiryDate.HasValue)
+                query = query.Where(x => x.ProductBatch.ExpiryDate <= specParams.ToExpiryDate);
+
+            // Get the total count of the filtered items
+            var totalCount = await query.CountAsync();
+            if(totalCount == 0)
+                return new Pagination(
+                    specParams.PageIndex,
+                    specParams.PageSize,
+                    totalCount, new());
+
+            // Apply pagination and ordering and get the result
+            var items = await query.OrderBy(x => x.ProductBatch.ExpiryDate)
+                .ThenBy(x => x.ProductBatch.Number)
+                .Skip((specParams.PageIndex - 1) * specParams.PageSize)
+                .Take(specParams.PageSize)
+                .ToListAsync();
+
+
+            List<ProductStockGroupDetails> result = new();
+            foreach(var item in items)
+            {
+                var dto = item.Adapt<ProductStockGroupDetails>();
+                dto.RemainingQuantity = CalculateQuantity(
+                    new List<InventoryItem> { item },
+                    true,
+                    product.ProductForm.BaseUnit.Name);
+
+                dto.ReceivedQuantity = CalculateQuantity(
+                    new List<InventoryItem> { item },
+                    false,
+                    product.ProductForm.BaseUnit.Name);
+                result.Add(dto);
+            }
+
+            return new Pagination(
+                specParams.PageIndex,
+                specParams.PageSize,
+                totalCount,
+                result);
         }
     }
 }

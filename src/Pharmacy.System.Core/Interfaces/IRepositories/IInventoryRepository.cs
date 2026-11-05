@@ -50,5 +50,6 @@ namespace Pharmacy.System.Core.Interfaces.IRepositories
         /// </remarks>
         public Task<Pagination> GetAllInventoryDetailsWithSpecAsync(IInventorySpecParams specParams);
         public Task<ProductStockDetailsDto> GetProductStockDetailsAsync(Product product);
+        public Task<Pagination> GetProductStockGroupDetailsWithSpecAsync(Product product, IProductStockGroupSpecParams specParams);
     }
 }

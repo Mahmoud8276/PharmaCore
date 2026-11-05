@@ -43,5 +43,24 @@ namespace Pharmacy.System.Services.Services
                 data: await _unitOfWork.InventoryRepository
                 .GetProductStockDetailsAsync(product));
         }
+
+        public async Task<Response> GetAllProductStockGroupsAsync(int productId, ProductStockGroupSpecParams specParams)
+        {
+            //Check if the product exists or not
+            var product = await _unitOfWork.ProductRepository
+                .GetWithSpecAsync(new ProductSpecification(productId));
+            if (product == null)
+            {
+                return Response.NotFound(
+                    message: "Product not found");
+            }
+
+            var result = await _unitOfWork.InventoryRepository
+                .GetProductStockGroupDetailsWithSpecAsync(product, specParams);
+            return Response.Success(
+                message: "Product stock details retrieved successfully",
+                data: result);
+        }
+
     }
 }

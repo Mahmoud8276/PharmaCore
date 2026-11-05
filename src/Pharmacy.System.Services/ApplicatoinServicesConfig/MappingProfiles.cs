@@ -13,6 +13,8 @@ using Pharmacy.System.Core.Enums;
 using Pharmacy.System.Core.Dtos.ProductCategoryDtos;
 using Pharmacy.System.Core.Dtos.SupplyInstallmentDtos;
 using Pharmacy.System.Core.Dtos.SupplyPaymentDtos;
+using Pharmacy.System.Core.Dtos.InventoryDtos;
+using System;
 
 namespace Pharmacy.System.Services.ApplicatoinServicesConfig
 {
@@ -148,6 +150,18 @@ namespace Pharmacy.System.Services.ApplicatoinServicesConfig
             TypeAdapterConfig<SupplyInstallment, SupplyInstallmentDetailsDto>
                 .NewConfig()
                 .Map(Dest => Dest.Payments, src => src.Payments);
+
+            TypeAdapterConfig<InventoryItem, ProductStockGroupDetails>
+                .NewConfig()
+                .Map(dest => dest.ProductName, src => src.Product.Name)
+                .Map(dest => dest.ProductCategory, src => src.Product.Category.Name)
+                .Map(dest => dest.ProductBarcodes, src => src.Product.Barcodes.Select(x => x.Barcode))
+                .Map(dest => dest.RepositoryName, src => src.Repository.Name)
+                .Map(dest => dest.ReminingDaysToExpiry, src => Math.Max((src.ProductBatch.ExpiryDate.ToDateTime(new TimeOnly()) - DateTime.Today).Days, 0))
+                .Map(dest => dest.TotalPurchaseCost, src => 0) //TODO: update it when you finish the purchase cost workflow
+                .Map(dest => dest.RemainingQuantitySellingPrice, src => src.OnHandBaseUnits * src.PricePerBaseUnits)
+                .Map(dest => dest.SupplierName, src => src.SupplyItem.Supply.Supplier.Name)
+                .Map(dest => dest.ExpiryDate, src => src.ProductBatch.ExpiryDate);
         }
     }
 }

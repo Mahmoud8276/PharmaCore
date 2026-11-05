@@ -8,5 +8,6 @@ namespace Pharmacy.System.Services.IServices
     {
         public Task<Response> GetAllAsync(InventorySpecParams specParams);
         public Task<Response> GetByProductIdAsync(int productId);
+        public Task<Response> GetAllProductStockGroupsAsync(int productId, ProductStockGroupSpecParams specParams);
     }
 }

@@ -29,5 +29,14 @@ namespace Pharmacy.System.Api.Controllers.V1
             return FromResponse(
                 await _inventoryService.GetByProductIdAsync(productId));
         }
+
+        [HttpGet("products/{productId:int}/stock-groups")]
+        public async Task<IActionResult> GetAllProductStockGroupsAsync(
+            int productId,
+            [FromQuery] ProductStockGroupSpecParams specParams)
+        {
+            return FromResponse(
+                await _inventoryService.GetAllProductStockGroupsAsync(productId, specParams));
+        }
     }
 }

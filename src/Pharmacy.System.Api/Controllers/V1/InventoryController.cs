@@ -50,5 +50,13 @@ namespace Pharmacy.System.Api.Controllers.V1
             return FromResponse(
                 await _inventoryItemService.GetAllAsync(specParams));
         }
+
+        [HttpGet("inventory-items/{Id}")]
+        public async Task<IActionResult> GetInventoryItemByIdAsync(int Id)
+        {
+            return FromResponse(
+                await _inventoryItemService.GetByIdAsync(Id));
+        }
+
     }
 }

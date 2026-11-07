@@ -1,6 +1,7 @@
 ﻿using Asp.Versioning;
 using Microsoft.AspNetCore.Mvc;
 using Pharmacy.System.Services.IServices;
+using Pharmacy.System.Services.Services;
 using Pharmacy.System.Services.SpecificationParams;
 using System.Threading.Tasks;
 
@@ -10,9 +11,13 @@ namespace Pharmacy.System.Api.Controllers.V1
     public class InventoryController : BaseController
     {
         private readonly IInventoryService _inventoryService;
-        public InventoryController(IInventoryService inventoryService)
+        private readonly IInventoryItemService _inventoryItemService;
+        public InventoryController(
+            IInventoryService inventoryService,
+            IInventoryItemService inventoryItemService)
         {
             _inventoryService = inventoryService;
+            _inventoryItemService = inventoryItemService;
         }
 
 
@@ -37,6 +42,13 @@ namespace Pharmacy.System.Api.Controllers.V1
         {
             return FromResponse(
                 await _inventoryService.GetProductStockGroupsAsync(productId, specParams));
+        }
+
+        [HttpGet("inventory-items")]
+        public async Task<IActionResult> GetAllInventoryItemsAsync([FromQuery] InventoryItemSpecParams specParams)
+        {
+            return FromResponse(
+                await _inventoryItemService.GetAllAsync(specParams));
         }
     }
 }

@@ -15,6 +15,8 @@ using Pharmacy.System.Core.Dtos.SupplyInstallmentDtos;
 using Pharmacy.System.Core.Dtos.SupplyPaymentDtos;
 using Pharmacy.System.Core.Dtos.InventoryDtos;
 using System;
+using Pharmacy.System.Core.Dtos.InventoryItemDtos;
+using Pharmacy.System.Core.Extensions;
 
 namespace Pharmacy.System.Services.ApplicatoinServicesConfig
 {
@@ -162,6 +164,12 @@ namespace Pharmacy.System.Services.ApplicatoinServicesConfig
                 .Map(dest => dest.RemainingQuantitySellingPrice, src => src.OnHandBaseUnits * src.PricePerBaseUnits)
                 .Map(dest => dest.SupplierName, src => src.SupplyItem.Supply.Supplier.Name)
                 .Map(dest => dest.ExpiryDate, src => src.ProductBatch.ExpiryDate);
+
+            TypeAdapterConfig<InventoryItem, InventoryItemDetailsDto>
+                .NewConfig()
+                .Map(dest=>dest.RemainingQuantity, src=>src.CalculateQuantity(true, null))
+                .Map(dest=>dest.ReceivedQuantity, src=>src.CalculateQuantity(false, null))
+                .Map(dest => dest.RemainingQuantitySellingPrice, src => src.OnHandBaseUnits * src.PricePerBaseUnits);
         }
     }
 }

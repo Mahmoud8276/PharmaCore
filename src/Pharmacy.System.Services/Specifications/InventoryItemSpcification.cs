@@ -14,6 +14,12 @@ namespace Pharmacy.System.Services.Specifications
             if (!isCount)
             {
                 AddInclude(x => x.Product);
+                AddInclude(x => x.SupplyItem);
+                AddInclude(x => x.Product.Manufacturer);
+                AddInclude(x => x.Product.ProductForm);
+                AddInclude("Product.ProductForm.BaseUnit");
+                AddInclude(x => x.Product.ProductActiveIngredients);
+                AddInclude("Product.ProductActiveIngredients.ActiveIngredient");
                 AddInclude(x => x.Product.Category);
                 AddInclude(x => x.Product.Barcodes);
                 AddInclude(x => x.Repository);
@@ -29,6 +35,12 @@ namespace Pharmacy.System.Services.Specifications
             : base(x=>x.Id == InventoryItemId)
         {
             AddInclude(x => x.Product);
+            AddInclude(x => x.SupplyItem);
+            AddInclude(x => x.Product.Manufacturer);
+            AddInclude(x => x.Product.ProductForm);
+            AddInclude("Product.ProductForm.BaseUnit");
+            AddInclude(x => x.Product.ProductActiveIngredients);
+            AddInclude("Product.ProductActiveIngredients.ActiveIngredient");
             AddInclude(x => x.Product.Category);
             AddInclude(x => x.Product.Barcodes);
             AddInclude(x => x.Repository);

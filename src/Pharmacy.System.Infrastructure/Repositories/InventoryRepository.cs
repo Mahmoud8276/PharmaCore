@@ -9,11 +9,10 @@ using Pharmacy.System.Core.Interfaces.IRepositories;
 using Pharmacy.System.Core.Interfaces.ISpecificationParams;
 using Pharmacy.System.Core.Models;
 using Pharmacy.System.Infrastructure.DbContexts;
-using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
+using Pharmacy.System.Core.Extensions;
 
 namespace Pharmacy.System.Infrastructure.Repositories
 {
@@ -24,90 +23,6 @@ namespace Pharmacy.System.Infrastructure.Repositories
         {
             _context = context;
         }
-
-
-        /// <summary>
-        /// Converts inventory quantities from base units into a readable multi-level
-        /// packaging representation.
-        /// </summary>
-        /// <remarks>
-        /// Uses each inventory item's <see cref="SupplyItem.PackagingLevelsSnapshot"/>
-        /// rather than the product's current packaging configuration. Levels are applied
-        /// from largest to smallest. Quantities with the same unit name are combined across
-        /// the supplied items. Any remainder is expressed in the specified base unit, or
-        /// the product form's base unit when no override is supplied.
-        /// </remarks>
-        /// <param name="inventoryItems">Inventory items whose quantities should be formatted.</param>
-        /// <param name="remaining">
-        /// <see langword="true"/> formats <see cref="InventoryItem.OnHandBaseUnits"/>;
-        /// <see langword="false"/> formats <see cref="InventoryItem.ReceivedBaseUnits"/>.
-        /// </param>
-        /// <param name="baseUnit">Optional name to use for the remaining base units.</param>
-        /// <returns>A string such as <c>10 boxes + 5 strips + 20 tablets</c>; an empty string if no positive quantity is found.</returns>
-        private static string CalculateQuantity(
-            IEnumerable<InventoryItem> inventoryItems,
-            bool remaining = true,
-            string baseUnit = null)
-        {
-            var quantities = new Dictionary<string, decimal>(
-                StringComparer.OrdinalIgnoreCase);
-
-            foreach (var item in inventoryItems)
-            {
-                var units = remaining? item.OnHandBaseUnits : item.ReceivedBaseUnits;
-
-                var packagingLevels = item.SupplyItem.PackagingLevelsSnapshot?
-                    .Where(x =>
-                        x.QuantityOfBaseUnit > 0 &&
-                        !string.IsNullOrWhiteSpace(x.UnitName))
-                    .OrderByDescending(x => x.QuantityOfBaseUnit)
-                    .ToList() ?? new();
-
-                foreach (var level in packagingLevels)
-                {
-                    var quantity = decimal.Floor(
-                        units / level.QuantityOfBaseUnit);
-
-                    if (quantity <= 0)
-                        continue;
-
-                    var unitName = level.UnitName.Trim();
-
-                    if (!quantities.ContainsKey(unitName))
-                        quantities[unitName] = 0;
-
-                    quantities[unitName] += quantity;
-
-                    units -= quantity * level.QuantityOfBaseUnit;
-                }
-
-                // Remaining base units
-                var baseUnitName = baseUnit??
-                    item.Product.ProductForm.BaseUnit.Name;
-
-                if (units > 0)
-                {
-                    if (string.IsNullOrWhiteSpace(baseUnitName))
-                        baseUnitName = "Base units";
-
-                    baseUnitName = baseUnitName.Trim();
-
-                    if (!quantities.ContainsKey(baseUnitName))
-                        quantities[baseUnitName] = 0;
-
-                    quantities[baseUnitName] += units;
-                }
-            }
-
-            return string.Join(
-                " + ",
-                quantities
-                    .Where(x => x.Value > 0)
-                    .Select(x =>
-                        $"{x.Value.ToString("0.####", CultureInfo.InvariantCulture)} {x.Key}"));
-        }
-
-
 
         public async Task<Pagination> GetInventoryProductsAsync(IInventorySpecParams specParams)
         {
@@ -186,7 +101,7 @@ namespace Pharmacy.System.Infrastructure.Repositories
 
                     var totalBaseUnits = group.Sum(x => x.OnHandBaseUnits);
 
-                    var quantity = CalculateQuantity(group);
+                    var quantity = group.CalculateQuantities();
 
                     var status =
                         !product.MinimumStockLevel.HasValue ? InventoryStatus.Undefiend :
@@ -238,7 +153,7 @@ namespace Pharmacy.System.Infrastructure.Repositories
 
             // Calculate total quantity, and total selling price
             // TODO: Calculate total purchase cost
-            var totalQuantity = CalculateQuantity(items, true, product.ProductForm.BaseUnit.Name);
+            var totalQuantity = items.CalculateQuantities(true, product.ProductForm.BaseUnit.Name);
             var totalSellingPrice = items.Sum(x => x.OnHandBaseUnits * x.PricePerBaseUnits);
             var status = !product.MinimumStockLevel.HasValue? InventoryStatus.Undefiend :
                 items.Sum(x => x.OnHandBaseUnits) <= (decimal)product.MinimumStockLevel.Value
@@ -254,7 +169,7 @@ namespace Pharmacy.System.Infrastructure.Repositories
                     return new TotalQuantityPerRepositoryDetailsDto
                     {
                         Repository = repository.Adapt<RepositoryDetailsDto>(),
-                        Quantity = CalculateQuantity(group, true, product.ProductForm.BaseUnit.Name)
+                        Quantity = group.CalculateQuantities(true, product.ProductForm.BaseUnit.Name)
                     };
                 })
                 .ToList();
@@ -330,13 +245,11 @@ namespace Pharmacy.System.Infrastructure.Repositories
             foreach(var item in items)
             {
                 var dto = item.Adapt<ProductStockGroupDetails>();
-                dto.RemainingQuantity = CalculateQuantity(
-                    new List<InventoryItem> { item },
+                dto.RemainingQuantity = item.CalculateQuantity(
                     true,
                     product.ProductForm.BaseUnit.Name);
 
-                dto.ReceivedQuantity = CalculateQuantity(
-                    new List<InventoryItem> { item },
+                dto.ReceivedQuantity = item.CalculateQuantity(
                     false,
                     product.ProductForm.BaseUnit.Name);
                 result.Add(dto);

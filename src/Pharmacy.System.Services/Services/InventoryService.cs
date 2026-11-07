@@ -17,17 +17,17 @@ namespace Pharmacy.System.Services.Services
         }
 
 
-        public async Task<Response> GetAllAsync(InventorySpecParams specParams)
+        public async Task<Response> GetInventoryProductsAsync(InventorySpecParams specParams)
         {
             var pagination = await _unitOfWork.InventoryRepository
-                .GetAllInventoryDetailsWithSpecAsync(specParams);
+                .GetInventoryProductsAsync(specParams);
 
             return Response.Success(
                 message: "Inventory retrieved successfully",
                 data: pagination);
         }
 
-        public async Task<Response> GetByProductIdAsync(int productId)
+        public async Task<Response> GetProductInventoryOverviewAsync(int productId)
         {
             //Check if the product exists or not
             var product = await _unitOfWork.ProductRepository
@@ -41,10 +41,10 @@ namespace Pharmacy.System.Services.Services
             return Response.Success(
                 message: "Product stock details retrieved successfully",
                 data: await _unitOfWork.InventoryRepository
-                .GetProductStockDetailsAsync(product));
+                .GetProductInventoryOverviewAsync(product));
         }
 
-        public async Task<Response> GetAllProductStockGroupsAsync(int productId, ProductStockGroupSpecParams specParams)
+        public async Task<Response> GetProductStockGroupsAsync(int productId, ProductStockGroupSpecParams specParams)
         {
             //Check if the product exists or not
             var product = await _unitOfWork.ProductRepository
@@ -56,7 +56,7 @@ namespace Pharmacy.System.Services.Services
             }
 
             var result = await _unitOfWork.InventoryRepository
-                .GetProductStockGroupDetailsWithSpecAsync(product, specParams);
+                .GetProductStockGroupsAsync(product, specParams);
             return Response.Success(
                 message: "Product stock details retrieved successfully",
                 data: result);

@@ -17,26 +17,26 @@ namespace Pharmacy.System.Api.Controllers.V1
 
 
         [HttpGet]
-        public async Task<IActionResult> GetAll([FromQuery] InventorySpecParams specParams)
+        public async Task<IActionResult> GetInventoryProductsAsync([FromQuery] InventorySpecParams specParams)
         {
             return FromResponse(
-                await _inventoryService.GetAllAsync(specParams));
+                await _inventoryService.GetInventoryProductsAsync(specParams));
         }
 
         [HttpGet("products/{productId:int}")]
-        public async Task<IActionResult> GetByProductIdAsync(int productId)
+        public async Task<IActionResult> GetProductInventoryOverviewAsync(int productId)
         {
             return FromResponse(
-                await _inventoryService.GetByProductIdAsync(productId));
+                await _inventoryService.GetProductInventoryOverviewAsync(productId));
         }
 
         [HttpGet("products/{productId:int}/stock-groups")]
-        public async Task<IActionResult> GetAllProductStockGroupsAsync(
+        public async Task<IActionResult> GetProductStockGroupsAsync(
             int productId,
             [FromQuery] ProductStockGroupSpecParams specParams)
         {
             return FromResponse(
-                await _inventoryService.GetAllProductStockGroupsAsync(productId, specParams));
+                await _inventoryService.GetProductStockGroupsAsync(productId, specParams));
         }
     }
 }

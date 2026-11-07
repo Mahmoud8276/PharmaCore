@@ -25,6 +25,25 @@ namespace Pharmacy.System.Infrastructure.Repositories
             _context = context;
         }
 
+
+        /// <summary>
+        /// Converts inventory quantities from base units into a readable multi-level
+        /// packaging representation.
+        /// </summary>
+        /// <remarks>
+        /// Uses each inventory item's <see cref="SupplyItem.PackagingLevelsSnapshot"/>
+        /// rather than the product's current packaging configuration. Levels are applied
+        /// from largest to smallest. Quantities with the same unit name are combined across
+        /// the supplied items. Any remainder is expressed in the specified base unit, or
+        /// the product form's base unit when no override is supplied.
+        /// </remarks>
+        /// <param name="inventoryItems">Inventory items whose quantities should be formatted.</param>
+        /// <param name="remaining">
+        /// <see langword="true"/> formats <see cref="InventoryItem.OnHandBaseUnits"/>;
+        /// <see langword="false"/> formats <see cref="InventoryItem.ReceivedBaseUnits"/>.
+        /// </param>
+        /// <param name="baseUnit">Optional name to use for the remaining base units.</param>
+        /// <returns>A string such as <c>10 boxes + 5 strips + 20 tablets</c>; an empty string if no positive quantity is found.</returns>
         private static string CalculateQuantity(
             IEnumerable<InventoryItem> inventoryItems,
             bool remaining = true,
@@ -90,7 +109,7 @@ namespace Pharmacy.System.Infrastructure.Repositories
 
 
 
-        public async Task<Pagination> GetAllInventoryDetailsWithSpecAsync(IInventorySpecParams specParams)
+        public async Task<Pagination> GetInventoryProductsAsync(IInventorySpecParams specParams)
         {
             var items = _context.InventoryItems.AsNoTracking()
                 .Where(x => x.OnHandBaseUnits > 0);
@@ -191,7 +210,7 @@ namespace Pharmacy.System.Infrastructure.Repositories
                 groupedItems);
         }
 
-        public async Task<ProductStockDetailsDto> GetProductStockDetailsAsync(Product product)
+        public async Task<ProductStockDetailsDto> GetProductInventoryOverviewAsync(Product product)
         {
             // Return default values if the product is null
             if (product == null)
@@ -251,7 +270,7 @@ namespace Pharmacy.System.Infrastructure.Repositories
             };
         }
 
-        public async Task<Pagination> GetProductStockGroupDetailsWithSpecAsync(
+        public async Task<Pagination> GetProductStockGroupsAsync(
             Product product,
             IProductStockGroupSpecParams specParams)
         {

@@ -1,6 +1,5 @@
 ﻿using Pharmacy.System.Core.Dtos;
 using Pharmacy.System.Core.Dtos.InventoryDtos;
-using Pharmacy.System.Core.Enums;
 using Pharmacy.System.Core.Interfaces.ISpecificationParams;
 using Pharmacy.System.Core.Models;
 using System.Threading.Tasks;
@@ -9,47 +8,43 @@ namespace Pharmacy.System.Core.Interfaces.IRepositories
 {
     public interface IInventoryRepository
     {
-        /// <summary>
-        /// Retrieves a paginated, product-level view of the inventory, filtered by the
-        /// supplied specification parameters.
-        /// </summary>
-        /// <param name="specParams">
-        /// The specification parameters that control filtering and paging:
-        /// <list type="bullet">
-        ///   <item><description><c>RepositoryId</c>: only include stock held in this repository.</description></item>
-        ///   <item><description><c>CategoryId</c>: only include products in this category.</description></item>
-        ///   <item><description><c>Name</c>: only include products whose name contains this text.</description></item>
-        ///   <item><description><c>Barcode</c>: only include products having this exact barcode.</description></item>
-        ///   <item><description><c>PageIndex</c> / <c>PageSize</c>: 1-based page number and page size.</description></item>
-        /// </list>
-        /// </param>
-        /// <returns>
-        /// A <see cref="Pagination"/> object whose <c>Data</c> is a list of
-        /// <see cref="InventoryRowDetailsDto"/> (one row per product, ordered by product name),
-        /// and whose <c>Count</c> is the total number of distinct products that match the
-        /// filters (not the number of rows on the current page). If the requested page contains
-        /// no products, <c>Data</c> is an empty list.
-        /// </returns>
+        /// <summary>Gets a paginated list of distinct products that currently have stock.</summary>
         /// <remarks>
-        /// <para>
-        /// Only inventory batches with <c>OnHandBaseUnits &gt; 0</c> are considered.
-        /// </para>
-        /// <para>
-        /// The method works in two steps: it first pages over the distinct product IDs
-        /// so that paging is applied per product rather than per batch, then loads all
-        /// batches of those products (with their related data) and groups them by product.
-        /// </para>
-        /// <para>
-        /// For each product, the total on-hand base units across all batches is summed and
-        /// compared with <c>Product.MinimumStockLevel</c>. The row's status is
-        /// <see cref="InventoryStatus.Low"/> if the total is less than or equal to the minimum
-        /// stock level, and <see cref="InventoryStatus.Normal"/> otherwise (including when no
-        /// minimum is configured). The displayed quantity is produced by
-        /// <see cref="CalculateQuantity(IEnumerable{InventoryItem})"/>.
-        /// </para>
+        /// Excludes inventory items with zero on-hand quantity. Supports filtering by
+        /// repository, category, product name, and barcode. Products are grouped across
+        /// their batches and repositories, and each result contains product details,
+        /// aggregated on-hand quantity, and stock status. Status is undefined when the
+        /// product has no configured minimum stock level.
         /// </remarks>
-        public Task<Pagination> GetAllInventoryDetailsWithSpecAsync(IInventorySpecParams specParams);
-        public Task<ProductStockDetailsDto> GetProductStockDetailsAsync(Product product);
-        public Task<Pagination> GetProductStockGroupDetailsWithSpecAsync(Product product, IProductStockGroupSpecParams specParams);
+        /// <param name="specParams">Filter and paging criteria. <c>PageIndex</c> is one-based.</param>
+        /// <returns>A <see cref="Pagination"/> containing inventory rows and the total number of distinct matching products before paging.</returns>
+        public Task<Pagination> GetInventoryProductsAsync(IInventorySpecParams specParams);
+
+
+        /// <summary>Gets the overall stock summary for a product across all repositories.</summary>
+        /// <remarks>
+        /// Includes total on-hand quantity, stock status, quantity per repository, and
+        /// total selling value. Quantity formatting uses each supply item's packaging
+        /// snapshot. Items without on-hand stock are excluded. If the product is null
+        /// or has no matching stock, the returned DTO uses <c>--</c> for total quantity.
+        /// Total purchase cost is not implemented yet and is currently returned as zero.
+        /// </remarks>
+        /// <param name="product">The product to summarize.</param>
+        /// <returns>A <see cref="ProductStockDetailsDto"/> containing the product's stock overview.</returns>
+        public Task<ProductStockDetailsDto> GetProductInventoryOverviewAsync(Product product);
+
+
+        /// <summary>Gets a paginated list of the stock groups belonging to a product.</summary>
+        /// <remarks>
+        /// Includes only stock groups with positive on-hand quantity. Supports filtering
+        /// by repository, supplier, batch number, and expiry-date range. Results are
+        /// ordered by expiry date and then batch number, with earliest expiry first.
+        /// Each DTO contains remaining and originally received quantities formatted using
+        /// the packaging snapshot for that inventory item's supply record.
+        /// </remarks>
+        /// <param name="product">The product whose stock groups should be retrieved.</param>
+        /// <param name="specParams">Filter and paging criteria. Expiry-date bounds are inclusive; <c>PageIndex</c> is one-based.</param>
+        /// <returns>A <see cref="Pagination"/> containing the requested stock-group page and the total number of filtered groups.</returns>
+        public Task<Pagination> GetProductStockGroupsAsync(Product product, IProductStockGroupSpecParams specParams);
     }
 }

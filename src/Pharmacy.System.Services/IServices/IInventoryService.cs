@@ -6,8 +6,8 @@ namespace Pharmacy.System.Services.IServices
 {
     public interface IInventoryService
     {
-        public Task<Response> GetAllAsync(InventorySpecParams specParams);
-        public Task<Response> GetByProductIdAsync(int productId);
-        public Task<Response> GetAllProductStockGroupsAsync(int productId, ProductStockGroupSpecParams specParams);
+        public Task<Response> GetInventoryProductsAsync(InventorySpecParams specParams);
+        public Task<Response> GetProductInventoryOverviewAsync(int productId);
+        public Task<Response> GetProductStockGroupsAsync(int productId, ProductStockGroupSpecParams specParams);
     }
 }

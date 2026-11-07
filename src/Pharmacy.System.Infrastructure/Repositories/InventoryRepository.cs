@@ -240,26 +240,11 @@ namespace Pharmacy.System.Infrastructure.Repositories
                 .Take(specParams.PageSize)
                 .ToListAsync();
 
-
-            List<ProductStockGroupDetails> result = new();
-            foreach(var item in items)
-            {
-                var dto = item.Adapt<ProductStockGroupDetails>();
-                dto.RemainingQuantity = item.CalculateQuantity(
-                    true,
-                    product.ProductForm.BaseUnit.Name);
-
-                dto.ReceivedQuantity = item.CalculateQuantity(
-                    false,
-                    product.ProductForm.BaseUnit.Name);
-                result.Add(dto);
-            }
-
             return new Pagination(
                 specParams.PageIndex,
                 specParams.PageSize,
                 totalCount,
-                result);
+                items.Adapt<List<ProductStockGroupDetails>>());
         }
     }
 }

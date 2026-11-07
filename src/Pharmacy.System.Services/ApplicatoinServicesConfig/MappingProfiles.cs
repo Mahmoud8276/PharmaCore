@@ -163,7 +163,9 @@ namespace Pharmacy.System.Services.ApplicatoinServicesConfig
                 .Map(dest => dest.TotalPurchaseCost, src => 0) //TODO: update it when you finish the purchase cost workflow
                 .Map(dest => dest.RemainingQuantitySellingPrice, src => src.OnHandBaseUnits * src.PricePerBaseUnits)
                 .Map(dest => dest.SupplierName, src => src.SupplyItem.Supply.Supplier.Name)
-                .Map(dest => dest.ExpiryDate, src => src.ProductBatch.ExpiryDate);
+                .Map(dest => dest.ExpiryDate, src => src.ProductBatch.ExpiryDate)
+                .Map(dest => dest.RemainingQuantity, src => src.CalculateQuantity(true, null))
+                .Map(dest => dest.ReceivedQuantity, src => src.CalculateQuantity(false, null));
 
             TypeAdapterConfig<InventoryItem, InventoryItemDetailsDto>
                 .NewConfig()

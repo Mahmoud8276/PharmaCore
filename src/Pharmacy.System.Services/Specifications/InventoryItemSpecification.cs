@@ -6,9 +6,9 @@ using System.Linq.Expressions;
 
 namespace Pharmacy.System.Services.Specifications
 {
-    public class InventoryItemSpcification : BaseSpecification<InventoryItem, int>
+    public class InventoryItemSpecification : BaseSpecification<InventoryItem, int>
     {
-        public InventoryItemSpcification(IInventoryItemSpecParams specParams, bool isCount = false)
+        public InventoryItemSpecification(IInventoryItemSpecParams specParams, bool isCount = false)
             : base(BuildCriteria(specParams))
         {
             if (!isCount)
@@ -31,7 +31,7 @@ namespace Pharmacy.System.Services.Specifications
             }
         }
 
-        public InventoryItemSpcification(int InventoryItemId)
+        public InventoryItemSpecification(int InventoryItemId)
             : base(x=>x.Id == InventoryItemId)
         {
             AddInclude(x => x.Product);

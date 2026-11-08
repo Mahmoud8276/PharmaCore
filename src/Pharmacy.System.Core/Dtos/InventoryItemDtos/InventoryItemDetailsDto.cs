@@ -13,5 +13,6 @@ namespace Pharmacy.System.Core.Dtos.InventoryItemDtos
         public string ReceivedQuantity { get; set; }
         public string RemainingQuantity { get; set; }
         public decimal RemainingQuantitySellingPrice { get; set; }
+        public decimal TotalPurchaseCost { get; set; }
     }
 }

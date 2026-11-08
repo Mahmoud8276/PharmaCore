@@ -137,7 +137,7 @@ namespace Pharmacy.System.Services.Services
                 supplyItem.BaseUnitsPerReceivedUnit = packagingLevel.QuantityOfBaseUnit;
                 supplyItem.TotalBaseUnits = supplyItem.BaseUnitsPerReceivedUnit * item.Quantity;
                 supplyItem.UnitName = packagingLevel.PackagingUnit.Name;
-                supplyItem.EffectiveUnitCost = item.PricePerUnit * (1 - (dto.DiscountPercentage ?? 0) / 100m);
+                supplyItem.EffectiveUnitCost = item.PurchaseCostPerReceivedUnit * (1 - (dto.DiscountPercentage ?? 0) / 100m);
                 supplyItem.Product = product;
                 supplyItem.ProductSnapshot = product.Adapt<ProductSnapshot>();
                 supplyItem.PackagingLevel = packagingLevel;

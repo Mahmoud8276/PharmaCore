@@ -9,9 +9,10 @@ namespace Pharmacy.System.Infrastructure.ModelsConfig
         public void Configure(EntityTypeBuilder<SupplyItem> builder)
         {
             builder.Property(x => x.Quantity).HasPrecision(18, 4);
-            builder.Property(x => x.PricePerUnit).HasPrecision(18, 4);
+            builder.Property(x => x.SellingPricePerReceivedUnit).HasPrecision(18, 4);
             builder.Property(x => x.BaseUnitsPerReceivedUnit).HasPrecision(18, 4);
             builder.Property(x => x.EffectiveUnitCost).HasPrecision(18, 4);
+            builder.Property(x => x.PurchaseCostPerReceivedUnit).HasPrecision(18, 4);
             
             builder.HasOne(x => x.Supply)
                    .WithMany(y => y.Items)

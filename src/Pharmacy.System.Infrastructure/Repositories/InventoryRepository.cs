@@ -154,7 +154,8 @@ namespace Pharmacy.System.Infrastructure.Repositories
             // Calculate total quantity, and total selling price
             // TODO: Calculate total purchase cost
             var totalQuantity = items.CalculateQuantities(true, product.ProductForm.BaseUnit.Name);
-            var totalSellingPrice = items.Sum(x => x.OnHandBaseUnits * x.PricePerBaseUnits);
+            var totalSellingPrice = items.Sum(x => x.ReceivedBaseUnits * x.SellingPricePerBaseUnit);
+            var totalPurchaseCose = items.Sum(x => x.ReceivedBaseUnits * x.PurchaseCostPerBaseUnit);
             var status = !product.MinimumStockLevel.HasValue? InventoryStatus.Undefiend :
                 items.Sum(x => x.OnHandBaseUnits) <= (decimal)product.MinimumStockLevel.Value
                     ? InventoryStatus.Low
@@ -180,7 +181,7 @@ namespace Pharmacy.System.Infrastructure.Repositories
                 TotalQuantity = totalQuantity,
                 Status = status,
                 QuantityPerRepository = quantityPerRepository,
-                TotalPurchaseCost = 0, // TODO: Calculate total purchase cost
+                TotalPurchaseCost = totalPurchaseCose, 
                 TotalSellingPrice = totalSellingPrice
             };
         }

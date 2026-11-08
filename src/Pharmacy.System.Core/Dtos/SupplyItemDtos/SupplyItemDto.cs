@@ -11,10 +11,15 @@ namespace Pharmacy.System.Core.Dtos.SupplyItemDtos
         public decimal Quantity { get; set; }
         
         
-        [Required(ErrorMessage = "Product Unit Price Is Rquired!")]
+        [Required(ErrorMessage = "Product Unit SellingPrice Is Rquired!")]
         [Range(typeof(decimal), "0.01", "79228162514264337593543950335",
         ErrorMessage = "Price must be greater than zero.")]
-        public decimal PricePerUnit { get; set; }
+        public decimal SellingPricePerReceivedUnit { get; set; }
+        
+        [Required(ErrorMessage = "Product Unit Purchase Cost Is Rquired!")]
+        [Range(typeof(decimal), "0.01", "79228162514264337593543950335",
+        ErrorMessage = "Purchase cost must be greater than zero.")]
+        public decimal PurchaseCostPerReceivedUnit { get; set; }
         
 
         [Required(ErrorMessage = "Product Id Is Rquired!")]

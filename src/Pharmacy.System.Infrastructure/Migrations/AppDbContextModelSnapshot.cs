@@ -279,21 +279,25 @@ namespace Pharmacy.System.Infrastructure.Migrations
                     b.Property<decimal>("OnHandBaseUnits")
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<decimal>("PricePerBaseUnits")
-                        .HasPrecision(18, 4)
-                        .HasColumnType("decimal(18,4)");
-
                     b.Property<int>("ProductBatchId")
                         .HasColumnType("int");
 
                     b.Property<int>("ProductId")
                         .HasColumnType("int");
 
+                    b.Property<decimal>("PurchaseCostPerBaseUnit")
+                        .HasPrecision(18, 4)
+                        .HasColumnType("decimal(18,4)");
+
                     b.Property<decimal>("ReceivedBaseUnits")
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<int>("RepositoryId")
                         .HasColumnType("int");
+
+                    b.Property<decimal>("SellingPricePerBaseUnit")
+                        .HasPrecision(18, 4)
+                        .HasColumnType("decimal(18,4)");
 
                     b.Property<int>("SupplyItemId")
                         .HasColumnType("int");
@@ -791,17 +795,21 @@ namespace Pharmacy.System.Infrastructure.Migrations
                     b.Property<int?>("PackagingLevelId")
                         .HasColumnType("int");
 
-                    b.Property<decimal>("PricePerUnit")
-                        .HasPrecision(18, 4)
-                        .HasColumnType("decimal(18,4)");
-
                     b.Property<int>("ProductBatchId")
                         .HasColumnType("int");
 
                     b.Property<int?>("ProductId")
                         .HasColumnType("int");
 
+                    b.Property<decimal>("PurchaseCostPerReceivedUnit")
+                        .HasPrecision(18, 4)
+                        .HasColumnType("decimal(18,4)");
+
                     b.Property<decimal>("Quantity")
+                        .HasPrecision(18, 4)
+                        .HasColumnType("decimal(18,4)");
+
+                    b.Property<decimal>("SellingPricePerReceivedUnit")
                         .HasPrecision(18, 4)
                         .HasColumnType("decimal(18,4)");
 

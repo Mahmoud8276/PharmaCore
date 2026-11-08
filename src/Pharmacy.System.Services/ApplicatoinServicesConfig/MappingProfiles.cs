@@ -90,9 +90,9 @@ namespace Pharmacy.System.Services.ApplicatoinServicesConfig
             TypeAdapterConfig<SupplyDto, Supply>
                 .NewConfig()
                 .Ignore(dest => dest.Items)
-                .Map(dest => dest.TotalCost, src => src.Items.Sum(x => x.Quantity * x.PricePerUnit))
+                .Map(dest => dest.TotalCost, src => src.Items.Sum(x => x.Quantity * x.PurchaseCostPerReceivedUnit))
                 .Map(dest => dest.DiscountPercentage, src => src.DiscountPercentage ?? 0)
-                .Map(dest => dest.FinalCost, src => src.Items.Sum(x => x.Quantity * x.PricePerUnit)
+                .Map(dest => dest.FinalCost, src => src.Items.Sum(x => x.Quantity * x.PurchaseCostPerReceivedUnit)
                                                         * (1 - (src.DiscountPercentage ?? 0) / 100m))
                 .Map(dest => dest.ReceivedAt, src => src.ReceivedAt)
                 .Map(dest => dest.SupplierId, src => src.SupplierId)
@@ -107,7 +107,6 @@ namespace Pharmacy.System.Services.ApplicatoinServicesConfig
             TypeAdapterConfig<SupplyItemDto, SupplyItem>
                 .NewConfig()
                 .Map(dest => dest.Quantity, src => src.Quantity)
-                .Map(dest => dest.PricePerUnit, src => src.PricePerUnit)
                 .Map(dest => dest.ProductBatchId, src => src.ProductBatchId)
                 .Map(dest => dest.ProductId, src => src.ProductId)
                 .Map(dest => dest.PackagingLevelId, src => src.PackagingLevelId);
@@ -147,7 +146,8 @@ namespace Pharmacy.System.Services.ApplicatoinServicesConfig
                 .Map(dest => dest.ProductBatchId, src => src.ProductBatchId)
                 .Map(dest => dest.ReceivedBaseUnits, src => src.BaseUnitsPerReceivedUnit * src.Quantity)
                 .Map(dest => dest.OnHandBaseUnits, src => src.BaseUnitsPerReceivedUnit * src.Quantity)
-                .Map(dest => dest.PricePerBaseUnits, src => src.EffectiveUnitCost / src.BaseUnitsPerReceivedUnit);
+                .Map(dest => dest.SellingPricePerBaseUnit, src => src.SellingPricePerReceivedUnit / src.BaseUnitsPerReceivedUnit)
+                .Map(dest => dest.PurchaseCostPerBaseUnit, src => src.EffectiveUnitCost / src.BaseUnitsPerReceivedUnit);
 
             TypeAdapterConfig<SupplyInstallment, SupplyInstallmentDetailsDto>
                 .NewConfig()
@@ -160,8 +160,8 @@ namespace Pharmacy.System.Services.ApplicatoinServicesConfig
                 .Map(dest => dest.ProductBarcodes, src => src.Product.Barcodes.Select(x => x.Barcode))
                 .Map(dest => dest.RepositoryName, src => src.Repository.Name)
                 .Map(dest => dest.ReminingDaysToExpiry, src => Math.Max((src.ProductBatch.ExpiryDate.ToDateTime(new TimeOnly()) - DateTime.Today).Days, 0))
-                .Map(dest => dest.TotalPurchaseCost, src => 0) //TODO: update it when you finish the purchase cost workflow
-                .Map(dest => dest.RemainingQuantitySellingPrice, src => src.OnHandBaseUnits * src.PricePerBaseUnits)
+                .Map(dest => dest.TotalPurchaseCost, src => src.ReceivedBaseUnits * src.PurchaseCostPerBaseUnit)
+                .Map(dest => dest.RemainingQuantitySellingPrice, src => src.OnHandBaseUnits * src.SellingPricePerBaseUnit)
                 .Map(dest => dest.SupplierName, src => src.SupplyItem.Supply.Supplier.Name)
                 .Map(dest => dest.ExpiryDate, src => src.ProductBatch.ExpiryDate)
                 .Map(dest => dest.RemainingQuantity, src => src.CalculateQuantity(true, null))
@@ -169,9 +169,10 @@ namespace Pharmacy.System.Services.ApplicatoinServicesConfig
 
             TypeAdapterConfig<InventoryItem, InventoryItemDetailsDto>
                 .NewConfig()
-                .Map(dest=>dest.RemainingQuantity, src=>src.CalculateQuantity(true, null))
-                .Map(dest=>dest.ReceivedQuantity, src=>src.CalculateQuantity(false, null))
-                .Map(dest => dest.RemainingQuantitySellingPrice, src => src.OnHandBaseUnits * src.PricePerBaseUnits);
+                .Map(dest => dest.RemainingQuantity, src => src.CalculateQuantity(true, null))
+                .Map(dest => dest.ReceivedQuantity, src => src.CalculateQuantity(false, null))
+                .Map(dest => dest.RemainingQuantitySellingPrice, src => src.OnHandBaseUnits * src.SellingPricePerBaseUnit)
+                .Map(dest => dest.TotalPurchaseCost, src => src.ReceivedBaseUnits * src.PurchaseCostPerBaseUnit);
         }
     }
 }

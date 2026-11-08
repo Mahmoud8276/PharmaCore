@@ -21,7 +21,8 @@ namespace Pharmacy.System.Core.Models
 
         public decimal ReceivedBaseUnits { get; set; } 
         public decimal OnHandBaseUnits { get; set; }
-        public decimal PricePerBaseUnits { get; set; }
+        public decimal SellingPricePerBaseUnit { get; set; }
+        public decimal PurchaseCostPerBaseUnit { get; set; }
 
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
